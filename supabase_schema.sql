@@ -15,8 +15,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- -------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.settings (
     id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-    phone TEXT NOT NULL DEFAULT '9542439498',
-    whatsapp_number TEXT NOT NULL DEFAULT '919542439498',
+    phone TEXT NOT NULL DEFAULT '6302690251',
+    whatsapp_number TEXT NOT NULL DEFAULT '916302690251',
     default_whatsapp_message TEXT NOT NULL DEFAULT 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.',
     tagline TEXT NOT NULL DEFAULT 'Build • Automate • Grow',
     secondary_tagline TEXT NOT NULL DEFAULT 'Smart Technology for a Stronger Tomorrow',
@@ -332,8 +332,8 @@ INSERT INTO public.settings (
     id, phone, whatsapp_number, default_whatsapp_message, tagline, secondary_tagline, location, instagram_url, youtube_url
 ) VALUES (
     1,
-    '9542439498',
-    '919542439498',
+    '6302690251',
+    '916302690251',
     'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.',
     'Build • Automate • Grow',
     'Smart Technology for a Stronger Tomorrow',
@@ -413,12 +413,12 @@ INSERT INTO public.packages (domain_id, name, price, features, is_popular, sort_
 
 -- 5. Insert Projects
 INSERT INTO public.projects (title, domain_id, client_category, description, technologies, metrics, link, image_url, sort_order, is_active) VALUES
-('Reddy Multi-Specialty Dental Clinic', 'web', 'Healthcare & Clinics', 'Modern showcase website with online WhatsApp appointment booking and treatment price charts.', ARRAY['React', 'Vite', 'Cloud Hosting', 'SEO'], '3x WhatsApp appointments in 30 days', 'https://wa.me/919542439498', '/projects/clinic-web.svg', 1, true),
-('Sri Lakshmi Silks & Sarees POS Billing App', 'app', 'Retail Clothing & Textiles', 'Fast barcode billing and customer credit (udhar) tracker with thermal printing and SMS alerts.', ARRAY['Flutter', 'PostgreSQL', 'Thermal Bluetooth API'], 'Saved ₹18,000/mo in bookkeeping fees', 'https://wa.me/919542439498', '/projects/saree-app.svg', 2, true),
-('Varma Logistics 24/7 AI WhatsApp Dispatcher', 'ai', 'Logistics & Cargo', 'Intelligent WhatsApp auto-responder providing instant freight freight quotes and driver status.', ARRAY['Python', 'FastAPI', 'WhatsApp Cloud API', 'GPT-4o'], '35% higher booking rate after hours', 'https://wa.me/919542439498', '/projects/dispatch-ai.svg', 3, true),
-('Modern Home Interiors Showcase Portal', 'web', 'Interior Design & Architecture', 'High-resolution project gallery with cost calculator and customer lead capture.', ARRAY['React', 'CSS Modules', 'Supabase'], 'Over 80 qualified local leads generated', 'https://wa.me/919542439498', '/projects/interior-web.svg', 4, true),
-('SuperFresh Mart Grocery Delivery & Billing App', 'app', 'Supermarkets & Groceries', 'Android app with barcode scanner, inventory re-ordering, and delivery boy dispatch tracking.', ARRAY['React Native', 'Node.js', 'PostgreSQL'], '50% faster checkout during peak hours', 'https://wa.me/919542439498', '/projects/mart-app.svg', 5, true),
-('Apex Solar Solutions Lead Automation', 'ai', 'Renewable Energy', 'Automated solar quote generator syncing directly to Google Sheets and sending instant PDF proposals.', ARRAY['Make.com', 'Google Sheets API', 'WhatsApp Bot'], 'Response time reduced from 4 hours to 30 seconds', 'https://wa.me/919542439498', '/projects/solar-ai.svg', 6, true);
+('Reddy Multi-Specialty Dental Clinic', 'web', 'Healthcare & Clinics', 'Modern showcase website with online WhatsApp appointment booking and treatment price charts.', ARRAY['React', 'Vite', 'Cloud Hosting', 'SEO'], '3x WhatsApp appointments in 30 days', 'https://wa.me/916302690251', '/projects/clinic-web.svg', 1, true),
+('Sri Lakshmi Silks & Sarees POS Billing App', 'app', 'Retail Clothing & Textiles', 'Fast barcode billing and customer credit (udhar) tracker with thermal printing and SMS alerts.', ARRAY['Flutter', 'PostgreSQL', 'Thermal Bluetooth API'], 'Saved ₹18,000/mo in bookkeeping fees', 'https://wa.me/916302690251', '/projects/saree-app.svg', 2, true),
+('Varma Logistics 24/7 AI WhatsApp Dispatcher', 'ai', 'Logistics & Cargo', 'Intelligent WhatsApp auto-responder providing instant freight freight quotes and driver status.', ARRAY['Python', 'FastAPI', 'WhatsApp Cloud API', 'GPT-4o'], '35% higher booking rate after hours', 'https://wa.me/916302690251', '/projects/dispatch-ai.svg', 3, true),
+('Modern Home Interiors Showcase Portal', 'web', 'Interior Design & Architecture', 'High-resolution project gallery with cost calculator and customer lead capture.', ARRAY['React', 'CSS Modules', 'Supabase'], 'Over 80 qualified local leads generated', 'https://wa.me/916302690251', '/projects/interior-web.svg', 4, true),
+('SuperFresh Mart Grocery Delivery & Billing App', 'app', 'Supermarkets & Groceries', 'Android app with barcode scanner, inventory re-ordering, and delivery boy dispatch tracking.', ARRAY['React Native', 'Node.js', 'PostgreSQL'], '50% faster checkout during peak hours', 'https://wa.me/916302690251', '/projects/mart-app.svg', 5, true),
+('Apex Solar Solutions Lead Automation', 'ai', 'Renewable Energy', 'Automated solar quote generator syncing directly to Google Sheets and sending instant PDF proposals.', ARRAY['Make.com', 'Google Sheets API', 'WhatsApp Bot'], 'Response time reduced from 4 hours to 30 seconds', 'https://wa.me/916302690251', '/projects/solar-ai.svg', 6, true);
 
 -- 6. Insert Testimonials
 INSERT INTO public.testimonials (client_name, business, domain_id, rating, message, sort_order, is_active) VALUES

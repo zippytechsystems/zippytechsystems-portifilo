@@ -35,11 +35,11 @@ export const content = {
     name: 'Lingaswamy',
     role: 'Founder & Solutions Architect',
     bio: 'Direct technical guidance without middlemen or inflated agency fees. Experienced in building practical web platforms, business accounting apps, and AI automations for growing Indian enterprises.',
-    phone: '9542439498',
-    phoneFormatted: '+91 95424 39498',
-    phoneCall: '+919542439498',
-    whatsappNumber: '919542439498',
-    whatsappLink: 'https://wa.me/919542439498',
+    phone: '6302690251',
+    phoneFormatted: '+91 63026 90251',
+    phoneCall: '+916302690251',
+    whatsappNumber: '916302690251',
+    whatsappLink: 'https://wa.me/916302690251',
     email: 'contact@zippytechsystems.com'
   },
 

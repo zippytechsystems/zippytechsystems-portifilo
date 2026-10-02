@@ -14,7 +14,7 @@ A modern, high-performance portfolio website for **ZippyTechSystems Pvt. Ltd.**,
   - 📱 **App Development**: Green (`#12a150`), Starting from **₹10,000**
   - ⚡ **AI Automation**: Purple (`#7a2fd0`), Starting from **₹6,000**
   - 🟡 **Primary Highlights & CTA**: High-contrast Yellow (`#ffe500`)
-- **Direct Founder Line**: Direct access to founder & lead architect **Lingaswamy** (+91 95424 39498).
+- **Direct Founder Line**: Direct access to founder & lead architect **Lingaswamy** (+91 63026 90251).
 - **Zero-Backend WhatsApp Lead Flow**: Enquiry form automatically pre-fills project scope and opens WhatsApp directly in the browser or mobile app.
 - **Sticky Floating WhatsApp Button**: Always visible with one-click direct chat on every page.
 - **Dual Theme Support**: Seamless Light & Dark mode toggle with system preference detection and localStorage persistence.
@@ -143,10 +143,10 @@ export const content = {
   },
   founder: {
     name: 'Lingaswamy',
-    phone: '9542439498',
-    phoneFormatted: '+91 95424 39498',
-    whatsappNumber: '919542439498',
-    whatsappLink: 'https://wa.me/919542439498',
+    phone: '6302690251',
+    phoneFormatted: '+91 63026 90251',
+    whatsappNumber: '916302690251',
+    whatsappLink: 'https://wa.me/916302690251',
     // ...
   }
 };
@@ -286,7 +286,7 @@ VITE_SUPABASE_ANON_KEY=sb_publishable_G1oB1splS3Wb92LbNZ90pA_NAxOUXpC
 
 ### 2. Database Tables & Row-Level Security
 Run the SQL script provided in [`supabase_schema.sql`](./supabase_schema.sql) in your Supabase SQL Editor:
-- **`settings`**: Dynamic site key-value settings (phone `9542439498`, WhatsApp, taglines, social links).
+- **`settings`**: Dynamic site key-value settings (phone `6302690251`, WhatsApp, taglines, social links).
 - **`domains`**: Web, App, AI starting prices stored as pure numbers with live INR formatting.
 - **`services`**: Domain services (main and more offerings) with sort order and descriptions.
 - **`packages`**: Transparent pricing tiers, deliverables lists, and popular badges.
@@ -315,8 +315,8 @@ To allow prices to auto-update on visitors' screens without page reload:
 
 - **Company**: ZippyTechSystems Pvt. Ltd.
 - **Founder**: Lingaswamy
-- **Phone / Calling**: [+91 95424 39498](tel:+919542439498)
-- **WhatsApp**: [wa.me/919542439498](https://wa.me/919542439498)
+- **Phone / Calling**: [+91 63026 90251](tel:+916302690251)
+- **WhatsApp**: [wa.me/916302690251](https://wa.me/916302690251)
 - **Instagram**: [instagram.com/zippytechsystems](https://www.instagram.com/zippytechsystems)
 - **YouTube**: [youtube.com/@zippytechsystems](https://www.youtube.com/@zippytechsystems)
 - **Location**: Hyderabad, Telangana, India

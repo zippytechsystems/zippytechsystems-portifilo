@@ -13,7 +13,7 @@ export default function ContactSection() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const { saveEnquiry, settingsData } = useData();
+  const { saveEnquiry, settingsData, domainsData, formatINR } = useData();
 
   const activePhone = settingsData?.phone || content.founder.phone;
   const activePhoneFormatted = settingsData?.phoneFormatted || content.founder.phoneFormatted;
@@ -258,9 +258,19 @@ export default function ContactSection() {
                   onChange={handleChange}
                   className="form-select"
                 >
-                  <option value="Web Development (from ₹7,000)">Web Development (from ₹7,000)</option>
-                  <option value="App Development (from ₹10,000)">App Development (from ₹10,000)</option>
-                  <option value="AI Automation (from ₹6,000)">AI Automation (from ₹6,000)</option>
+                  {domainsData && domainsData.length > 0 ? (
+                    domainsData.map((d) => (
+                      <option key={d.key || d.id} value={`${d.name} (${d.price_label || 'from'} ${formatINR(d.starting_price)})`}>
+                        {d.name} ({d.price_label || 'from'} {formatINR(d.starting_price)})
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="Web Development (from ₹7,000)">Web Development (from ₹7,000)</option>
+                      <option value="App Development (from ₹10,000)">App Development (from ₹10,000)</option>
+                      <option value="AI Automation (from ₹6,000)">AI Automation (from ₹6,000)</option>
+                    </>
+                  )}
                   <option value="Complete Web + App + AI Package">Complete Web + App + AI Package</option>
                   <option value="Other / Custom Software Consulting">Other / Custom Software Consulting</option>
                 </select>
@@ -304,7 +314,7 @@ export default function ContactSection() {
                   marginBottom: 0
                 }}
               >
-                ⚡ No backend or database required — opens directly in your WhatsApp app or web.
+                ⚡ Saved to database &amp; opens directly in WhatsApp for instant response.
               </p>
             </form>
           </div>

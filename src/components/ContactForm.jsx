@@ -120,7 +120,7 @@ export default function ContactForm({ preselectedService = 'Web Development' }) 
             }}
           >
             <a
-              href={`https://wa.me/919542439498?text=${encodeURIComponent(
+              href={`https://wa.me/916302690251?text=${encodeURIComponent(
                 `Hello Lingaswamy, I just submitted an enquiry for ${formData.service} on your website. Name: ${formData.name}.`
               )}`}
               target="_blank"

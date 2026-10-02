@@ -1,12 +1,18 @@
 import React from 'react';
 import { MessageCircle, ArrowRight, ShieldCheck, Zap, BadgePercent, Headphones, CheckCircle2 } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
+import { useData } from '../context/DataContext';
 import DomainPreviewCards from './DomainPreviewCards';
 
 export default function Hero({ onOpenQuoteModal, onExploreServices }) {
-  const heroWhatsAppUrl = buildWhatsAppUrl(
-    'Hi Lingaswamy, I would like to get a quote for a website / app / AI automation for my business.'
-  );
+  const { settingsData } = useData();
+  const phone = settingsData?.phone || content.founder.phone;
+  const secondaryTagline = settingsData?.secondaryTagline || content.company.secondaryTagline;
+  const whatsappNum = (settingsData?.whatsappNumber || content.founder.whatsappNumber).replace(/[^0-9]/g, '');
+
+  const heroWhatsAppUrl = `https://wa.me/${whatsappNum.startsWith('91') ? whatsappNum : `91${whatsappNum}`}?text=${encodeURIComponent(
+    settingsData?.defaultWhatsAppMessage || 'Hi Lingaswamy, I would like to get a quote for a website / app / AI automation for my business.'
+  )}`;
 
   return (
     <section
@@ -65,7 +71,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               }}
             />
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)' }}>
-              Direct line to founder Lingaswamy: <span style={{ color: '#12a150' }}>{content.founder.phone}</span>
+              Direct line to founder Lingaswamy: <span style={{ color: '#12a150' }}>{phone}</span>
             </span>
           </div>
 
@@ -105,7 +111,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
           >
             {content.company.positioning}{' '}
             <strong style={{ color: 'var(--text-main)', fontWeight: 600 }}>
-              {content.company.secondaryTagline}.
+              {secondaryTagline}.
             </strong>
           </p>
 

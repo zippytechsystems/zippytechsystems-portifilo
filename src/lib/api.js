@@ -433,7 +433,7 @@ export async function getProjects() {
       shortDescription: p.description,
       technologies: Array.isArray(p.technologies) ? p.technologies : [],
       metrics: p.metrics || '',
-      link: p.link || 'https://wa.me/919542439498',
+      link: p.link || 'https://wa.me/916302690251',
       image: p.image_url || '/projects/clinic-web.svg',
       isActive: p.is_active
     }));
@@ -463,7 +463,7 @@ export async function createProjectApi(payload) {
           description: sanitizeString(payload.shortDescription || payload.description),
           technologies: techArray,
           metrics: sanitizeString(payload.metrics || ''),
-          link: payload.link || 'https://wa.me/919542439498',
+          link: payload.link || 'https://wa.me/916302690251',
           image_url: payload.image || payload.image_url || '/projects/clinic-web.svg',
           is_active: payload.isActive !== false
         }
