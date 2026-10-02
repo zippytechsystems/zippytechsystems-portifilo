@@ -176,6 +176,26 @@ export default function Navbar({ onOpenQuoteModal }) {
               </a>
             );
           })}
+
+          {/* Subtle Admin Link (far right, visually minor, muted grey, 12-13px) */}
+          <Link
+            to="/admin"
+            style={{
+              fontSize: '13px',
+              color: '#94a3b8',
+              textDecoration: 'none',
+              fontWeight: 500,
+              padding: '2px 4px',
+              marginLeft: '0.25rem',
+              transition: 'color var(--transition-fast)',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => (e.target.style.color = 'var(--text-main)')}
+            onMouseLeave={(e) => (e.target.style.color = '#94a3b8')}
+            title="Admin Portal"
+          >
+            Admin
+          </Link>
         </nav>
 
         {/* Right Action Cluster */}
@@ -319,6 +339,25 @@ export default function Navbar({ onOpenQuoteModal }) {
               <Phone size={15} color="#12a150" />
               <span>Call Lingaswamy: {content.founder.phoneFormatted}</span>
             </a>
+
+            {/* Subtle mobile Admin link at bottom */}
+            <div style={{ textAlign: 'center', paddingTop: '0.4rem' }}>
+              <Link
+                to="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  fontSize: '12px',
+                  color: '#94a3b8',
+                  textDecoration: 'none',
+                  fontWeight: 500,
+                  display: 'inline-block',
+                  padding: '4px 8px',
+                  opacity: 0.8
+                }}
+              >
+                Admin
+              </Link>
+            </div>
           </div>
         </div>
       )}

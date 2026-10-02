@@ -40,6 +40,24 @@ export function AdminAuthProvider({ children }) {
           sessionStorage.setItem('zippy_admin_user', JSON.stringify(session.user));
         }
       });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session) {
+          setIsAuthenticated(true);
+          setAdminUser(session.user);
+          sessionStorage.setItem('zippy_admin_logged_in', 'true');
+          sessionStorage.setItem('zippy_admin_user', JSON.stringify(session.user));
+        } else {
+          setIsAuthenticated(false);
+          setAdminUser(null);
+          sessionStorage.removeItem('zippy_admin_logged_in');
+          sessionStorage.removeItem('zippy_admin_user');
+        }
+      });
+
+      return () => {
+        subscription?.unsubscribe();
+      };
     }
   }, []);
 

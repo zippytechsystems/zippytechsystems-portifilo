@@ -272,6 +272,86 @@ export function DataProvider({ children }) {
     }
   };
 
+  // Edit Service Item
+  const editServiceItem = async (domainSlug, type, index, updatedItem) => {
+    const updated = servicesData.map((s) => {
+      if (s.slug !== domainSlug) return s;
+      if (type === 'main') {
+        const list = [...s.mainServices];
+        list[index] = { title: updatedItem.title, desc: updatedItem.desc || '' };
+        return { ...s, mainServices: list };
+      } else {
+        const list = [...s.moreServices];
+        list[index] = updatedItem.title;
+        return { ...s, moreServices: list };
+      }
+    });
+    persistServices(updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('services').update({
+          title: updatedItem.title,
+          description: updatedItem.desc || ''
+        }).eq('domain_id', domainSlug).eq('type', type);
+      } catch (e) {}
+    }
+  };
+
+  // Reorder Service Items (Move Up / Down)
+  const reorderServiceItems = async (domainSlug, type, index, direction) => {
+    const targetDomain = servicesData.find((s) => s.slug === domainSlug);
+    if (!targetDomain) return;
+
+    const list = type === 'main' ? [...targetDomain.mainServices] : [...targetDomain.moreServices];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= list.length) return;
+
+    const [moved] = list.splice(index, 1);
+    list.splice(newIndex, 0, moved);
+
+    const updated = servicesData.map((s) => {
+      if (s.slug !== domainSlug) return s;
+      return type === 'main' ? { ...s, mainServices: list } : { ...s, moreServices: list };
+    });
+    persistServices(updated);
+  };
+
+  // Image Upload helper (Supabase storage with local Data URL fallback)
+  const uploadProjectImage = async (file) => {
+    if (!file) return null;
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('portfolio-images')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data } = supabase.storage
+            .from('portfolio-images')
+            .getPublicUrl(filePath);
+          if (data?.publicUrl) {
+            return data.publicUrl;
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase storage upload error, using local fallback:', err);
+      }
+    }
+
+    // Local Data URL fallback
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = (e) => reject(e);
+      reader.readAsDataURL(file);
+    });
+  };
+
   // 3. Project Management
   const addProject = async (project) => {
     const newProj = {
@@ -306,6 +386,45 @@ export function DataProvider({ children }) {
         });
       } catch (e) {
         console.error('Supabase project insert error:', e);
+      }
+    }
+  };
+
+  const editProject = async (id, updatedFields) => {
+    const updated = projectsData.map((p) => {
+      if (p.id !== id) return p;
+      return {
+        ...p,
+        ...updatedFields,
+        domainColor:
+          (updatedFields.domain || p.domain) === 'web'
+            ? '#1d5cf0'
+            : (updatedFields.domain || p.domain) === 'app'
+            ? '#12a150'
+            : '#7a2fd0',
+        domainLabel:
+          (updatedFields.domain || p.domain) === 'web'
+            ? 'Web Development'
+            : (updatedFields.domain || p.domain) === 'app'
+            ? 'App Development'
+            : 'AI Automation'
+      };
+    });
+    persistProjects(updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('projects').update({
+          title: updatedFields.title,
+          domain: updatedFields.domain,
+          client_category: updatedFields.clientCategory,
+          short_description: updatedFields.shortDescription,
+          technologies: updatedFields.technologies,
+          metrics: updatedFields.metrics,
+          image_url: updatedFields.image
+        }).eq('id', id);
+      } catch (e) {
+        console.error('Supabase project update error:', e);
       }
     }
   };
@@ -391,9 +510,13 @@ export function DataProvider({ children }) {
         loading,
         updateDomainPrice,
         addServiceItem,
+        editServiceItem,
         deleteServiceItem,
+        reorderServiceItems,
         addProject,
+        editProject,
         deleteProject,
+        uploadProjectImage,
         saveEnquiry,
         updateEnquiryStatus,
         deleteEnquiry,
