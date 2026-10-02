@@ -17,7 +17,19 @@ import {
   uploadProjectImageApi,
   updateEnquiryStatusApi,
   deleteEnquiryApi,
-  updateSettingsApi
+  updateSettingsApi,
+  getTestimonials,
+  createTestimonialApi,
+  updateTestimonialApi,
+  deleteTestimonialApi,
+  getFaqs,
+  createFaqApi,
+  updateFaqApi,
+  deleteFaqApi,
+  getPackages,
+  createPackageApi,
+  updatePackageApi,
+  deletePackageApi
 } from '../lib/api';
 
 const DataContext = createContext();
@@ -38,6 +50,33 @@ export function DataProvider({ children }) {
       return cached ? JSON.parse(cached) : initialContent.projects;
     } catch {
       return initialContent.projects;
+    }
+  });
+
+  const [testimonialsData, setTestimonialsData] = useState(() => {
+    try {
+      const cached = localStorage.getItem('zippy_local_testimonials');
+      return cached ? JSON.parse(cached) : initialContent.testimonials || [];
+    } catch {
+      return initialContent.testimonials || [];
+    }
+  });
+
+  const [faqsData, setFaqsData] = useState(() => {
+    try {
+      const cached = localStorage.getItem('zippy_local_faqs');
+      return cached ? JSON.parse(cached) : initialContent.faqs || [];
+    } catch {
+      return initialContent.faqs || [];
+    }
+  });
+
+  const [packagesData, setPackagesData] = useState(() => {
+    try {
+      const cached = localStorage.getItem('zippy_local_packages');
+      return cached ? JSON.parse(cached) : initialContent.packages || [];
+    } catch {
+      return initialContent.packages || [];
     }
   });
 
@@ -92,11 +131,14 @@ export function DataProvider({ children }) {
     async function loadAllData() {
       setLoading(true);
       try {
-        const [services, projects, settings, enqs] = await Promise.all([
+        const [services, projects, settings, enqs, tests, faqs, pkgs] = await Promise.all([
           getServices(),
           getProjects(),
           getSettings(),
-          getEnquiriesApi()
+          getEnquiriesApi(),
+          getTestimonials(),
+          getFaqs(),
+          getPackages()
         ]);
 
         if (mounted) {
@@ -104,6 +146,9 @@ export function DataProvider({ children }) {
           if (projects && projects.length > 0) setProjectsData(projects);
           if (settings) setSettingsData(settings);
           if (enqs && enqs.length > 0) setEnquiries(enqs);
+          if (tests && tests.length > 0) setTestimonialsData(tests);
+          if (faqs && faqs.length > 0) setFaqsData(faqs);
+          if (pkgs && pkgs.length > 0) setPackagesData(pkgs);
           setIsLiveConnected(isSupabaseConfigured);
         }
       } catch (err) {
@@ -297,11 +342,92 @@ export function DataProvider({ children }) {
     await deleteEnquiryApi(id);
   };
 
+  // 8. Testimonials Management
+  const persistTestimonials = (data) => {
+    setTestimonialsData(data);
+    try {
+      localStorage.setItem('zippy_local_testimonials', JSON.stringify(data));
+    } catch {}
+  };
+
+  const addTestimonial = async (item) => {
+    const created = await createTestimonialApi(item);
+    persistTestimonials([...testimonialsData, created]);
+    return created;
+  };
+
+  const editTestimonial = async (id, updates) => {
+    const updated = testimonialsData.map((t) => (t.id === id ? { ...t, ...updates } : t));
+    persistTestimonials(updated);
+    await updateTestimonialApi(id, updates);
+  };
+
+  const deleteTestimonial = async (id) => {
+    const updated = testimonialsData.filter((t) => t.id !== id);
+    persistTestimonials(updated);
+    await deleteTestimonialApi(id);
+  };
+
+  // 9. FAQs Management
+  const persistFaqs = (data) => {
+    setFaqsData(data);
+    try {
+      localStorage.setItem('zippy_local_faqs', JSON.stringify(data));
+    } catch {}
+  };
+
+  const addFaq = async (item) => {
+    const created = await createFaqApi(item);
+    persistFaqs([...faqsData, created]);
+    return created;
+  };
+
+  const editFaq = async (id, updates) => {
+    const updated = faqsData.map((f) => (f.id === id ? { ...f, ...updates } : f));
+    persistFaqs(updated);
+    await updateFaqApi(id, updates);
+  };
+
+  const deleteFaq = async (id) => {
+    const updated = faqsData.filter((f) => f.id !== id);
+    persistFaqs(updated);
+    await deleteFaqApi(id);
+  };
+
+  // 10. Packages Management
+  const persistPackages = (data) => {
+    setPackagesData(data);
+    try {
+      localStorage.setItem('zippy_local_packages', JSON.stringify(data));
+    } catch {}
+  };
+
+  const addPackage = async (item) => {
+    const created = await createPackageApi(item);
+    persistPackages([...packagesData, created]);
+    return created;
+  };
+
+  const editPackage = async (id, updates) => {
+    const updated = packagesData.map((p) => (p.id === id ? { ...p, ...updates } : p));
+    persistPackages(updated);
+    await updatePackageApi(id, updates);
+  };
+
+  const deletePackage = async (id) => {
+    const updated = packagesData.filter((p) => p.id !== id);
+    persistPackages(updated);
+    await deletePackageApi(id);
+  };
+
   return (
     <DataContext.Provider
       value={{
         servicesData,
         projectsData,
+        testimonialsData,
+        faqsData,
+        packagesData,
         settingsData,
         enquiries,
         isLiveConnected,
@@ -318,7 +444,16 @@ export function DataProvider({ children }) {
         saveEnquiry,
         updateEnquiryStatus,
         deleteEnquiry,
-        persistSettings
+        persistSettings,
+        addTestimonial,
+        editTestimonial,
+        deleteTestimonial,
+        addFaq,
+        editFaq,
+        deleteFaq,
+        addPackage,
+        editPackage,
+        deletePackage
       }}
     >
       {children}

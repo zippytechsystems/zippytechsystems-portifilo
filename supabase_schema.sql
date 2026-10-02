@@ -57,6 +57,48 @@ CREATE TABLE IF NOT EXISTS public.settings (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- 6. Testimonials Table (Real Indian SMB client reviews)
+CREATE TABLE IF NOT EXISTS public.testimonials (
+    id TEXT PRIMARY KEY,
+    client_name TEXT NOT NULL,
+    role_or_company TEXT,
+    domain TEXT DEFAULT 'web',
+    rating INTEGER DEFAULT 5,
+    content TEXT NOT NULL,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 7. FAQs Table (Common client questions & answers)
+CREATE TABLE IF NOT EXISTS public.faqs (
+    id TEXT PRIMARY KEY,
+    category TEXT DEFAULT 'General',
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 8. Packages Table (Transparent service packages per domain)
+CREATE TABLE IF NOT EXISTS public.packages (
+    id TEXT PRIMARY KEY,
+    domain TEXT NOT NULL,
+    name TEXT NOT NULL,
+    price TEXT NOT NULL,
+    tagline TEXT,
+    deliverables TEXT[] DEFAULT '{}',
+    popular BOOLEAN DEFAULT false,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_services_domain ON public.services(domain_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_projects_domain ON public.projects(domain, sort_order);
+CREATE INDEX IF NOT EXISTS idx_testimonials_sort ON public.testimonials(sort_order);
+CREATE INDEX IF NOT EXISTS idx_faqs_category ON public.faqs(category, sort_order);
+CREATE INDEX IF NOT EXISTS idx_packages_domain ON public.packages(domain, sort_order);
+
 -- =========================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- =========================================================================
@@ -67,6 +109,9 @@ ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.enquiries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.testimonials ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.faqs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.packages ENABLE ROW LEVEL SECURITY;
 
 -- 1. Domains: Everyone can read; Only authenticated users (Admin) can update
 CREATE POLICY "Allow public read on domains" ON public.domains FOR SELECT USING (true);
@@ -87,6 +132,18 @@ CREATE POLICY "Allow admin full access on enquiries" ON public.enquiries FOR ALL
 -- 5. Settings: Everyone can read; Only admin can update
 CREATE POLICY "Allow public read on settings" ON public.settings FOR SELECT USING (true);
 CREATE POLICY "Allow admin full access on settings" ON public.settings FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+-- 6. Testimonials: Everyone can read; Only admin can manage
+CREATE POLICY "Allow public read on testimonials" ON public.testimonials FOR SELECT USING (true);
+CREATE POLICY "Allow admin full access on testimonials" ON public.testimonials FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+-- 7. FAQs: Everyone can read; Only admin can manage
+CREATE POLICY "Allow public read on faqs" ON public.faqs FOR SELECT USING (true);
+CREATE POLICY "Allow admin full access on faqs" ON public.faqs FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+-- 8. Packages: Everyone can read; Only admin can manage
+CREATE POLICY "Allow public read on packages" ON public.packages FOR SELECT USING (true);
+CREATE POLICY "Allow admin full access on packages" ON public.packages FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- =========================================================================
 -- STORAGE BUCKET FOR PROJECT IMAGES
@@ -167,9 +224,9 @@ INSERT INTO public.services (domain_id, type, title, description, sort_order) VA
 -- Insert Default Settings
 INSERT INTO public.settings (key, value) VALUES
 ('founder_name', 'Lingaswamy'),
-('phone', '6302690251'),
-('phone_formatted', '+91 63026 90251'),
-('whatsapp_number', '916302690251'),
+('phone', '9542439498'),
+('phone_formatted', '+91 95424 39498'),
+('whatsapp_number', '919542439498'),
 ('whatsapp_prefill', 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.'),
 ('tagline', 'Build • Automate • Grow'),
 ('secondary_tagline', 'Smart Technology for a Stronger Tomorrow'),
@@ -177,3 +234,31 @@ INSERT INTO public.settings (key, value) VALUES
 ('instagram_url', 'https://www.instagram.com/zippytechsystems'),
 ('youtube_url', 'https://www.youtube.com/@zippytechsystems')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
+
+-- Insert Seed Testimonials
+INSERT INTO public.testimonials (id, client_name, role_or_company, domain, rating, content, sort_order) VALUES
+('test-1', 'Dr. Ramesh Reddy', 'Reddy Multi-Specialty Dental Clinic, Hyderabad', 'web', 5, 'Lingaswamy built our clinic showcase website in just 4 days. Patients can now easily view treatments, doctors, and book appointments directly on WhatsApp. Super fast delivery and extremely affordable!', 1),
+('test-2', 'Suresh Patel', 'Patel Wholesale Electricals, Secunderabad', 'app', 5, 'The custom billing and stock app replaced our expensive accounting software. We save at least ₹18,000 every month on accountant salaries, and I can check my shop daily sales on my phone from anywhere.', 2),
+('test-3', 'Vikram Varma', 'Varma Logistics & Transport, Vijayawada', 'ai', 5, 'The 24/7 WhatsApp AI automation handles late-night freight rate queries instantly. We turned 35% more leads into booked orders within the first month itself.', 3),
+('test-4', 'Ananya Sharma', 'TrendBoutique Ethnic Studio, Bangalore', 'web', 5, 'Great design aesthetic, mobile responsive, and honest pricing. Lingaswamy is always available on phone and WhatsApp without any corporate bureaucracy.', 4)
+ON CONFLICT (id) DO NOTHING;
+
+-- Insert Seed FAQs
+INSERT INTO public.faqs (id, category, question, answer, sort_order) VALUES
+('faq-1', 'General', 'What makes ZippyTechSystems different from other agencies in India?', 'We eliminate bloated agency overhead and middleman layers. You communicate directly with founder Lingaswamy on WhatsApp or call. We provide transparent starting prices (Web from ₹7k, App from ₹10k, AI from ₹6k) and deliver production-ready software in 48 hours to 7 days.', 1),
+('faq-2', 'Web', 'What is included in the ₹7,000 Web Development starting package?', 'It includes a modern responsive business website, custom domain connection, lightning-fast cloud hosting setup, mobile optimization, WhatsApp direct integration, contact form, and Google Search Console/SEO basics.', 2),
+('faq-3', 'App', 'How does your business app help save on accountant salaries?', 'Our custom mobile & web applications automate day-to-day billing, GST invoice generation, thermal print receipts, customer udhar (credit ledger), and stock levels. Because calculations and reports are automated and tamper-proof, shop owners do not need to hire a full-time accountant for daily entries.', 3),
+('faq-4', 'AI', 'How does WhatsApp AI Automation work when our shop is closed?', 'Our AI agent connects to your WhatsApp business number. When a customer messages at night or during peak rush hours, the AI answers product questions, shares price lists or catalogs, collects their requirements, and syncs their phone number to your dashboard or Google Sheet.', 4),
+('faq-5', 'General', 'What are your payment terms and milestones?', 'We work with clear, risk-free milestones: a small advance to initiate the architecture and wireframing, milestone reviews where you inspect the live demo, and final payment upon your 100% satisfaction and handover.', 5),
+('faq-6', 'General', 'Do you offer ongoing support and maintenance?', 'Yes! All projects come with 30 days of complimentary post-launch support. Afterward, we provide affordable yearly maintenance packages covering security updates, server monitoring, backups, and feature tweaks.', 6)
+ON CONFLICT (id) DO NOTHING;
+
+-- Insert Seed Packages
+INSERT INTO public.packages (id, domain, name, price, tagline, deliverables, popular, sort_order) VALUES
+('pkg-web-starter', 'web', 'Starter Web Presence', '₹7,000', 'Best for local shops, professionals, and new businesses', ARRAY['Single-page fast responsive landing site', 'Direct WhatsApp chat button & Call CTA', 'Mobile, tablet & desktop optimized', 'Google Maps & Google Business profile link', 'Free SSL certificate & fast cloud hosting setup', '7 days turnaround time'], false, 1),
+('pkg-web-business', 'web', 'Business Growth Showcase', '₹14,500', 'For established businesses wanting full catalog showcases', ARRAY['Up to 5 pages (Home, About, Services, Gallery, Contact)', 'Full service/product visual showcase catalog', 'Customer enquiry form with database & WhatsApp sync', 'On-page SEO optimization & metadata', 'Google Search Console indexing', '30 days free support & maintenance'], true, 2),
+('pkg-app-billing', 'app', 'Shop Billing & Udhar App', '₹10,000', 'Save accountant salary with automated shop records', ARRAY['Fast barcode scanning & POS billing', 'GST & non-GST thermal receipt printing', 'Customer credit ledger (Udhar tracking & WhatsApp reminders)', 'Daily cash in hand & profit report on mobile', 'Tamper-proof calculations & offline support', 'Free staff training session'], true, 3),
+('pkg-app-enterprise', 'app', 'Complete Business Management App', '₹22,000', 'Multi-store, staff attendance, and inventory management', ARRAY['Multi-user roles (Owner, Manager, Cashier)', 'Live warehouse stock alerts & supplier order records', 'Staff attendance & payroll calculation', 'Cloud backup & multi-device sync', 'Android APK + Web dashboard included', '3 months priority bugfix guarantee'], false, 4),
+('pkg-ai-whatsapp', 'ai', 'WhatsApp 24/7 Auto-Responder', '₹6,000', 'Never lose a customer lead after working hours', ARRAY['Official or QR WhatsApp automation setup', 'Instant replies with price cards & catalog PDF', 'Lead qualification & phone number capture', 'Instant alert on owner mobile for hot leads', 'Custom business greeting & FAQ answering', 'Quick 48-hour deployment'], true, 5),
+('pkg-ai-agent', 'ai', 'AI Voice & Lead Pipeline Suite', '₹16,000', 'Full intelligent customer qualification & automated CRM', ARRAY['AI Voice Agent for telephone enquiry triage', 'Website AI chatbot widget trained on your business', 'Sync leads automatically to Google Sheets & CRM', 'Automated follow-up WhatsApp reminders for pending quotes', 'Weekly analytics of customer questions and conversions', 'Dedicated onboarding & testing'], false, 6)
+ON CONFLICT (id) DO NOTHING;

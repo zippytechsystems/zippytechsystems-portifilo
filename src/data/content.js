@@ -35,11 +35,11 @@ export const content = {
     name: 'Lingaswamy',
     role: 'Founder & Solutions Architect',
     bio: 'Direct technical guidance without middlemen or inflated agency fees. Experienced in building practical web platforms, business accounting apps, and AI automations for growing Indian enterprises.',
-    phone: '6302690251',
-    phoneFormatted: '+91 63026 90251',
-    phoneCall: '+916302690251',
-    whatsappNumber: '916302690251',
-    whatsappLink: 'https://wa.me/916302690251',
+    phone: '9542439498',
+    phoneFormatted: '+91 95424 39498',
+    phoneCall: '+919542439498',
+    whatsappNumber: '919542439498',
+    whatsappLink: 'https://wa.me/919542439498',
     email: 'contact@zippytechsystems.com'
   },
 
@@ -379,6 +379,182 @@ export const content = {
       { number: '99.9%', label: 'Uptime & Reliability' }
     ]
   },
+
+  // Client Testimonials
+  testimonials: [
+    {
+      id: 'test-1',
+      clientName: 'Dr. Ramesh Reddy',
+      roleOrCompany: 'Reddy Multi-Specialty Dental Clinic, Hyderabad',
+      domain: 'web',
+      rating: 5,
+      content: 'Lingaswamy built our clinic showcase website in just 4 days. Patients can now easily view treatments, doctors, and book appointments directly on WhatsApp. Super fast delivery and extremely affordable!'
+    },
+    {
+      id: 'test-2',
+      clientName: 'Suresh Patel',
+      roleOrCompany: 'Patel Wholesale Electricals, Secunderabad',
+      domain: 'app',
+      rating: 5,
+      content: 'The custom billing and stock app replaced our expensive accounting software. We save at least ₹18,000 every month on accountant salaries, and I can check my shop daily sales on my phone from anywhere.'
+    },
+    {
+      id: 'test-3',
+      clientName: 'Vikram Varma',
+      roleOrCompany: 'Varma Logistics & Transport, Vijayawada',
+      domain: 'ai',
+      rating: 5,
+      content: 'The 24/7 WhatsApp AI automation handles late-night freight rate queries instantly. We turned 35% more leads into booked orders within the first month itself.'
+    },
+    {
+      id: 'test-4',
+      clientName: 'Ananya Sharma',
+      roleOrCompany: 'TrendBoutique Ethnic Studio, Bangalore',
+      domain: 'web',
+      rating: 5,
+      content: 'Great design aesthetic, mobile responsive, and honest pricing. Lingaswamy is always available on phone and WhatsApp without any corporate bureaucracy.'
+    }
+  ],
+
+  // Frequently Asked Questions
+  faqs: [
+    {
+      id: 'faq-1',
+      category: 'General',
+      question: 'What makes ZippyTechSystems different from other agencies in India?',
+      answer: 'We eliminate bloated agency overhead and middleman layers. You communicate directly with founder Lingaswamy on WhatsApp or call. We provide transparent starting prices (Web from ₹7k, App from ₹10k, AI from ₹6k) and deliver production-ready software in 48 hours to 7 days.'
+    },
+    {
+      id: 'faq-2',
+      category: 'Web',
+      question: 'What is included in the ₹7,000 Web Development starting package?',
+      answer: 'It includes a modern responsive business website, custom domain connection, lightning-fast cloud hosting setup, mobile optimization, WhatsApp direct integration, contact form, and Google Search Console/SEO basics.'
+    },
+    {
+      id: 'faq-3',
+      category: 'App',
+      question: 'How does your business app help save on accountant salaries?',
+      answer: 'Our custom mobile & web applications automate day-to-day billing, GST invoice generation, thermal print receipts, customer udhar (credit ledger), and stock levels. Because calculations and reports are automated and tamper-proof, shop owners do not need to hire a full-time accountant for daily entries.'
+    },
+    {
+      id: 'faq-4',
+      category: 'AI',
+      question: 'How does WhatsApp AI Automation work when our shop is closed?',
+      answer: 'Our AI agent connects to your WhatsApp business number. When a customer messages at night or during peak rush hours, the AI answers product questions, shares price lists or catalogs, collects their requirements, and syncs their phone number to your dashboard or Google Sheet.'
+    },
+    {
+      id: 'faq-5',
+      category: 'General',
+      question: 'What are your payment terms and milestones?',
+      answer: 'We work with clear, risk-free milestones: a small advance to initiate the architecture and wireframing, milestone reviews where you inspect the live demo, and final payment upon your 100% satisfaction and handover.'
+    },
+    {
+      id: 'faq-6',
+      category: 'General',
+      question: 'Do you offer ongoing support and maintenance?',
+      answer: 'Yes! All projects come with 30 days of complimentary post-launch support. Afterward, we provide affordable yearly maintenance packages covering security updates, server monitoring, backups, and feature tweaks.'
+    }
+  ],
+
+  // Solution Packages
+  packages: [
+    {
+      id: 'pkg-web-starter',
+      domain: 'web',
+      name: 'Starter Web Presence',
+      price: '₹7,000',
+      tagline: 'Best for local shops, professionals, and new businesses',
+      deliverables: [
+        'Single-page fast responsive landing site',
+        'Direct WhatsApp chat button & Call CTA',
+        'Mobile, tablet & desktop optimized',
+        'Google Maps & Google Business profile link',
+        'Free SSL certificate & fast cloud hosting setup',
+        '7 days turnaround time'
+      ],
+      popular: false
+    },
+    {
+      id: 'pkg-web-business',
+      domain: 'web',
+      name: 'Business Growth Showcase',
+      price: '₹14,500',
+      tagline: 'For established businesses wanting full catalog showcases',
+      deliverables: [
+        'Up to 5 pages (Home, About, Services, Gallery, Contact)',
+        'Full service/product visual showcase catalog',
+        'Customer enquiry form with database & WhatsApp sync',
+        'On-page SEO optimization & metadata',
+        'Google Search Console indexing',
+        '30 days free support & maintenance'
+      ],
+      popular: true
+    },
+    {
+      id: 'pkg-app-billing',
+      domain: 'app',
+      name: 'Shop Billing & Udhar App',
+      price: '₹10,000',
+      tagline: 'Save accountant salary with automated shop records',
+      deliverables: [
+        'Fast barcode scanning & POS billing',
+        'GST & non-GST thermal receipt printing',
+        'Customer credit ledger (Udhar tracking & WhatsApp reminders)',
+        'Daily cash in hand & profit report on mobile',
+        'Tamper-proof calculations & offline support',
+        'Free staff training session'
+      ],
+      popular: true
+    },
+    {
+      id: 'pkg-app-enterprise',
+      domain: 'app',
+      name: 'Complete Business Management App',
+      price: '₹22,000',
+      tagline: 'Multi-store, staff attendance, and inventory management',
+      deliverables: [
+        'Multi-user roles (Owner, Manager, Cashier)',
+        'Live warehouse stock alerts & supplier order records',
+        'Staff attendance & payroll calculation',
+        'Cloud backup & multi-device sync',
+        'Android APK + Web dashboard included',
+        '3 months priority bugfix guarantee'
+      ],
+      popular: false
+    },
+    {
+      id: 'pkg-ai-whatsapp',
+      domain: 'ai',
+      name: 'WhatsApp 24/7 Auto-Responder',
+      price: '₹6,000',
+      tagline: 'Never lose a customer lead after working hours',
+      deliverables: [
+        'Official or QR WhatsApp automation setup',
+        'Instant replies with price cards & catalog PDF',
+        'Lead qualification & phone number capture',
+        'Instant alert on owner mobile for hot leads',
+        'Custom business greeting & FAQ answering',
+        'Quick 48-hour deployment'
+      ],
+      popular: true
+    },
+    {
+      id: 'pkg-ai-agent',
+      domain: 'ai',
+      name: 'AI Voice & Lead Pipeline Suite',
+      price: '₹16,000',
+      tagline: 'Full intelligent customer qualification & automated CRM',
+      deliverables: [
+        'AI Voice Agent for telephone enquiry triage',
+        'Website AI chatbot widget trained on your business',
+        'Sync leads automatically to Google Sheets & CRM',
+        'Automated follow-up WhatsApp reminders for pending quotes',
+        'Weekly analytics of customer questions and conversions',
+        'Dedicated onboarding & testing'
+      ],
+      popular: false
+    }
+  ],
 
   // Navigation Links
   navLinks: [

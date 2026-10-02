@@ -16,7 +16,7 @@ import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
 
 export default function ServicesSection() {
-  const { servicesData } = useData();
+  const { servicesData, loading } = useData();
   const services = servicesData && servicesData.length > 0 ? servicesData : content.services;
 
   const iconMap = {
@@ -24,6 +24,45 @@ export default function ServicesSection() {
     Smartphone: <Smartphone size={32} />,
     Cpu: <Cpu size={32} />
   };
+
+  if (loading && (!services || services.length === 0)) {
+    return (
+      <div id="services-wrapper" style={{ padding: '5rem 0' }}>
+        <div className="container">
+          {[1, 2, 3].map((n) => (
+            <div
+              key={n}
+              className="card skeleton"
+              style={{
+                height: '380px',
+                borderRadius: '16px',
+                marginBottom: '2rem',
+                opacity: 0.7
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!services || services.length === 0) {
+    return (
+      <div id="services-wrapper" style={{ padding: '5rem 0', textAlign: 'center' }}>
+        <div className="container">
+          <div className="card" style={{ padding: '3rem', maxWidth: '600px', margin: '0 auto' }}>
+            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>No Services Available</h3>
+            <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem' }}>
+              Service offerings are currently being updated. Please check back shortly or contact us directly on WhatsApp.
+            </p>
+            <a href={buildWhatsAppUrl()} className="btn btn-cta-yellow">
+              Contact Lingaswamy on WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div id="services-wrapper">

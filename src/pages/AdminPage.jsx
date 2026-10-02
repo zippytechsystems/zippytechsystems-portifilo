@@ -26,7 +26,10 @@ import {
   Smartphone,
   Cpu,
   RefreshCw,
-  Eye
+  Eye,
+  Star,
+  HelpCircle,
+  PackageCheck
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -35,6 +38,9 @@ export default function AdminPage() {
   const {
     servicesData,
     projectsData,
+    testimonialsData,
+    faqsData,
+    packagesData,
     settingsData,
     enquiries,
     isLiveConnected,
@@ -49,10 +55,19 @@ export default function AdminPage() {
     uploadProjectImage,
     updateEnquiryStatus,
     deleteEnquiry,
-    persistSettings
+    persistSettings,
+    addTestimonial,
+    editTestimonial,
+    deleteTestimonial,
+    addFaq,
+    editFaq,
+    deleteFaq,
+    addPackage,
+    editPackage,
+    deletePackage
   } = useData();
 
-  // Navigation tab state: 'dashboard' | 'services' | 'portfolio' | 'enquiries' | 'settings'
+  // Navigation tab state: 'dashboard' | 'services' | 'packages' | 'portfolio' | 'testimonials' | 'faqs' | 'enquiries' | 'settings'
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Login form state
@@ -139,6 +154,47 @@ export default function AdminPage() {
       setSettingsForm(settingsData);
     }
   }, [settingsData]);
+
+  // -------------------------------------------------------------
+  // 5. Packages State
+  // -------------------------------------------------------------
+  const [packageModal, setPackageModal] = useState({
+    isOpen: false,
+    mode: 'add',
+    id: null,
+    domain: 'web',
+    name: '',
+    price: '',
+    tagline: '',
+    deliverables: '',
+    popular: false
+  });
+
+  // -------------------------------------------------------------
+  // 6. Testimonials State
+  // -------------------------------------------------------------
+  const [testimonialModal, setTestimonialModal] = useState({
+    isOpen: false,
+    mode: 'add',
+    id: null,
+    clientName: '',
+    roleOrCompany: '',
+    domain: 'web',
+    rating: 5,
+    content: ''
+  });
+
+  // -------------------------------------------------------------
+  // 7. FAQs State
+  // -------------------------------------------------------------
+  const [faqModal, setFaqModal] = useState({
+    isOpen: false,
+    mode: 'add',
+    id: null,
+    category: 'General',
+    question: '',
+    answer: ''
+  });
 
   // -------------------------------------------------------------
   // Handler: Login
@@ -434,6 +490,127 @@ export default function AdminPage() {
   };
 
   // -------------------------------------------------------------
+  // Packages Actions
+  // -------------------------------------------------------------
+  const [packageDomainFilter, setPackageDomainFilter] = useState('all');
+
+  const handleSavePackageModal = async (e) => {
+    e.preventDefault();
+    if (!packageModal.name.trim() || !packageModal.price.trim()) return;
+
+    const deliverablesList =
+      typeof packageModal.deliverables === 'string'
+        ? packageModal.deliverables
+            .split('\n')
+            .map((d) => d.trim())
+            .filter(Boolean)
+        : packageModal.deliverables;
+
+    const payload = {
+      domain: packageModal.domain,
+      name: packageModal.name.trim(),
+      price: packageModal.price.trim(),
+      tagline: packageModal.tagline.trim(),
+      deliverables: deliverablesList,
+      popular: Boolean(packageModal.popular)
+    };
+
+    if (packageModal.mode === 'add') {
+      await addPackage(payload);
+      showToast('New package published successfully!');
+    } else {
+      await editPackage(packageModal.id, payload);
+      showToast('Package updated successfully!');
+    }
+    setPackageModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const handleDeletePackage = (id, name) => {
+    openConfirm(
+      'Delete Package',
+      `Are you sure you want to delete package "${name}"?`,
+      async () => {
+        await deletePackage(id);
+        showToast('Package deleted.', 'error');
+      }
+    );
+  };
+
+  // -------------------------------------------------------------
+  // Testimonials Actions
+  // -------------------------------------------------------------
+  const [testimonialDomainFilter, setTestimonialDomainFilter] = useState('all');
+
+  const handleSaveTestimonialModal = async (e) => {
+    e.preventDefault();
+    if (!testimonialModal.clientName.trim() || !testimonialModal.content.trim()) return;
+
+    const payload = {
+      clientName: testimonialModal.clientName.trim(),
+      roleOrCompany: testimonialModal.roleOrCompany.trim(),
+      domain: testimonialModal.domain,
+      rating: Number(testimonialModal.rating) || 5,
+      content: testimonialModal.content.trim()
+    };
+
+    if (testimonialModal.mode === 'add') {
+      await addTestimonial(payload);
+      showToast('Client review published successfully!');
+    } else {
+      await editTestimonial(testimonialModal.id, payload);
+      showToast('Review updated successfully!');
+    }
+    setTestimonialModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const handleDeleteTestimonial = (id, clientName) => {
+    openConfirm(
+      'Delete Review',
+      `Are you sure you want to delete review from "${clientName}"?`,
+      async () => {
+        await deleteTestimonial(id);
+        showToast('Review deleted.', 'error');
+      }
+    );
+  };
+
+  // -------------------------------------------------------------
+  // FAQs Actions
+  // -------------------------------------------------------------
+  const [faqCategoryFilter, setFaqCategoryFilter] = useState('all');
+
+  const handleSaveFaqModal = async (e) => {
+    e.preventDefault();
+    if (!faqModal.question.trim() || !faqModal.answer.trim()) return;
+
+    const payload = {
+      category: faqModal.category.trim() || 'General',
+      question: faqModal.question.trim(),
+      answer: faqModal.answer.trim()
+    };
+
+    if (faqModal.mode === 'add') {
+      await addFaq(payload);
+      showToast('FAQ added successfully!');
+    } else {
+      await editFaq(faqModal.id, payload);
+      showToast('FAQ updated successfully!');
+    }
+    setFaqModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const handleDeleteFaq = (id, question) => {
+    openConfirm(
+      'Delete FAQ',
+      `Are you sure you want to delete FAQ "${question}"?`,
+      async () => {
+        await deleteFaq(id);
+        showToast('FAQ deleted.', 'error');
+      }
+    );
+  };
+
+  // -------------------------------------------------------------
   // Settings Actions
   // -------------------------------------------------------------
   const handleSaveSettings = async (e) => {
@@ -446,7 +623,10 @@ export default function AdminPage() {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
     { id: 'services', label: 'Services', icon: <Layers size={18} /> },
+    { id: 'packages', label: 'Packages', icon: <PackageCheck size={18} /> },
     { id: 'portfolio', label: 'Portfolio', icon: <Briefcase size={18} /> },
+    { id: 'testimonials', label: 'Reviews', icon: <Star size={18} /> },
+    { id: 'faqs', label: 'FAQs', icon: <HelpCircle size={18} /> },
     {
       id: 'enquiries',
       label: 'Enquiries',
@@ -859,6 +1039,72 @@ export default function AdminPage() {
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.35rem' }}>
                   Enquiries received to date
+                </div>
+              </div>
+
+              {/* Total Packages */}
+              <div
+                className="card"
+                onClick={() => setActiveTab('packages')}
+                style={{ padding: '1.5rem', cursor: 'pointer' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 600 }}>
+                    PRICING PACKAGES
+                  </span>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255, 229, 0, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <PackageCheck size={18} color="#ffe500" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                  {(packagesData || []).length}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.35rem' }}>
+                  Web, App &amp; AI packages
+                </div>
+              </div>
+
+              {/* Total Testimonials */}
+              <div
+                className="card"
+                onClick={() => setActiveTab('testimonials')}
+                style={{ padding: '1.5rem', cursor: 'pointer' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 600 }}>
+                    CLIENT REVIEWS
+                  </span>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255, 229, 0, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Star size={18} color="#ffe500" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                  {(testimonialsData || []).length}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.35rem' }}>
+                  5-star verified ratings
+                </div>
+              </div>
+
+              {/* Total FAQs */}
+              <div
+                className="card"
+                onClick={() => setActiveTab('faqs')}
+                style={{ padding: '1.5rem', cursor: 'pointer' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 600 }}>
+                    FAQS ANSWERED
+                  </span>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(29, 92, 240, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <HelpCircle size={18} color="#1d5cf0" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#1d5cf0' }}>
+                  {(faqsData || []).length}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.35rem' }}>
+                  Pre-sales trust questions
                 </div>
               </div>
             </div>
@@ -1691,6 +1937,856 @@ export default function AdminPage() {
                       </button>
                       <button type="submit" className="btn btn-cta-yellow">
                         {projectModal.mode === 'add' ? 'Save Project' : 'Update Project'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB: PACKAGES */}
+        {/* ------------------------------------------------------------- */}
+        {activeTab === 'packages' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, marginBottom: '0.35rem' }}>
+                  Transparent Packages ({(packagesData || []).length})
+                </h1>
+                <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
+                  Manage clear budget packages across Web Development, Mobile Apps, and AI Automation.
+                </p>
+              </div>
+
+              <button
+                onClick={() =>
+                  setPackageModal({
+                    isOpen: true,
+                    mode: 'add',
+                    id: null,
+                    domain: 'web',
+                    name: '',
+                    price: '₹9,999',
+                    tagline: '',
+                    deliverables: '',
+                    popular: false
+                  })
+                }
+                className="btn btn-cta-yellow"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}
+              >
+                <Plus size={16} />
+                <span>Add Package</span>
+              </button>
+            </div>
+
+            {/* Domain Filter Pills */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.75rem', flexWrap: 'wrap' }}>
+              {[
+                { id: 'all', label: 'All Packages' },
+                { id: 'web', label: 'Web Development' },
+                { id: 'app', label: 'App Development' },
+                { id: 'ai', label: 'AI Automation' }
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setPackageDomainFilter(f.id)}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    borderRadius: 'var(--radius-full)',
+                    border: packageDomainFilter === f.id ? '1px solid #1d5cf0' : '1px solid var(--border-subtle)',
+                    background: packageDomainFilter === f.id ? 'rgba(29, 92, 240, 0.15)' : 'transparent',
+                    color: packageDomainFilter === f.id ? '#1d5cf0' : 'var(--text-body)',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Packages Grid */}
+            {(packagesData || []).filter(p => packageDomainFilter === 'all' || p.domain === packageDomainFilter).length === 0 ? (
+              <div className="card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-dim)' }}>
+                No packages found in this category.
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                  gap: '1.5rem'
+                }}
+              >
+                {(packagesData || [])
+                  .filter((p) => packageDomainFilter === 'all' || p.domain === packageDomainFilter)
+                  .map((pkg) => {
+                    const domainColor =
+                      pkg.domain === 'app'
+                        ? '#12a150'
+                        : pkg.domain === 'ai'
+                        ? '#7a2fd0'
+                        : '#1d5cf0';
+
+                    return (
+                      <div
+                        key={pkg.id}
+                        className="card"
+                        style={{
+                          padding: '1.75rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          borderTop: `4px solid ${domainColor}`,
+                          position: 'relative'
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                padding: '3px 8px',
+                                borderRadius: '4px',
+                                background: `${domainColor}20`,
+                                color: domainColor
+                              }}
+                            >
+                              {pkg.domain === 'app' ? 'Mobile App' : pkg.domain === 'ai' ? 'AI System' : 'Web Platform'}
+                            </span>
+                            {pkg.popular && (
+                              <span
+                                style={{
+                                  fontSize: '0.72rem',
+                                  fontWeight: 800,
+                                  background: '#ffe500',
+                                  color: '#0b1b4a',
+                                  padding: '2px 8px',
+                                  borderRadius: '12px'
+                                }}
+                              >
+                                ★ Most Popular
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.25rem' }}>
+                            {pkg.name}
+                          </h3>
+                          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: domainColor, marginBottom: '0.5rem' }}>
+                            {pkg.price}
+                          </div>
+                          {pkg.tagline && (
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: '1rem', fontStyle: 'italic' }}>
+                              {pkg.tagline}
+                            </p>
+                          )}
+
+                          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.85rem', marginBottom: '1.25rem' }}>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+                              Included Deliverables:
+                            </div>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                              {(pkg.deliverables || []).map((del, dIdx) => (
+                                <li key={dIdx} style={{ fontSize: '0.82rem', color: 'var(--text-body)', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                  <span style={{ color: domainColor, fontWeight: 'bold' }}>✓</span>
+                                  <span>{del}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.75rem' }}>
+                          <button
+                            onClick={() =>
+                              setPackageModal({
+                                isOpen: true,
+                                mode: 'edit',
+                                id: pkg.id,
+                                domain: pkg.domain,
+                                name: pkg.name,
+                                price: pkg.price,
+                                tagline: pkg.tagline || '',
+                                deliverables: (pkg.deliverables || []).join('\n'),
+                                popular: Boolean(pkg.popular)
+                              })
+                            }
+                            className="btn btn-outline"
+                            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                          >
+                            <Edit2 size={13} />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeletePackage(pkg.id, pkg.name)}
+                            className="btn btn-outline"
+                            style={{ padding: '0.4rem 0.65rem', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                            title="Delete Package"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+
+            {/* Package Edit/Add Modal */}
+            {packageModal.isOpen && (
+              <div
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  zIndex: 9998,
+                  background: 'rgba(0, 0, 0, 0.75)',
+                  backdropFilter: 'blur(4px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '1rem'
+                }}
+              >
+                <div
+                  className="card"
+                  style={{
+                    maxWidth: '520px',
+                    width: '100%',
+                    padding: '2rem',
+                    maxHeight: '90vh',
+                    overflowY: 'auto'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0 }}>
+                      {packageModal.mode === 'add' ? 'Add Transparent Package' : 'Edit Package'}
+                    </h3>
+                    <button
+                      onClick={() => setPackageModal((prev) => ({ ...prev, isOpen: false }))}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSavePackageModal}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                      <div className="form-group">
+                        <label className="form-label">Domain *</label>
+                        <select
+                          className="form-input"
+                          value={packageModal.domain}
+                          onChange={(e) => setPackageModal((prev) => ({ ...prev, domain: e.target.value }))}
+                        >
+                          <option value="web">Web Development</option>
+                          <option value="app">App Development</option>
+                          <option value="ai">AI Automation</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Price Display *</label>
+                        <input
+                          type="text"
+                          required
+                          className="form-input"
+                          placeholder="e.g. ₹9,999 or ₹29,999"
+                          value={packageModal.price}
+                          onChange={(e) => setPackageModal((prev) => ({ ...prev, price: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '1rem' }}>
+                      <label className="form-label">Package Name *</label>
+                      <input
+                        type="text"
+                        required
+                        className="form-input"
+                        placeholder="e.g. Business Pro Web or Cross-Platform Mobile"
+                        value={packageModal.name}
+                        onChange={(e) => setPackageModal((prev) => ({ ...prev, name: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '1rem' }}>
+                      <label className="form-label">Tagline / Short Summary</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g. For shops & clinics needing online bookings"
+                        value={packageModal.tagline}
+                        onChange={(e) => setPackageModal((prev) => ({ ...prev, tagline: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '1rem' }}>
+                      <label className="form-label">Deliverables (one per line) *</label>
+                      <textarea
+                        rows={4}
+                        required
+                        className="form-input"
+                        placeholder={"Up to 7 Custom Pages\n100% Mobile Responsive\nWhatsApp Click-to-Chat\nAdmin Lead Management"}
+                        value={packageModal.deliverables}
+                        onChange={(e) => setPackageModal((prev) => ({ ...prev, deliverables: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.5rem' }}>
+                      <input
+                        type="checkbox"
+                        id="package-popular"
+                        checked={packageModal.popular}
+                        onChange={(e) => setPackageModal((prev) => ({ ...prev, popular: e.target.checked }))}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      />
+                      <label htmlFor="package-popular" style={{ fontSize: '0.9rem', cursor: 'pointer', fontWeight: 600 }}>
+                        Mark as "Most Popular" / Recommended Tier
+                      </label>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => setPackageModal((prev) => ({ ...prev, isOpen: false }))}
+                        className="btn btn-outline"
+                      >
+                        Cancel
+                      </button>
+                      <button type="submit" className="btn btn-cta-yellow">
+                        {packageModal.mode === 'add' ? 'Save Package' : 'Update Package'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB: TESTIMONIALS / REVIEWS */}
+        {/* ------------------------------------------------------------- */}
+        {activeTab === 'testimonials' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, marginBottom: '0.35rem' }}>
+                  Client Reviews &amp; Testimonials ({(testimonialsData || []).length})
+                </h1>
+                <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
+                  Verified feedback and ratings from business owners who built with ZippyTechSystems.
+                </p>
+              </div>
+
+              <button
+                onClick={() =>
+                  setTestimonialModal({
+                    isOpen: true,
+                    mode: 'add',
+                    id: null,
+                    clientName: '',
+                    roleOrCompany: '',
+                    domain: 'web',
+                    rating: 5,
+                    content: ''
+                  })
+                }
+                className="btn btn-cta-yellow"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}
+              >
+                <Plus size={16} />
+                <span>Add Review</span>
+              </button>
+            </div>
+
+            {/* Testimonials Filter */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.75rem', flexWrap: 'wrap' }}>
+              {[
+                { id: 'all', label: 'All Domains' },
+                { id: 'web', label: 'Web' },
+                { id: 'app', label: 'App' },
+                { id: 'ai', label: 'AI' }
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setTestimonialDomainFilter(f.id)}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    borderRadius: 'var(--radius-full)',
+                    border: testimonialDomainFilter === f.id ? '1px solid #1d5cf0' : '1px solid var(--border-subtle)',
+                    background: testimonialDomainFilter === f.id ? 'rgba(29, 92, 240, 0.15)' : 'transparent',
+                    color: testimonialDomainFilter === f.id ? '#1d5cf0' : 'var(--text-body)',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Testimonials Grid */}
+            {(testimonialsData || []).filter(t => testimonialDomainFilter === 'all' || t.domain === testimonialDomainFilter).length === 0 ? (
+              <div className="card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-dim)' }}>
+                No reviews found in this category.
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                  gap: '1.5rem'
+                }}
+              >
+                {(testimonialsData || [])
+                  .filter((t) => testimonialDomainFilter === 'all' || t.domain === testimonialDomainFilter)
+                  .map((rev) => {
+                    const domainColor =
+                      rev.domain === 'app'
+                        ? '#12a150'
+                        : rev.domain === 'ai'
+                        ? '#7a2fd0'
+                        : '#1d5cf0';
+
+                    return (
+                      <div
+                        key={rev.id}
+                        className="card"
+                        style={{
+                          padding: '1.5rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          borderLeft: `4px solid ${domainColor}`
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <div style={{ display: 'flex', gap: '2px', color: '#ffe500' }}>
+                              {[...Array(rev.rating || 5)].map((_, i) => (
+                                <Star key={i} size={15} fill="#ffe500" />
+                              ))}
+                            </div>
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                padding: '2px 7px',
+                                borderRadius: '4px',
+                                background: `${domainColor}20`,
+                                color: domainColor
+                              }}
+                            >
+                              {rev.domain}
+                            </span>
+                          </div>
+
+                          <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.5, marginBottom: '1rem', fontStyle: 'italic' }}>
+                            "{rev.content}"
+                          </p>
+
+                          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.75rem' }}>
+                            <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-main)' }}>
+                              {rev.clientName}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+                              {rev.roleOrCompany}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                          <button
+                            onClick={() =>
+                              setTestimonialModal({
+                                isOpen: true,
+                                mode: 'edit',
+                                id: rev.id,
+                                clientName: rev.clientName,
+                                roleOrCompany: rev.roleOrCompany,
+                                domain: rev.domain,
+                                rating: rev.rating || 5,
+                                content: rev.content
+                              })
+                            }
+                            className="btn btn-outline"
+                            style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                          >
+                            <Edit2 size={13} />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTestimonial(rev.id, rev.clientName)}
+                            className="btn btn-outline"
+                            style={{ padding: '0.35rem 0.65rem', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                            title="Delete Review"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+
+            {/* Testimonial Edit/Add Modal */}
+            {testimonialModal.isOpen && (
+              <div
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  zIndex: 9998,
+                  background: 'rgba(0, 0, 0, 0.75)',
+                  backdropFilter: 'blur(4px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '1rem'
+                }}
+              >
+                <div
+                  className="card"
+                  style={{
+                    maxWidth: '480px',
+                    width: '100%',
+                    padding: '2rem',
+                    maxHeight: '90vh',
+                    overflowY: 'auto'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0 }}>
+                      {testimonialModal.mode === 'add' ? 'Add Client Review' : 'Edit Review'}
+                    </h3>
+                    <button
+                      onClick={() => setTestimonialModal((prev) => ({ ...prev, isOpen: false }))}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveTestimonialModal}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                      <div className="form-group">
+                        <label className="form-label">Client Name *</label>
+                        <input
+                          type="text"
+                          required
+                          className="form-input"
+                          placeholder="e.g. Dr. K. Rao"
+                          value={testimonialModal.clientName}
+                          onChange={(e) => setTestimonialModal((prev) => ({ ...prev, clientName: e.target.value }))}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Role or Company</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="e.g. Founder, CareClinic"
+                          value={testimonialModal.roleOrCompany}
+                          onChange={(e) => setTestimonialModal((prev) => ({ ...prev, roleOrCompany: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                      <div className="form-group">
+                        <label className="form-label">Domain *</label>
+                        <select
+                          className="form-input"
+                          value={testimonialModal.domain}
+                          onChange={(e) => setTestimonialModal((prev) => ({ ...prev, domain: e.target.value }))}
+                        >
+                          <option value="web">Web Development</option>
+                          <option value="app">App Development</option>
+                          <option value="ai">AI Automation</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Star Rating *</label>
+                        <select
+                          className="form-input"
+                          value={testimonialModal.rating}
+                          onChange={(e) => setTestimonialModal((prev) => ({ ...prev, rating: Number(e.target.value) }))}
+                        >
+                          <option value={5}>5 Stars ★★★★★</option>
+                          <option value={4}>4 Stars ★★★★☆</option>
+                          <option value={3}>3 Stars ★★★☆☆</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                      <label className="form-label">Review Content *</label>
+                      <textarea
+                        rows={3}
+                        required
+                        className="form-input"
+                        placeholder="What did the client say about our speed, communication, and quality?"
+                        value={testimonialModal.content}
+                        onChange={(e) => setTestimonialModal((prev) => ({ ...prev, content: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => setTestimonialModal((prev) => ({ ...prev, isOpen: false }))}
+                        className="btn btn-outline"
+                      >
+                        Cancel
+                      </button>
+                      <button type="submit" className="btn btn-cta-yellow">
+                        {testimonialModal.mode === 'add' ? 'Save Review' : 'Update Review'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB: FAQS */}
+        {/* ------------------------------------------------------------- */}
+        {activeTab === 'faqs' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, marginBottom: '0.35rem' }}>
+                  Frequently Asked Questions ({(faqsData || []).length})
+                </h1>
+                <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
+                  Answers to client queries about low-budget delivery, timelines, hosting, and AI setups.
+                </p>
+              </div>
+
+              <button
+                onClick={() =>
+                  setFaqModal({
+                    isOpen: true,
+                    mode: 'add',
+                    id: null,
+                    category: 'General',
+                    question: '',
+                    answer: ''
+                  })
+                }
+                className="btn btn-cta-yellow"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}
+              >
+                <Plus size={16} />
+                <span>Add FAQ</span>
+              </button>
+            </div>
+
+            {/* Category Filter */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.75rem', flexWrap: 'wrap' }}>
+              {['all', 'Pricing & Budget', 'Timeline & Delivery', 'Technology & Security', 'AI & Automation', 'Support & Maintenance'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setFaqCategoryFilter(cat)}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    borderRadius: 'var(--radius-full)',
+                    border: faqCategoryFilter === cat ? '1px solid #1d5cf0' : '1px solid var(--border-subtle)',
+                    background: faqCategoryFilter === cat ? 'rgba(29, 92, 240, 0.15)' : 'transparent',
+                    color: faqCategoryFilter === cat ? '#1d5cf0' : 'var(--text-body)',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {cat === 'all' ? 'All Categories' : cat}
+                </button>
+              ))}
+            </div>
+
+            {/* FAQs List */}
+            {(faqsData || []).filter(f => faqCategoryFilter === 'all' || f.category === faqCategoryFilter).length === 0 ? (
+              <div className="card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-dim)' }}>
+                No FAQs found in this category.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {(faqsData || [])
+                  .filter((f) => faqCategoryFilter === 'all' || f.category === faqCategoryFilter)
+                  .map((faq) => (
+                    <div
+                      key={faq.id}
+                      className="card"
+                      style={{
+                        padding: '1.25rem 1.5rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                        <div>
+                          <span
+                            style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              background: 'rgba(29, 92, 240, 0.1)',
+                              color: '#1d5cf0',
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              display: 'inline-block',
+                              marginBottom: '0.4rem'
+                            }}
+                          >
+                            {faq.category || 'General'}
+                          </span>
+                          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                            {faq.question}
+                          </h3>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
+                          <button
+                            onClick={() =>
+                              setFaqModal({
+                                isOpen: true,
+                                mode: 'edit',
+                                id: faq.id,
+                                category: faq.category || 'General',
+                                question: faq.question,
+                                answer: faq.answer
+                              })
+                            }
+                            className="btn btn-outline"
+                            style={{ padding: '0.35rem 0.65rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                          >
+                            <Edit2 size={13} />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteFaq(faq.id, faq.question)}
+                            className="btn btn-outline"
+                            style={{ padding: '0.35rem 0.6rem', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                            title="Delete FAQ"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.5, margin: 0 }}>
+                        {faq.answer}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            )}
+
+            {/* FAQ Edit/Add Modal */}
+            {faqModal.isOpen && (
+              <div
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  zIndex: 9998,
+                  background: 'rgba(0, 0, 0, 0.75)',
+                  backdropFilter: 'blur(4px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '1rem'
+                }}
+              >
+                <div
+                  className="card"
+                  style={{
+                    maxWidth: '520px',
+                    width: '100%',
+                    padding: '2rem',
+                    maxHeight: '90vh',
+                    overflowY: 'auto'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0 }}>
+                      {faqModal.mode === 'add' ? 'Add FAQ' : 'Edit FAQ'}
+                    </h3>
+                    <button
+                      onClick={() => setFaqModal((prev) => ({ ...prev, isOpen: false }))}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveFaqModal}>
+                    <div className="form-group" style={{ marginBottom: '1rem' }}>
+                      <label className="form-label">Category *</label>
+                      <select
+                        className="form-input"
+                        value={faqModal.category}
+                        onChange={(e) => setFaqModal((prev) => ({ ...prev, category: e.target.value }))}
+                      >
+                        <option value="General">General</option>
+                        <option value="Pricing & Budget">Pricing & Budget</option>
+                        <option value="Timeline & Delivery">Timeline & Delivery</option>
+                        <option value="Technology & Security">Technology & Security</option>
+                        <option value="AI & Automation">AI & Automation</option>
+                        <option value="Support & Maintenance">Support & Maintenance</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '1rem' }}>
+                      <label className="form-label">Question *</label>
+                      <input
+                        type="text"
+                        required
+                        className="form-input"
+                        placeholder="e.g. Can you build a full website in under a week?"
+                        value={faqModal.question}
+                        onChange={(e) => setFaqModal((prev) => ({ ...prev, question: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                      <label className="form-label">Answer *</label>
+                      <textarea
+                        rows={4}
+                        required
+                        className="form-input"
+                        placeholder="Provide a clear, reassuring answer with specifics..."
+                        value={faqModal.answer}
+                        onChange={(e) => setFaqModal((prev) => ({ ...prev, answer: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => setFaqModal((prev) => ({ ...prev, isOpen: false }))}
+                        className="btn btn-outline"
+                      >
+                        Cancel
+                      </button>
+                      <button type="submit" className="btn btn-cta-yellow">
+                        {faqModal.mode === 'add' ? 'Save FAQ' : 'Update FAQ'}
                       </button>
                     </div>
                   </form>

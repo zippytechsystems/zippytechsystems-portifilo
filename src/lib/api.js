@@ -316,10 +316,10 @@ export async function uploadProjectImageApi(file) {
 
 export async function getSettings() {
   const defaultSettings = {
-    phone: initialContent.founder.phone, // 6302690251
-    phoneFormatted: initialContent.founder.phoneFormatted, // +91 63026 90251
-    phoneCall: initialContent.founder.phoneCall, // +916302690251
-    whatsappNumber: initialContent.founder.whatsappNumber, // 916302690251
+    phone: initialContent.founder.phone, // 9542439498
+    phoneFormatted: initialContent.founder.phoneFormatted, // +91 95424 39498
+    phoneCall: initialContent.founder.phoneCall, // +919542439498
+    whatsappNumber: initialContent.founder.whatsappNumber, // 919542439498
     defaultWhatsAppMessage: "Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.",
     tagline: initialContent.company.tagline,
     secondaryTagline: initialContent.company.secondaryTagline,
@@ -481,6 +481,289 @@ export async function deleteEnquiryApi(id) {
       await supabase.from('enquiries').delete().eq('id', id);
     } catch (e) {
       console.error('API deleteEnquiry error:', e);
+    }
+  }
+  return { success: true };
+}
+
+// -------------------------------------------------------------
+// 5. Testimonials API
+// -------------------------------------------------------------
+
+export async function getTestimonials() {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .order('sort_order', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return data.map((t) => ({
+          id: t.id,
+          clientName: t.client_name,
+          roleOrCompany: t.role_or_company,
+          domain: t.domain,
+          rating: t.rating || 5,
+          content: t.content,
+          sortOrder: t.sort_order
+        }));
+      }
+    } catch (err) {
+      console.warn('API getTestimonials: Supabase unavailable, reading local data.', err);
+    }
+  }
+
+  try {
+    const cached = localStorage.getItem('zippy_local_testimonials');
+    if (cached) return JSON.parse(cached);
+  } catch {}
+  return initialContent.testimonials || [];
+}
+
+export async function createTestimonialApi(testimonial) {
+  const newT = {
+    id: testimonial.id || 'test-' + Date.now(),
+    clientName: sanitizeInput(testimonial.clientName),
+    roleOrCompany: sanitizeInput(testimonial.roleOrCompany),
+    domain: testimonial.domain || 'web',
+    rating: Number(testimonial.rating) || 5,
+    content: sanitizeInput(testimonial.content),
+    sortOrder: testimonial.sortOrder || 0
+  };
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('testimonials').insert({
+        id: newT.id,
+        client_name: newT.clientName,
+        role_or_company: newT.roleOrCompany,
+        domain: newT.domain,
+        rating: newT.rating,
+        content: newT.content,
+        sort_order: newT.sortOrder
+      });
+    } catch (e) {
+      console.error('API createTestimonial error:', e);
+    }
+  }
+  return newT;
+}
+
+export async function updateTestimonialApi(id, updates) {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const payload = {};
+      if (updates.clientName !== undefined) payload.client_name = sanitizeInput(updates.clientName);
+      if (updates.roleOrCompany !== undefined) payload.role_or_company = sanitizeInput(updates.roleOrCompany);
+      if (updates.domain !== undefined) payload.domain = updates.domain;
+      if (updates.rating !== undefined) payload.rating = Number(updates.rating);
+      if (updates.content !== undefined) payload.content = sanitizeInput(updates.content);
+      if (updates.sortOrder !== undefined) payload.sort_order = updates.sortOrder;
+
+      await supabase.from('testimonials').update(payload).eq('id', id);
+    } catch (e) {
+      console.error('API updateTestimonial error:', e);
+    }
+  }
+  return { success: true };
+}
+
+export async function deleteTestimonialApi(id) {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('testimonials').delete().eq('id', id);
+    } catch (e) {
+      console.error('API deleteTestimonial error:', e);
+    }
+  }
+  return { success: true };
+}
+
+// -------------------------------------------------------------
+// 6. FAQs API
+// -------------------------------------------------------------
+
+export async function getFaqs() {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('faqs')
+        .select('*')
+        .order('sort_order', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return data.map((f) => ({
+          id: f.id,
+          category: f.category,
+          question: f.question,
+          answer: f.answer,
+          sortOrder: f.sort_order
+        }));
+      }
+    } catch (err) {
+      console.warn('API getFaqs: Supabase unavailable, reading local data.', err);
+    }
+  }
+
+  try {
+    const cached = localStorage.getItem('zippy_local_faqs');
+    if (cached) return JSON.parse(cached);
+  } catch {}
+  return initialContent.faqs || [];
+}
+
+export async function createFaqApi(faq) {
+  const newF = {
+    id: faq.id || 'faq-' + Date.now(),
+    category: sanitizeInput(faq.category || 'General'),
+    question: sanitizeInput(faq.question),
+    answer: sanitizeInput(faq.answer),
+    sortOrder: faq.sortOrder || 0
+  };
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('faqs').insert({
+        id: newF.id,
+        category: newF.category,
+        question: newF.question,
+        answer: newF.answer,
+        sort_order: newF.sortOrder
+      });
+    } catch (e) {
+      console.error('API createFaq error:', e);
+    }
+  }
+  return newF;
+}
+
+export async function updateFaqApi(id, updates) {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const payload = {};
+      if (updates.category !== undefined) payload.category = sanitizeInput(updates.category);
+      if (updates.question !== undefined) payload.question = sanitizeInput(updates.question);
+      if (updates.answer !== undefined) payload.answer = sanitizeInput(updates.answer);
+      if (updates.sortOrder !== undefined) payload.sort_order = updates.sortOrder;
+
+      await supabase.from('faqs').update(payload).eq('id', id);
+    } catch (e) {
+      console.error('API updateFaq error:', e);
+    }
+  }
+  return { success: true };
+}
+
+export async function deleteFaqApi(id) {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('faqs').delete().eq('id', id);
+    } catch (e) {
+      console.error('API deleteFaq error:', e);
+    }
+  }
+  return { success: true };
+}
+
+// -------------------------------------------------------------
+// 7. Packages API
+// -------------------------------------------------------------
+
+export async function getPackages() {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('packages')
+        .select('*')
+        .order('sort_order', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return data.map((p) => ({
+          id: p.id,
+          domain: p.domain,
+          name: p.name,
+          price: p.price,
+          tagline: p.tagline,
+          deliverables: p.deliverables || [],
+          popular: p.popular || false,
+          sortOrder: p.sort_order
+        }));
+      }
+    } catch (err) {
+      console.warn('API getPackages: Supabase unavailable, reading local data.', err);
+    }
+  }
+
+  try {
+    const cached = localStorage.getItem('zippy_local_packages');
+    if (cached) return JSON.parse(cached);
+  } catch {}
+  return initialContent.packages || [];
+}
+
+export async function createPackageApi(pkg) {
+  const deliverables = Array.isArray(pkg.deliverables)
+    ? pkg.deliverables
+    : (pkg.deliverables || '').split('\n').map((d) => d.trim()).filter(Boolean);
+
+  const newP = {
+    id: pkg.id || 'pkg-' + Date.now(),
+    domain: pkg.domain || 'web',
+    name: sanitizeInput(pkg.name),
+    price: sanitizeInput(pkg.price),
+    tagline: sanitizeInput(pkg.tagline || ''),
+    deliverables,
+    popular: Boolean(pkg.popular),
+    sortOrder: pkg.sortOrder || 0
+  };
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('packages').insert({
+        id: newP.id,
+        domain: newP.domain,
+        name: newP.name,
+        price: newP.price,
+        tagline: newP.tagline,
+        deliverables: newP.deliverables,
+        popular: newP.popular,
+        sort_order: newP.sortOrder
+      });
+    } catch (e) {
+      console.error('API createPackage error:', e);
+    }
+  }
+  return newP;
+}
+
+export async function updatePackageApi(id, updates) {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const payload = {};
+      if (updates.domain !== undefined) payload.domain = updates.domain;
+      if (updates.name !== undefined) payload.name = sanitizeInput(updates.name);
+      if (updates.price !== undefined) payload.price = sanitizeInput(updates.price);
+      if (updates.tagline !== undefined) payload.tagline = sanitizeInput(updates.tagline);
+      if (updates.deliverables !== undefined) {
+        payload.deliverables = Array.isArray(updates.deliverables)
+          ? updates.deliverables
+          : updates.deliverables.split('\n').map((d) => d.trim()).filter(Boolean);
+      }
+      if (updates.popular !== undefined) payload.popular = Boolean(updates.popular);
+      if (updates.sortOrder !== undefined) payload.sort_order = updates.sortOrder;
+
+      await supabase.from('packages').update(payload).eq('id', id);
+    } catch (e) {
+      console.error('API updatePackage error:', e);
+    }
+  }
+  return { success: true };
+}
+
+export async function deletePackageApi(id) {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('packages').delete().eq('id', id);
+    } catch (e) {
+      console.error('API deletePackage error:', e);
     }
   }
   return { success: true };

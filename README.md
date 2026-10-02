@@ -60,8 +60,8 @@ As requested, the link to the admin area is kept tiny and subtle on the public w
 ## ⚡ Supabase Setup & Row Level Security (RLS)
 
 The website is engineered with a **hybrid data architecture**:
-- **With Supabase**: Reads and synchronizes data live from Supabase tables (`domains`, `services`, `projects`, `site_settings`, `enquiries`).
-- **Offline / Fallback**: If Supabase credentials are not set, it operates seamlessly using local data (`src/data/content.js`) and `localStorage` — zero downtime!
+- **With Supabase**: Reads and synchronizes data live from 7 Supabase tables (`services`, `projects`, `enquiries`, `settings`, `testimonials`, `faqs`, `packages`).
+- **Offline / Fallback**: If Supabase credentials are not set or network fails, it operates seamlessly using local data (`src/data/content.js`) and `localStorage` — zero downtime! All sections render loading skeletons, polite empty states, and fallback content.
 
 ### Step 1: Create a Supabase Project
 1. Go to [supabase.com](https://supabase.com/) and sign in.
@@ -72,14 +72,15 @@ The website is engineered with a **hybrid data architecture**:
 2. Open the file [`supabase_schema.sql`](./supabase_schema.sql) from this repository.
 3. Copy and paste the entire script into the Supabase SQL Editor and click **Run**.
 4. This script automatically:
-   - Creates the 5 relational tables: `domains`, `services`, `projects`, `site_settings`, `enquiries`.
-   - Populates initial domain data, services, prices, projects, and founder settings.
+   - Creates all 7 tables: `services`, `projects`, `enquiries`, `settings`, `testimonials`, `faqs`, `packages`.
+   - Populates seed data from existing verified content for instant readiness.
+   - Creates indexes for fast lookups.
    - Enables **Row Level Security (RLS)** on all tables.
    - Applies secure policies:
-     - Public can **SELECT** domains, services, projects, and site settings.
-     - Public can **INSERT** new enquiries (enquiry form submissions).
-     - Only authenticated administrators can **UPDATE/DELETE** services and projects, and **SELECT/UPDATE/DELETE** enquiries.
-     - The private `service_role` key is **never** exposed in the client frontend.
+     - Public can **SELECT** `services`, `projects`, `settings`, `testimonials`, `faqs`, `packages`.
+     - Public can **INSERT** into `enquiries` (validated contact submissions).
+     - Only authenticated admin (`lingaswamymaddeboina@gmail.com`) has full CRUD on all tables and read access to `enquiries`.
+     - The private `service_role` key is **never** exposed in the frontend.
 
 ### Step 3: Add Environment Variables
 1. In your Supabase project, go to **Project Settings** > **API**.
@@ -142,10 +143,10 @@ export const content = {
   },
   founder: {
     name: 'Lingaswamy',
-    phone: '6302690251',
-    phoneFormatted: '+91 63026 90251',
-    whatsappNumber: '916302690251',
-    whatsappLink: 'https://wa.me/916302690251',
+    phone: '9542439498',
+    phoneFormatted: '+91 95424 39498',
+    whatsappNumber: '919542439498',
+    whatsappLink: 'https://wa.me/919542439498',
     // ...
   }
 };
@@ -278,10 +279,13 @@ Run the SQL script provided in `supabase_schema.sql` in your Supabase SQL Editor
 - **`projects`**: Stores portfolio projects with tags, metrics, and image URLs.
 - **`enquiries`**: Captures customer leads directly from the contact form.
 - **`settings`**: Dynamic site key-value settings (phone, WhatsApp, taglines, social links).
+- **`testimonials`**: Client reviews, 5-star ratings, company info, and domain tags.
+- **`faqs`**: Frequently asked questions grouped by categories.
+- **`packages`**: Transparent pricing tiers, deliverables lists, and popular badges.
 - **Storage Bucket (`portfolio-images`)**: Public read, authenticated admin upload.
 
 ### Security Rules (RLS):
-- Public users can only read services, projects, settings, and submit enquiries.
+- Public users can only read services, projects, settings, testimonials, faqs, packages, and submit enquiries.
 - Only the authenticated admin email (`lingaswamymaddeboina@gmail.com`) can edit or view leads.
 
 ---
@@ -290,8 +294,8 @@ Run the SQL script provided in `supabase_schema.sql` in your Supabase SQL Editor
 
 - **Company**: ZippyTechSystems Pvt. Ltd.
 - **Founder**: Lingaswamy
-- **Phone / Calling**: [+91 63026 90251](tel:+916302690251)
-- **WhatsApp**: [wa.me/916302690251](https://wa.me/916302690251)
+- **Phone / Calling**: [+91 95424 39498](tel:+919542439498)
+- **WhatsApp**: [wa.me/919542439498](https://wa.me/919542439498)
 - **Instagram**: [instagram.com/zippytechsystems](https://www.instagram.com/zippytechsystems)
 - **YouTube**: [youtube.com/@zippytechsystems](https://www.youtube.com/@zippytechsystems)
 - **Location**: Hyderabad, Telangana, India
