@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MessageCircle, Phone, Mail, MapPin, Send, CheckCircle2 } from 'lucide-react';
 import { content, buildEnquiryWhatsAppUrl, buildWhatsAppUrl } from '../data/content';
+import { useData } from '../context/DataContext';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -11,18 +12,33 @@ export default function ContactSection() {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
+  const { saveEnquiry } = useData();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.phone.trim()) {
       alert('Please provide your name and phone number so Lingaswamy can reply to your quote.');
       return;
     }
 
+    // 1. Save to Supabase (or local fallback)
+    try {
+      await saveEnquiry({
+        name: formData.name,
+        phone: formData.phone,
+        service: formData.service,
+        message: formData.message
+      });
+    } catch (err) {
+      console.warn('Error saving enquiry to database:', err);
+    }
+
+    // 2. Open WhatsApp with prefilled message
     const whatsappUrl = buildEnquiryWhatsAppUrl({
       name: formData.name,
       phone: formData.phone,
@@ -31,7 +47,6 @@ export default function ContactSection() {
     });
 
     setFormSubmitted(true);
-    // Open WhatsApp in new tab with prefilled message
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 

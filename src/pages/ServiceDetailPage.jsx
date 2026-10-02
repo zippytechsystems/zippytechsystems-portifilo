@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { content, buildWhatsAppUrl } from '../data/content';
+import { useData } from '../context/DataContext';
 import ContactSection from '../components/ContactSection';
 import {
   Globe,
@@ -23,7 +24,9 @@ const iconMap = {
 
 export default function ServiceDetailPage() {
   const { slug } = useParams();
-  const service = content.services.find((s) => s.slug === slug);
+  const { servicesData } = useData();
+  const services = servicesData && servicesData.length > 0 ? servicesData : content.services;
+  const service = services.find((s) => s.slug === slug);
 
   if (!service) {
     return (

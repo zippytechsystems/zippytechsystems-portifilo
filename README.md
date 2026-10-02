@@ -24,6 +24,75 @@ A modern, high-performance portfolio website for **ZippyTechSystems Pvt. Ltd.**,
 
 ---
 
+## 🔐 Protected Admin Panel (`/admin`)
+
+The website includes a mobile-friendly, secure administrative dashboard located at **`/admin`**.
+
+### 🔑 Owner Login Credentials
+- **Username**: `lingaswamymaddeboina`
+- **Password**: `linga@123`
+
+### 🕵️ Discreet Website Access
+As requested, the link to the admin area is kept tiny and subtle on the public website so regular customers do not notice it:
+- Located at the bottom right corner of the **Footer** right after "Terms" in low opacity (`admin`).
+- Also available as a faint anchor at the bottom-right edge of the screen.
+
+### 🎛️ Admin Features
+1. **Services & Pricing Management**:
+   - Edit the starting price per domain: Web (from ₹7,000), App (from ₹10,000), AI (from ₹6,000).
+   - Add, edit, delete services under each domain.
+   - Mark items as **"Main Services"** (prominently displayed) or **"More Services"** (compact bullet points).
+2. **Portfolio Projects CRUD**:
+   - Add new projects with title, domain (`web`, `app`, `ai`), client category, description, metrics, live URL, and image upload/URL.
+   - Delete or edit existing showcase projects.
+3. **Customer Enquiries & Lead Management**:
+   - The public website's enquiry form automatically saves each lead to the database (Name, Phone, Service, Message, Timestamp) **AND** opens WhatsApp with prefilled project scope.
+   - Admin view displays a live table of all customer leads.
+   - Search leads by customer name, phone number, or project requirements.
+   - Filter leads by status (`All`, `New`, `Contacted`, `Closed`) and service category.
+   - One-click **"Call"** button (triggers direct mobile call) and **"WhatsApp"** button (opens instant conversation with that client).
+   - Change lead status dropdown (`New` ➔ `Contacted` ➔ `Closed`).
+4. **Site Settings Editor**:
+   - Edit phone number, WhatsApp number, prefilled WhatsApp message, brand tagline, and location.
+
+---
+
+## ⚡ Supabase Setup & Row Level Security (RLS)
+
+The website is engineered with a **hybrid data architecture**:
+- **With Supabase**: Reads and synchronizes data live from Supabase tables (`domains`, `services`, `projects`, `site_settings`, `enquiries`).
+- **Offline / Fallback**: If Supabase credentials are not set, it operates seamlessly using local data (`src/data/content.js`) and `localStorage` — zero downtime!
+
+### Step 1: Create a Supabase Project
+1. Go to [supabase.com](https://supabase.com/) and sign in.
+2. Click **"New Project"** and select your preferred region (e.g., South Asia / Mumbai).
+
+### Step 2: Run the SQL Schema
+1. In your Supabase dashboard, click on the **SQL Editor** on the left menu.
+2. Open the file [`supabase_schema.sql`](./supabase_schema.sql) from this repository.
+3. Copy and paste the entire script into the Supabase SQL Editor and click **Run**.
+4. This script automatically:
+   - Creates the 5 relational tables: `domains`, `services`, `projects`, `site_settings`, `enquiries`.
+   - Populates initial domain data, services, prices, projects, and founder settings.
+   - Enables **Row Level Security (RLS)** on all tables.
+   - Applies secure policies:
+     - Public can **SELECT** domains, services, projects, and site settings.
+     - Public can **INSERT** new enquiries (enquiry form submissions).
+     - Only authenticated administrators can **UPDATE/DELETE** services and projects, and **SELECT/UPDATE/DELETE** enquiries.
+     - The private `service_role` key is **never** exposed in the client frontend.
+
+### Step 3: Add Environment Variables
+1. In your Supabase project, go to **Project Settings** > **API**.
+2. Copy your **Project URL** and **anon / public key**.
+3. Create a `.env` file in the root directory of this project:
+   ```env
+   VITE_SUPABASE_URL=https://your-project-id.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+   ```
+4. Restart the development server (`npm run dev`) or redeploy to Vercel/Netlify with these environment variables added in the hosting dashboard.
+
+---
+
 ## 🛠️ How to Run Locally
 
 ### Prerequisites
@@ -41,6 +110,7 @@ npm install
 npm run dev
 ```
 The site will launch at: **`http://localhost:5173/`**
+Admin panel: **`http://localhost:5173/admin`**
 
 ### Step 3: Build for Production
 To generate an optimized production bundle:

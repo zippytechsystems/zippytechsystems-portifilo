@@ -195,9 +195,49 @@ export default function Footer() {
             </span>
             <Link to="/privacy" style={{ color: '#94a3b8' }}>Privacy</Link>
             <Link to="/terms" style={{ color: '#94a3b8' }}>Terms</Link>
+            {/* Discreet Admin link */}
+            <Link
+              to="/admin"
+              style={{
+                color: '#475569',
+                fontSize: '0.68rem',
+                textDecoration: 'none',
+                opacity: 0.3,
+                transition: 'opacity 0.2s ease',
+                letterSpacing: '0.02em',
+                userSelect: 'none',
+                padding: '2px 4px'
+              }}
+              onMouseEnter={(e) => (e.target.style.opacity = '0.9')}
+              onMouseLeave={(e) => (e.target.style.opacity = '0.3')}
+              title="Admin Portal"
+            >
+              admin
+            </Link>
           </div>
         </div>
 
+        {/* Tiny subtle right-side anchor for owner convenience without drawing public attention */}
+        <Link
+          to="/admin"
+          style={{
+            position: 'fixed',
+            right: '6px',
+            bottom: '6px',
+            fontSize: '9px',
+            color: '#94a3b8',
+            opacity: 0.18,
+            textDecoration: 'none',
+            zIndex: 40,
+            userSelect: 'none',
+            letterSpacing: '0.02em'
+          }}
+          onMouseEnter={(e) => (e.target.style.opacity = '0.8')}
+          onMouseLeave={(e) => (e.target.style.opacity = '0.18')}
+          aria-label="Admin"
+        >
+          admin
+        </Link>
       </div>
     </footer>
   );

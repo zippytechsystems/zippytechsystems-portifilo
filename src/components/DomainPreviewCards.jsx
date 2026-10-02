@@ -1,8 +1,12 @@
 import React from 'react';
 import { Globe, Smartphone, Cpu, ArrowDown, ArrowRight } from 'lucide-react';
 import { content } from '../data/content';
+import { useData } from '../context/DataContext';
 
 export default function DomainPreviewCards() {
+  const { servicesData } = useData();
+  const services = servicesData && servicesData.length > 0 ? servicesData : content.services;
+
   const iconMap = {
     Globe: <Globe size={24} />,
     Smartphone: <Smartphone size={24} />,
@@ -26,7 +30,7 @@ export default function DomainPreviewCards() {
             gap: '1.25rem'
           }}
         >
-          {content.services.map((service) => {
+          {services.map((service) => {
             const isWeb = service.domain === 'web';
             const isApp = service.domain === 'app';
             const isAI = service.domain === 'ai';

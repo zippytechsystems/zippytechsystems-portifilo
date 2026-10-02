@@ -13,8 +13,12 @@ import {
   Check
 } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
+import { useData } from '../context/DataContext';
 
 export default function ServicesSection() {
+  const { servicesData } = useData();
+  const services = servicesData && servicesData.length > 0 ? servicesData : content.services;
+
   const iconMap = {
     Globe: <Globe size={32} />,
     Smartphone: <Smartphone size={32} />,
@@ -27,7 +31,7 @@ export default function ServicesSection() {
         Each Domain is rendered ONE BY ONE as a dedicated, full-width section stacked vertically.
         No mixing in a single grid!
       */}
-      {content.services.map((service, index) => {
+      {services.map((service, index) => {
         const isWeb = service.domain === 'web';
         const isApp = service.domain === 'app';
         const isAI = service.domain === 'ai';

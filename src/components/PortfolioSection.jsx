@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { ExternalLink, MessageCircle, ArrowUpRight } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
+import { useData } from '../context/DataContext';
 
 export default function PortfolioSection() {
   const [activeFilter, setActiveFilter] = useState('all');
+  const { projectsData } = useData();
+  const allProjects = projectsData && projectsData.length > 0 ? projectsData : content.projects;
 
   const filterTabs = [
     { id: 'all', label: 'All Projects' },
@@ -14,8 +17,8 @@ export default function PortfolioSection() {
 
   const filteredProjects =
     activeFilter === 'all'
-      ? content.projects
-      : content.projects.filter((p) => p.domain === activeFilter);
+      ? allProjects
+      : allProjects.filter((p) => p.domain === activeFilter);
 
   return (
     <section id="projects" style={{ padding: '5rem 0', background: 'var(--bg-surface)' }} aria-labelledby="portfolio-heading">
