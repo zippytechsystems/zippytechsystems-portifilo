@@ -1,6 +1,7 @@
 import React from 'react';
 import { MessageCircle, ArrowRight, ShieldCheck, Zap, BadgePercent, Headphones, CheckCircle2 } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
+import DomainPreviewCards from './DomainPreviewCards';
 
 export default function Hero({ onOpenQuoteModal, onExploreServices }) {
   const heroWhatsAppUrl = buildWhatsAppUrl(
@@ -12,7 +13,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
       style={{
         position: 'relative',
         paddingTop: 'calc(var(--navbar-height) + 3.5rem)',
-        paddingBottom: '4.5rem',
+        paddingBottom: '3rem',
         overflow: 'hidden'
       }}
       aria-labelledby="hero-heading"
@@ -37,7 +38,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
       />
 
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{ maxWidth: '880px', margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
           
           {/* Top Pill Badge */}
           <div
@@ -46,7 +47,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              padding: '0.4rem 1rem',
+              padding: '0.4rem 1.1rem',
               borderRadius: 'var(--radius-full)',
               background: 'var(--bg-glass-subtle)',
               border: '1px solid var(--border-glass-hover)',
@@ -64,7 +65,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               }}
             />
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)' }}>
-              Direct line to founder Lingaswamy: <span style={{ color: '#12a150' }}>9542439498</span>
+              Direct line to founder Lingaswamy: <span style={{ color: '#12a150' }}>{content.founder.phone}</span>
             </span>
           </div>
 
@@ -96,8 +97,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
               color: 'var(--text-body)',
               lineHeight: 1.6,
-              marginBottom: '2rem',
-              maxWidth: '740px',
+              marginBottom: '2.25rem',
+              maxWidth: '760px',
               marginLeft: 'auto',
               marginRight: 'auto'
             }}
@@ -108,28 +109,6 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             </strong>
           </p>
 
-          {/* Pricing Quick-Badges */}
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.75rem',
-              marginBottom: '2.5rem'
-            }}
-          >
-            <a href="#services" className="badge badge-web" style={{ fontSize: '0.86rem', padding: '0.45rem 1rem' }}>
-              <span style={{ fontWeight: 700 }}>Web</span> from ₹7,000
-            </a>
-            <a href="#services" className="badge badge-app" style={{ fontSize: '0.86rem', padding: '0.45rem 1rem' }}>
-              <span style={{ fontWeight: 700 }}>App</span> from ₹10,000
-            </a>
-            <a href="#services" className="badge badge-ai" style={{ fontSize: '0.86rem', padding: '0.45rem 1rem' }}>
-              <span style={{ fontWeight: 700 }}>AI</span> from ₹6,000
-            </a>
-          </div>
-
           {/* Primary Action Buttons */}
           <div
             style={{
@@ -138,7 +117,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '1rem',
-              marginBottom: '3.5rem'
+              marginBottom: '3rem'
             }}
           >
             <a
@@ -163,7 +142,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
                 fontSize: '1rem'
               }}
             >
-              <span>Explore Services &amp; Prices</span>
+              <span>Explore 3 Domains</span>
               <ArrowRight size={17} />
             </button>
           </div>
@@ -174,7 +153,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
               gap: '1rem',
-              textAlign: 'left'
+              textAlign: 'left',
+              marginBottom: '3.5rem'
             }}
           >
             {content.trustPoints.map((trust) => {
@@ -218,6 +198,10 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
           </div>
 
         </div>
+
+        {/* 3 Domain Preview Cards linking directly to each stacked section */}
+        <DomainPreviewCards />
+
       </div>
     </section>
   );
