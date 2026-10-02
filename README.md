@@ -207,14 +207,22 @@ projects: [
 
 > **SPA Routing on Vercel**: A `vercel.json` file is included in this repository to handle client-side routing rewrites automatically.
 
-### Option B: Deploy on Netlify
-1. Log in to [netlify.com](https://www.netlify.com/) with GitHub.
-2. Click **"Add new site"** > **"Import an existing project"**.
-3. Select `zippytechsystems-portifilo`.
-4. Configure build settings:
+### Option B: Deploy on Netlify (Recommended)
+1. Push your repository to GitHub:
+   ```bash
+   git push -u origin main
+   ```
+2. Log in to [netlify.com](https://www.netlify.com/) and click **"Add new site"** > **"Import an existing project"**.
+3. Select **GitHub** and pick `zippytechsystems-portifilo`.
+4. The build settings are auto-detected via [`netlify.toml`](./netlify.toml):
    - **Build command**: `npm run build`
    - **Publish directory**: `dist`
-5. Click **"Deploy site"**.
+5. Click **"Site configuration"** (or **"Environment variables"**):
+   Add the following exact environment variables:
+   - `VITE_SUPABASE_URL` = `https://cdrwrbmabcyhxngvyrxh.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` = `sb_publishable_G1oB1splS3Wb92LbNZ90pA_NAxOUXpC`
+   *(Or your custom Supabase URL and publishable/anon key. Never add or expose the service_role key!)*
+6. Click **"Deploy site"**. Both `public/_redirects` and `netlify.toml` ensure Single Page App (SPA) client-side routing works smoothly across all URLs (`/admin`, `/services`, etc.).
 
 ---
 
@@ -222,7 +230,9 @@ projects: [
 
 ```text
 zippytechsystems-portfolio/
+├── netlify.toml                # Netlify build configuration & SPA redirects
 ├── public/                     # Static assets & SVG project illustrations
+│   ├── _redirects              # Netlify SPA fallback redirect rule (/* /index.html 200)
 │   ├── projects/               # Domain-specific SVG mockups (saree-app, clinic-web, etc.)
 │   ├── robots.txt              # Search engine crawler instructions
 │   └── sitemap.xml             # XML sitemap for SEO indexing
@@ -230,22 +240,22 @@ zippytechsystems-portfolio/
 │   ├── components/             # Reusable UI components
 │   │   ├── Navbar.jsx          # Header with theme toggle & WhatsApp CTA
 │   │   ├── Hero.jsx            # Hero banner with ambient motion & trust points
-│   │   ├── ServicesSection.jsx # Domain cards with starting INR prices
+│   │   ├── ServicesSection.jsx # Domain cards with dynamic INR prices from Supabase
 │   │   ├── PortfolioSection.jsx# Filterable project grid (Web / App / AI)
 │   │   ├── WhyChooseUs.jsx     # Value proposition for Indian SMBs
 │   │   ├── AboutSection.jsx    # Company story, mission & founder Lingaswamy
-│   │   ├── ContactSection.jsx  # Zero-backend prefilled WhatsApp enquiry form
+│   │   ├── ContactSection.jsx  # Lead submission to Supabase + WhatsApp routing
 │   │   ├── FloatingWhatsApp.jsx# Sticky pulsing WhatsApp button
-│   │   └── Footer.jsx          # Brand lockup, copyright, and quick links
+│   │   └── Footer.jsx          # Brand lockup, social links, and discrete admin link
 │   ├── context/
-│   │   ├── AdminAuthContext.jsx # Supabase Auth & session manager
-│   │   ├── DataContext.jsx     # Unified dynamic data state & offline cache
+│   │   ├── AdminAuthContext.jsx # Supabase Auth & session manager with password reset
+│   │   ├── DataContext.jsx     # Unified Supabase Realtime subscriptions & offline cache
 │   │   └── ThemeContext.jsx    # Light / Dark mode state management
 │   ├── data/
-│   │   └── content.js          # CENTRAL CONTENT FILE (Edit everything here!)
+│   │   └── content.js          # Fallback content file when database is offline
 │   ├── lib/
-│   │   ├── api.js              # Full database abstraction layer (CRUD, fallback, sanitization)
-│   │   └── supabase.js         # Supabase client & environment configuration
+│   │   ├── api.js              # Complete database abstraction layer (CRUD, sanitization)
+│   │   └── supabase.js         # Resilient Supabase client with legacy key fallback
 │   ├── pages/                  # Page routes (Home, Projects, About, Contact, Services, Admin)
 │   ├── styles/
 │   │   ├── tokens.css          # Brand color tokens & light/dark variables
@@ -253,7 +263,8 @@ zippytechsystems-portfolio/
 │   │   └── index.css           # Global typography & accessible controls
 │   ├── App.jsx                 # Router layout coordinator
 │   └── main.jsx                # Application root entry
-├── supabase_schema.sql         # Supabase Postgres tables, indexes & RLS policies
+├── supabase_schema.sql         # 9 Postgres tables, RLS policies, price history trigger & seed
+├── .env.example                # Safe environment variable template
 ├── index.html                  # HTML entry with Bricolage Grotesque & JSON-LD
 ├── package.json                # Project dependencies and npm scripts
 ├── vercel.json                 # Vercel SPA routing rewrites
@@ -269,24 +280,34 @@ The website supports Supabase for live dynamic content and administration with o
 ### 1. Environment Variables
 Create `.env` in the root:
 ```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-public-key
+VITE_SUPABASE_URL=https://cdrwrbmabcyhxngvyrxh.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_G1oB1splS3Wb92LbNZ90pA_NAxOUXpC
 ```
 
 ### 2. Database Tables & Row-Level Security
-Run the SQL script provided in `supabase_schema.sql` in your Supabase SQL Editor:
-- **`services`**: Stores domain services (main and more offerings) with sort order and descriptions.
-- **`projects`**: Stores portfolio projects with tags, metrics, and image URLs.
-- **`enquiries`**: Captures customer leads directly from the contact form.
-- **`settings`**: Dynamic site key-value settings (phone, WhatsApp, taglines, social links).
+Run the SQL script provided in [`supabase_schema.sql`](./supabase_schema.sql) in your Supabase SQL Editor:
+- **`settings`**: Dynamic site key-value settings (phone `9542439498`, WhatsApp, taglines, social links).
+- **`domains`**: Web, App, AI starting prices stored as pure numbers with live INR formatting.
+- **`services`**: Domain services (main and more offerings) with sort order and descriptions.
+- **`packages`**: Transparent pricing tiers, deliverables lists, and popular badges.
+- **`projects`**: Portfolio projects with tags, metrics, and image URLs.
 - **`testimonials`**: Client reviews, 5-star ratings, company info, and domain tags.
 - **`faqs`**: Frequently asked questions grouped by categories.
-- **`packages`**: Transparent pricing tiers, deliverables lists, and popular badges.
-- **Storage Bucket (`portfolio-images`)**: Public read, authenticated admin upload.
+- **`enquiries`**: Captures customer leads directly from the contact form.
+- **`price_history`**: Audit trail populated automatically by Postgres triggers whenever a domain or package price is changed.
+- **Storage Bucket (`portfolio-images`)**: Public read, authenticated admin upload with 2MB limits.
 
-### Security Rules (RLS):
-- Public users can only read services, projects, settings, testimonials, faqs, packages, and submit enquiries.
-- Only the authenticated admin email (`lingaswamymaddeboina@gmail.com`) can edit or view leads.
+### 3. Enable Realtime Publications
+To allow prices to auto-update on visitors' screens without page reload:
+1. In Supabase Dashboard, navigate to **Database** > **Publications**.
+2. Select `supabase_realtime`.
+3. Enable replication for `domains`, `packages`, `settings`, and `services`.
+
+### 4. Admin User Creation
+1. Go to Supabase Dashboard > **Authentication** > **Users**.
+2. Click **"Add user"** > **"Create user"**.
+3. Email: `lingaswamymaddeboina@gmail.com`
+4. Set your secure password.
 
 ---
 

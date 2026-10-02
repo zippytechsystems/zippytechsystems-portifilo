@@ -1,23 +1,24 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { isSupabaseConfigured } from '../lib/supabase';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { content as initialContent } from '../data/content';
 import {
+  formatINR,
+  getDomains,
+  updateDomainPriceApi,
   getServices,
-  getProjects,
-  getSettings,
-  createEnquiry,
-  getEnquiriesApi,
   createServiceApi,
   updateServiceApi,
   deleteServiceApi,
-  updateDomainPriceApi,
+  getPackages,
+  createPackageApi,
+  updatePackageApi,
+  updatePackagePriceApi,
+  deletePackageApi,
+  getProjects,
   createProjectApi,
   updateProjectApi,
   deleteProjectApi,
   uploadProjectImageApi,
-  updateEnquiryStatusApi,
-  deleteEnquiryApi,
-  updateSettingsApi,
   getTestimonials,
   createTestimonialApi,
   updateTestimonialApi,
@@ -26,434 +27,467 @@ import {
   createFaqApi,
   updateFaqApi,
   deleteFaqApi,
-  getPackages,
-  createPackageApi,
-  updatePackageApi,
-  deletePackageApi
+  getSettings,
+  updateSettingsApi,
+  createEnquiry,
+  getEnquiriesApi,
+  updateEnquiryStatusApi,
+  deleteEnquiryApi,
+  getPriceHistoryApi
 } from '../lib/api';
 
 const DataContext = createContext();
 
 export function DataProvider({ children }) {
-  const [servicesData, setServicesData] = useState(() => {
-    try {
-      const cached = localStorage.getItem('zippy_local_services');
-      return cached ? JSON.parse(cached) : initialContent.services;
-    } catch {
-      return initialContent.services;
-    }
-  });
+  // State for all 7 dynamic entities + domains + price history
+  const [domainsData, setDomainsData] = useState([
+    { id: 'web', key: 'web', name: 'Web Development', starting_price: 7000, price_label: 'Starting from', color: '#1d5cf0' },
+    { id: 'app', key: 'app', name: 'App Development', starting_price: 10000, price_label: 'Starting from', color: '#12a150' },
+    { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 6000, price_label: 'Starting from', color: '#7a2fd0' }
+  ]);
 
-  const [projectsData, setProjectsData] = useState(() => {
-    try {
-      const cached = localStorage.getItem('zippy_local_projects');
-      return cached ? JSON.parse(cached) : initialContent.projects;
-    } catch {
-      return initialContent.projects;
-    }
+  const [servicesData, setServicesData] = useState(initialContent.services);
+  const [packagesData, setPackagesData] = useState(initialContent.packages || []);
+  const [projectsData, setProjectsData] = useState(initialContent.projects || []);
+  const [testimonialsData, setTestimonialsData] = useState(initialContent.testimonials || []);
+  const [faqsData, setFaqsData] = useState(initialContent.faqs || []);
+  const [settingsData, setSettingsData] = useState({
+    phone: initialContent.founder.phone,
+    whatsappNumber: initialContent.founder.whatsappNumber,
+    defaultWhatsAppMessage: 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.',
+    tagline: initialContent.company.tagline,
+    secondaryTagline: initialContent.company.secondaryTagline,
+    location: initialContent.company.location,
+    instagramUrl: initialContent.social?.instagram || 'https://www.instagram.com/zippytechsystems',
+    youtubeUrl: initialContent.social?.youtube || 'https://www.youtube.com/@zippytechsystems'
   });
+  const [enquiries, setEnquiries] = useState([]);
+  const [priceHistory, setPriceHistory] = useState([]);
 
-  const [testimonialsData, setTestimonialsData] = useState(() => {
-    try {
-      const cached = localStorage.getItem('zippy_local_testimonials');
-      return cached ? JSON.parse(cached) : initialContent.testimonials || [];
-    } catch {
-      return initialContent.testimonials || [];
-    }
-  });
-
-  const [faqsData, setFaqsData] = useState(() => {
-    try {
-      const cached = localStorage.getItem('zippy_local_faqs');
-      return cached ? JSON.parse(cached) : initialContent.faqs || [];
-    } catch {
-      return initialContent.faqs || [];
-    }
-  });
-
-  const [packagesData, setPackagesData] = useState(() => {
-    try {
-      const cached = localStorage.getItem('zippy_local_packages');
-      return cached ? JSON.parse(cached) : initialContent.packages || [];
-    } catch {
-      return initialContent.packages || [];
-    }
-  });
-
-  const [settingsData, setSettingsData] = useState(() => {
-    try {
-      const cached = localStorage.getItem('zippy_local_settings');
-      return cached
-        ? JSON.parse(cached)
-        : {
-            phone: initialContent.founder.phone,
-            phoneFormatted: initialContent.founder.phoneFormatted,
-            phoneCall: initialContent.founder.phoneCall,
-            whatsappNumber: initialContent.founder.whatsappNumber,
-            defaultWhatsAppMessage: 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.',
-            tagline: initialContent.company.tagline,
-            secondaryTagline: initialContent.company.secondaryTagline,
-            location: initialContent.company.location,
-            instagramUrl: initialContent.social?.instagram || 'https://www.instagram.com/zippytechsystems',
-            youtubeUrl: initialContent.social?.youtube || 'https://www.youtube.com/@zippytechsystems'
-          };
-    } catch {
-      return {
-        phone: initialContent.founder.phone,
-        phoneFormatted: initialContent.founder.phoneFormatted,
-        phoneCall: initialContent.founder.phoneCall,
-        whatsappNumber: initialContent.founder.whatsappNumber,
-        defaultWhatsAppMessage: 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.',
-        tagline: initialContent.company.tagline,
-        secondaryTagline: initialContent.company.secondaryTagline,
-        location: initialContent.company.location,
-        instagramUrl: initialContent.social?.instagram || 'https://www.instagram.com/zippytechsystems',
-        youtubeUrl: initialContent.social?.youtube || 'https://www.youtube.com/@zippytechsystems'
-      };
-    }
-  });
-
-  const [enquiries, setEnquiries] = useState(() => {
-    try {
-      const cached = localStorage.getItem('zippy_local_enquiries');
-      return cached ? JSON.parse(cached) : [];
-    } catch {
-      return [];
-    }
-  });
-
+  const [loading, setLoading] = useState(true);
   const [isLiveConnected, setIsLiveConnected] = useState(isSupabaseConfigured);
-  const [loading, setLoading] = useState(false);
 
-  // Sync data on mount via API layer
-  useEffect(() => {
-    let mounted = true;
-    async function loadAllData() {
-      setLoading(true);
-      try {
-        const [services, projects, settings, enqs, tests, faqs, pkgs] = await Promise.all([
-          getServices(),
-          getProjects(),
-          getSettings(),
-          getEnquiriesApi(),
-          getTestimonials(),
-          getFaqs(),
-          getPackages()
-        ]);
+  // Fetch all fresh data
+  const loadAllData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [doms, srvs, pkgs, projs, tests, fqs, sttngs, enqs, phist] = await Promise.all([
+        getDomains(),
+        getServices(),
+        getPackages(),
+        getProjects(),
+        getTestimonials(),
+        getFaqs(),
+        getSettings(),
+        getEnquiriesApi(),
+        getPriceHistoryApi()
+      ]);
 
-        if (mounted) {
-          if (services && services.length > 0) setServicesData(services);
-          if (projects && projects.length > 0) setProjectsData(projects);
-          if (settings) setSettingsData(settings);
-          if (enqs && enqs.length > 0) setEnquiries(enqs);
-          if (tests && tests.length > 0) setTestimonialsData(tests);
-          if (faqs && faqs.length > 0) setFaqsData(faqs);
-          if (pkgs && pkgs.length > 0) setPackagesData(pkgs);
-          setIsLiveConnected(isSupabaseConfigured);
-        }
-      } catch (err) {
-        console.warn('DataContext: API synchronization fallback active.', err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
+      if (doms && doms.length > 0) setDomainsData(doms);
+      if (srvs && srvs.length > 0) setServicesData(srvs);
+      if (pkgs && pkgs.length > 0) setPackagesData(pkgs);
+      if (projs && projs.length > 0) setProjectsData(projs);
+      if (tests && tests.length > 0) setTestimonialsData(tests);
+      if (fqs && fqs.length > 0) setFaqsData(fqs);
+      if (sttngs) setSettingsData(sttngs);
+      if (enqs) setEnquiries(enqs);
+      if (phist) setPriceHistory(phist);
+
+      setIsLiveConnected(isSupabaseConfigured && Boolean(supabase));
+    } catch (err) {
+      console.warn('DataContext synchronization warning:', err);
+    } finally {
+      setLoading(false);
     }
+  }, []);
 
+  // Initial load
+  useEffect(() => {
     loadAllData();
+  }, [loadAllData]);
+
+  // Realtime Subscriptions: Auto-update live website on changes to domains, packages, settings
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) return;
+
+    const channel = supabase
+      .channel('zippy_live_website_sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'domains' },
+        async () => {
+          const freshDomains = await getDomains();
+          setDomainsData(freshDomains);
+          const freshServices = await getServices();
+          setServicesData(freshServices);
+          const freshHistory = await getPriceHistoryApi();
+          setPriceHistory(freshHistory);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'packages' },
+        async () => {
+          const freshPkgs = await getPackages();
+          setPackagesData(freshPkgs);
+          const freshHistory = await getPriceHistoryApi();
+          setPriceHistory(freshHistory);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'settings' },
+        async () => {
+          const freshSettings = await getSettings();
+          setSettingsData(freshSettings);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'services' },
+        async () => {
+          const freshServices = await getServices();
+          setServicesData(freshServices);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'projects' },
+        async () => {
+          const freshProjs = await getProjects();
+          setProjectsData(freshProjs);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'testimonials' },
+        async () => {
+          const freshTests = await getTestimonials();
+          setTestimonialsData(freshTests);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'faqs' },
+        async () => {
+          const freshFaqs = await getFaqs();
+          setFaqsData(freshFaqs);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'enquiries' },
+        async () => {
+          const freshEnqs = await getEnquiriesApi();
+          setEnquiries(freshEnqs);
+        }
+      )
+      .subscribe();
+
     return () => {
-      mounted = false;
+      supabase.removeChannel(channel);
     };
   }, []);
 
-  // Persistence helpers
-  const persistServices = (data) => {
-    setServicesData(data);
-    try {
-      localStorage.setItem('zippy_local_services', JSON.stringify(data));
-    } catch {}
+  // Helper: Retrieve formatted price for any domain ('web', 'app', 'ai')
+  const getDomainPrice = (key) => {
+    const d = domainsData.find((item) => item.key === key || item.id === key);
+    if (!d) {
+      if (key === 'web') return '₹7,000';
+      if (key === 'app') return '₹10,000';
+      if (key === 'ai') return '₹6,000';
+      return '₹7,000';
+    }
+    return formatINR(d.starting_price);
   };
 
-  const persistProjects = (data) => {
-    setProjectsData(data);
-    try {
-      localStorage.setItem('zippy_local_projects', JSON.stringify(data));
-    } catch {}
+  const getDomainPriceNum = (key) => {
+    const d = domainsData.find((item) => item.key === key || item.id === key);
+    if (!d) {
+      if (key === 'web') return 7000;
+      if (key === 'app') return 10000;
+      if (key === 'ai') return 6000;
+      return 7000;
+    }
+    return Number(d.starting_price) || 0;
   };
 
-  const persistSettings = async (data) => {
-    setSettingsData(data);
-    try {
-      localStorage.setItem('zippy_local_settings', JSON.stringify(data));
-    } catch {}
-    await updateSettingsApi(data);
-  };
-
-  const persistEnquiries = (data) => {
-    setEnquiries(data);
-    try {
-      localStorage.setItem('zippy_local_enquiries', JSON.stringify(data));
-    } catch {}
-  };
-
-  // 1. Update Domain Starting Price
-  const updateDomainPrice = async (domainSlug, newPrice) => {
-    const updated = servicesData.map((s) =>
-      s.slug === domainSlug ? { ...s, startingPrice: newPrice } : s
+  // -------------------------------------------------------------
+  // Prices Tab Actions
+  // -------------------------------------------------------------
+  const updateDomainPrice = async (domainId, newPrice) => {
+    const numeric = Math.max(0, Number(newPrice) || 0);
+    // Optimistic local update
+    setDomainsData((prev) =>
+      prev.map((d) => (d.id === domainId || d.key === domainId ? { ...d, starting_price: numeric } : d))
     );
-    persistServices(updated);
-    await updateDomainPriceApi(domainSlug, newPrice);
+    setServicesData((prev) =>
+      prev.map((s) => (s.domain === domainId ? { ...s, startingPrice: formatINR(numeric), startingPriceNum: numeric } : s))
+    );
+
+    const res = await updateDomainPriceApi(domainId, numeric);
+    const hist = await getPriceHistoryApi();
+    setPriceHistory(hist);
+    return res;
   };
 
-  // 2. Add Service
-  const addServiceItem = async (domainSlug, type, title, desc = '') => {
-    const updated = servicesData.map((s) => {
-      if (s.slug !== domainSlug) return s;
-      if (type === 'main') {
-        return {
-          ...s,
-          mainServices: [...(s.mainServices || []), { title, desc }]
-        };
-      } else {
-        return {
-          ...s,
-          moreServices: [...(s.moreServices || []), title]
-        };
-      }
+  const updatePackagePrice = async (packageId, newPrice) => {
+    const numeric = Math.max(0, Number(newPrice) || 0);
+    setPackagesData((prev) =>
+      prev.map((p) => (p.id === packageId ? { ...p, price: formatINR(numeric), priceNum: numeric } : p))
+    );
+
+    const res = await updatePackagePriceApi(packageId, numeric);
+    const hist = await getPriceHistoryApi();
+    setPriceHistory(hist);
+    return res;
+  };
+
+  const saveAllPrices = async (domainPricesObj, packagePricesObj) => {
+    const promises = [];
+    Object.entries(domainPricesObj).forEach(([dId, price]) => {
+      promises.push(updateDomainPrice(dId, price));
     });
-    persistServices(updated);
-    await createServiceApi({ domain_id: domainSlug, type, title, description: desc });
-  };
-
-  // 3. Edit Service
-  const editServiceItem = async (domainSlug, type, index, updatedItem) => {
-    let oldTitle = '';
-    const updated = servicesData.map((s) => {
-      if (s.slug !== domainSlug) return s;
-      if (type === 'main') {
-        const list = [...s.mainServices];
-        oldTitle = list[index]?.title || '';
-        list[index] = { title: updatedItem.title, desc: updatedItem.desc || '' };
-        return { ...s, mainServices: list };
-      } else {
-        const list = [...s.moreServices];
-        oldTitle = list[index] || '';
-        list[index] = updatedItem.title;
-        return { ...s, moreServices: list };
-      }
+    Object.entries(packagePricesObj).forEach(([pkgId, price]) => {
+      promises.push(updatePackagePrice(pkgId, price));
     });
-    persistServices(updated);
-    await updateServiceApi(domainSlug, type, oldTitle || updatedItem.title, updatedItem);
+    await Promise.all(promises);
+    const hist = await getPriceHistoryApi();
+    setPriceHistory(hist);
+    return { success: true };
   };
 
-  // 4. Delete Service
-  const deleteServiceItem = async (domainSlug, type, indexOrTitle) => {
-    let titleToDelete = typeof indexOrTitle === 'string' ? indexOrTitle : '';
-    const updated = servicesData.map((s) => {
-      if (s.slug !== domainSlug) return s;
-      if (type === 'main') {
-        const list = s.mainServices.filter((item, idx) => {
-          if (typeof indexOrTitle === 'number') {
-            if (idx === indexOrTitle) titleToDelete = item.title;
-            return idx !== indexOrTitle;
-          }
-          return item.title !== indexOrTitle;
-        });
-        return { ...s, mainServices: list };
-      } else {
-        const list = s.moreServices.filter((t, idx) => {
-          if (typeof indexOrTitle === 'number') {
-            if (idx === indexOrTitle) titleToDelete = t;
-            return idx !== indexOrTitle;
-          }
-          return t !== indexOrTitle;
-        });
-        return { ...s, moreServices: list };
-      }
+  // -------------------------------------------------------------
+  // Services Actions
+  // -------------------------------------------------------------
+  const addServiceItem = async (domainKey, type, name, description = '') => {
+    const res = await createServiceApi({
+      domain_id: domainKey,
+      name,
+      description,
+      type,
+      sort_order: 99
     });
-    persistServices(updated);
-    await deleteServiceApi(domainSlug, type, titleToDelete);
+    const fresh = await getServices();
+    setServicesData(fresh);
+    return res;
   };
 
-  // 5. Reorder Services
-  const reorderServiceItems = async (domainSlug, type, index, direction) => {
-    const targetDomain = servicesData.find((s) => s.slug === domainSlug);
-    if (!targetDomain) return;
-
-    const list = type === 'main' ? [...targetDomain.mainServices] : [...targetDomain.moreServices];
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= list.length) return;
-
-    const [moved] = list.splice(index, 1);
-    list.splice(newIndex, 0, moved);
-
-    const updated = servicesData.map((s) => {
-      if (s.slug !== domainSlug) return s;
-      return type === 'main' ? { ...s, mainServices: list } : { ...s, moreServices: list };
-    });
-    persistServices(updated);
+  const editServiceItem = async (serviceId, updates) => {
+    const res = await updateServiceApi(serviceId, updates);
+    const fresh = await getServices();
+    setServicesData(fresh);
+    return res;
   };
 
-  // 6. Project Management
-  const addProject = async (project) => {
-    const created = await createProjectApi(project);
-    const updated = [created, ...projectsData];
-    persistProjects(updated);
-    return created;
+  const deleteServiceItem = async (serviceId) => {
+    const res = await deleteServiceApi(serviceId);
+    const fresh = await getServices();
+    setServicesData(fresh);
+    return res;
   };
 
-  const editProject = async (id, updatedFields) => {
-    const updated = projectsData.map((p) => {
-      if (p.id !== id) return p;
-      return { ...p, ...updatedFields };
-    });
-    persistProjects(updated);
-    await updateProjectApi(id, updatedFields);
+  // -------------------------------------------------------------
+  // Packages Actions
+  // -------------------------------------------------------------
+  const addPackage = async (payload) => {
+    const res = await createPackageApi(payload);
+    const fresh = await getPackages();
+    setPackagesData(fresh);
+    return res;
   };
 
-  const deleteProject = async (id) => {
-    const updated = projectsData.filter((p) => p.id !== id);
-    persistProjects(updated);
-    await deleteProjectApi(id);
+  const editPackage = async (packageId, payload) => {
+    const res = await updatePackageApi(packageId, payload);
+    const fresh = await getPackages();
+    setPackagesData(fresh);
+    return res;
+  };
+
+  const deletePackage = async (packageId) => {
+    const res = await deletePackageApi(packageId);
+    const fresh = await getPackages();
+    setPackagesData(fresh);
+    return res;
+  };
+
+  // -------------------------------------------------------------
+  // Portfolio Actions
+  // -------------------------------------------------------------
+  const addProject = async (payload) => {
+    const res = await createProjectApi(payload);
+    const fresh = await getProjects();
+    setProjectsData(fresh);
+    return res;
+  };
+
+  const editProject = async (projectId, payload) => {
+    const res = await updateProjectApi(projectId, payload);
+    const fresh = await getProjects();
+    setProjectsData(fresh);
+    return res;
+  };
+
+  const deleteProject = async (projectId) => {
+    const res = await deleteProjectApi(projectId);
+    const fresh = await getProjects();
+    setProjectsData(fresh);
+    return res;
   };
 
   const uploadProjectImage = async (file) => {
     return await uploadProjectImageApi(file);
   };
 
-  // 7. Enquiries Management
-  const saveEnquiry = async ({ name, phone, service, message }) => {
-    const res = await createEnquiry({ name, phone, service, message });
-    if (res.success && res.enquiry) {
-      persistEnquiries([res.enquiry, ...enquiries]);
+  // -------------------------------------------------------------
+  // Testimonials Actions
+  // -------------------------------------------------------------
+  const addTestimonial = async (payload) => {
+    const res = await createTestimonialApi(payload);
+    const fresh = await getTestimonials();
+    setTestimonialsData(fresh);
+    return res;
+  };
+
+  const editTestimonial = async (id, payload) => {
+    const res = await updateTestimonialApi(id, payload);
+    const fresh = await getTestimonials();
+    setTestimonialsData(fresh);
+    return res;
+  };
+
+  const deleteTestimonial = async (id) => {
+    const res = await deleteTestimonialApi(id);
+    const fresh = await getTestimonials();
+    setTestimonialsData(fresh);
+    return res;
+  };
+
+  // -------------------------------------------------------------
+  // FAQs Actions
+  // -------------------------------------------------------------
+  const addFaq = async (payload) => {
+    const res = await createFaqApi(payload);
+    const fresh = await getFaqs();
+    setFaqsData(fresh);
+    return res;
+  };
+
+  const editFaq = async (id, payload) => {
+    const res = await updateFaqApi(id, payload);
+    const fresh = await getFaqs();
+    setFaqsData(fresh);
+    return res;
+  };
+
+  const deleteFaq = async (id) => {
+    const res = await deleteFaqApi(id);
+    const fresh = await getFaqs();
+    setFaqsData(fresh);
+    return res;
+  };
+
+  // -------------------------------------------------------------
+  // Settings Actions
+  // -------------------------------------------------------------
+  const persistSettings = async (data) => {
+    setSettingsData(data);
+    return await updateSettingsApi(data);
+  };
+
+  // -------------------------------------------------------------
+  // Enquiries Actions
+  // -------------------------------------------------------------
+  const saveEnquiry = async (data) => {
+    const res = await createEnquiry(data);
+    if (res.data) {
+      setEnquiries((prev) => [res.data, ...prev]);
     }
     return res;
   };
 
-  const updateEnquiryStatus = async (id, newStatus) => {
-    const updated = enquiries.map((e) =>
-      e.id === id ? { ...e, status: newStatus } : e
+  const updateEnquiryStatus = async (id, status) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, status } : e))
     );
-    persistEnquiries(updated);
-    await updateEnquiryStatusApi(id, newStatus);
+    return await updateEnquiryStatusApi(id, status);
   };
 
   const deleteEnquiry = async (id) => {
-    const updated = enquiries.filter((e) => e.id !== id);
-    persistEnquiries(updated);
-    await deleteEnquiryApi(id);
+    setEnquiries((prev) => prev.filter((e) => e.id !== id));
+    return await deleteEnquiryApi(id);
   };
 
-  // 8. Testimonials Management
-  const persistTestimonials = (data) => {
-    setTestimonialsData(data);
-    try {
-      localStorage.setItem('zippy_local_testimonials', JSON.stringify(data));
-    } catch {}
-  };
+  // CSV Export for Enquiries
+  const exportEnquiriesCSV = () => {
+    if (!enquiries || enquiries.length === 0) return false;
 
-  const addTestimonial = async (item) => {
-    const created = await createTestimonialApi(item);
-    persistTestimonials([...testimonialsData, created]);
-    return created;
-  };
+    const headers = ['ID', 'Date', 'Name', 'Phone', 'Service', 'Message', 'Status', 'Source'];
+    const rows = enquiries.map((enq) => [
+      enq.id,
+      new Date(enq.created_at).toLocaleString('en-IN'),
+      `"${(enq.name || '').replace(/"/g, '""')}"`,
+      `"${enq.phone || ''}"`,
+      `"${(enq.service || '').replace(/"/g, '""')}"`,
+      `"${(enq.message || '').replace(/"/g, '""')}"`,
+      enq.status || 'New',
+      enq.source || 'contact'
+    ]);
 
-  const editTestimonial = async (id, updates) => {
-    const updated = testimonialsData.map((t) => (t.id === id ? { ...t, ...updates } : t));
-    persistTestimonials(updated);
-    await updateTestimonialApi(id, updates);
-  };
-
-  const deleteTestimonial = async (id) => {
-    const updated = testimonialsData.filter((t) => t.id !== id);
-    persistTestimonials(updated);
-    await deleteTestimonialApi(id);
-  };
-
-  // 9. FAQs Management
-  const persistFaqs = (data) => {
-    setFaqsData(data);
-    try {
-      localStorage.setItem('zippy_local_faqs', JSON.stringify(data));
-    } catch {}
-  };
-
-  const addFaq = async (item) => {
-    const created = await createFaqApi(item);
-    persistFaqs([...faqsData, created]);
-    return created;
-  };
-
-  const editFaq = async (id, updates) => {
-    const updated = faqsData.map((f) => (f.id === id ? { ...f, ...updates } : f));
-    persistFaqs(updated);
-    await updateFaqApi(id, updates);
-  };
-
-  const deleteFaq = async (id) => {
-    const updated = faqsData.filter((f) => f.id !== id);
-    persistFaqs(updated);
-    await deleteFaqApi(id);
-  };
-
-  // 10. Packages Management
-  const persistPackages = (data) => {
-    setPackagesData(data);
-    try {
-      localStorage.setItem('zippy_local_packages', JSON.stringify(data));
-    } catch {}
-  };
-
-  const addPackage = async (item) => {
-    const created = await createPackageApi(item);
-    persistPackages([...packagesData, created]);
-    return created;
-  };
-
-  const editPackage = async (id, updates) => {
-    const updated = packagesData.map((p) => (p.id === id ? { ...p, ...updates } : p));
-    persistPackages(updated);
-    await updatePackageApi(id, updates);
-  };
-
-  const deletePackage = async (id) => {
-    const updated = packagesData.filter((p) => p.id !== id);
-    persistPackages(updated);
-    await deletePackageApi(id);
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `zippy_leads_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    return true;
   };
 
   return (
     <DataContext.Provider
       value={{
+        domainsData,
         servicesData,
+        packagesData,
         projectsData,
         testimonialsData,
         faqsData,
-        packagesData,
         settingsData,
         enquiries,
-        isLiveConnected,
+        priceHistory,
         loading,
+        isLiveConnected,
+        loadAllData,
+        formatINR,
+        getDomainPrice,
+        getDomainPriceNum,
         updateDomainPrice,
+        updatePackagePrice,
+        saveAllPrices,
         addServiceItem,
         editServiceItem,
         deleteServiceItem,
-        reorderServiceItems,
+        addPackage,
+        editPackage,
+        deletePackage,
         addProject,
         editProject,
         deleteProject,
         uploadProjectImage,
-        saveEnquiry,
-        updateEnquiryStatus,
-        deleteEnquiry,
-        persistSettings,
         addTestimonial,
         editTestimonial,
         deleteTestimonial,
         addFaq,
         editFaq,
         deleteFaq,
-        addPackage,
-        editPackage,
-        deletePackage
+        persistSettings,
+        saveEnquiry,
+        updateEnquiryStatus,
+        deleteEnquiry,
+        exportEnquiriesCSV
       }}
     >
       {children}

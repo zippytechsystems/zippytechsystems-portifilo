@@ -1,326 +1,44 @@
-/**
- * =========================================================================
- * ZippyTechSystems Pvt. Ltd. — Centralized API Layer
- * =========================================================================
- * All database operations route through this layer. Never call Supabase
- * directly from UI components. Implements input validation, sanitization,
- * and zero-downtime offline fallback resilience.
- */
-
 import { supabase, isSupabaseConfigured } from './supabase';
 import { content as initialContent } from '../data/content';
 
 /**
- * Sanitize user string to prevent XSS and unwanted formatting
+ * Currency Formatter for Indian Rupees
+ * Takes number (e.g. 7000) -> returns formatted string "₹7,000"
  */
-export function sanitizeInput(str) {
-  if (typeof str !== 'string') return '';
+export function formatINR(value) {
+  if (value === null || value === undefined || value === '') return '₹0';
+  if (typeof value === 'string' && value.includes('₹')) return value;
+  const num = typeof value === 'number' ? value : parseFloat(String(value).replace(/[^0-9.]/g, ''));
+  if (isNaN(num)) return '₹0';
+  return '₹' + num.toLocaleString('en-IN');
+}
+
+/**
+ * Sanitize text input to prevent XSS / malicious injections
+ */
+export function sanitizeString(str) {
+  if (!str || typeof str !== 'string') return '';
   return str
-    .replace(/[<>]/g, '') // strip HTML brackets
+    .replace(/[<>]/g, '')
     .trim();
 }
 
 /**
- * Validate phone number (must contain at least 10 digits)
+ * Clean phone numbers to pure digits
  */
-export function isValidPhone(phone) {
-  if (!phone) return false;
-  const digits = phone.replace(/[^0-9]/g, '');
-  return digits.length >= 10;
+export function cleanPhone(phone) {
+  if (!phone) return '';
+  return String(phone).replace(/[^0-9]/g, '');
 }
 
-// -------------------------------------------------------------
-// 1. Services API
-// -------------------------------------------------------------
-
-/**
- * Fetch all services grouped by domain with starting prices
- */
-export async function getServices() {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data: domains, error: domErr } = await supabase
-        .from('domains')
-        .select('*');
-
-      const { data: services, error: servErr } = await supabase
-        .from('services')
-        .select('*')
-        .order('sort_order', { ascending: true });
-
-      if (!domErr && domains && domains.length > 0) {
-        return domains.map((dom) => {
-          const domainServices = (services || []).filter((s) => s.domain_id === dom.id);
-          const mainServices = domainServices
-            .filter((s) => s.type === 'main')
-            .map((s) => ({ id: s.id, title: s.title, desc: s.description }));
-          const moreServices = domainServices
-            .filter((s) => s.type === 'more')
-            .map((s) => s.title);
-
-          const matchStatic = initialContent.services.find((s) => s.slug === dom.id) || {};
-
-          return {
-            ...matchStatic,
-            id: dom.id,
-            slug: dom.id,
-            domainLabel: dom.name,
-            startingPrice: dom.starting_price,
-            startingPriceNum: dom.starting_price_num,
-            introLine: dom.intro_line,
-            conceptCopy: dom.concept_copy,
-            badgeColor: dom.color,
-            mainServices: mainServices.length > 0 ? mainServices : matchStatic.mainServices,
-            moreServices: moreServices.length > 0 ? moreServices : matchStatic.moreServices
-          };
-        });
-      }
-    } catch (err) {
-      console.warn('API getServices: Supabase unavailable, falling back to local data.', err);
-    }
-  }
-
-  // Fallback to localStorage or static content
-  try {
-    const cached = localStorage.getItem('zippy_local_services');
-    if (cached) return JSON.parse(cached);
-  } catch {}
-  return initialContent.services;
-}
-
-export async function updateDomainPriceApi(domainSlug, newPrice) {
-  const cleanPrice = sanitizeInput(newPrice);
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const num = parseInt(cleanPrice.replace(/[^0-9]/g, ''), 10) || 0;
-      await supabase
-        .from('domains')
-        .update({ starting_price: cleanPrice, starting_price_num: num })
-        .eq('id', domainSlug);
-    } catch (e) {
-      console.error('API updateDomainPrice error:', e);
-    }
-  }
-  return { success: true, newPrice: cleanPrice };
-}
-
-export async function createServiceApi({ domain_id, type, title, description, sort_order = 0 }) {
-  const cleanTitle = sanitizeInput(title);
-  const cleanDesc = sanitizeInput(description);
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase.from('services').insert({
-        domain_id,
-        type,
-        title: cleanTitle,
-        description: cleanDesc,
-        sort_order
-      }).select().single();
-      if (!error && data) return data;
-    } catch (e) {
-      console.error('API createService error:', e);
-    }
-  }
-  return { id: 'serv-' + Date.now(), domain_id, type, title: cleanTitle, description: cleanDesc, sort_order };
-}
-
-export async function updateServiceApi(domainSlug, type, title, updatedData) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('services').update({
-        title: sanitizeInput(updatedData.title),
-        description: sanitizeInput(updatedData.desc || '')
-      }).eq('domain_id', domainSlug).eq('type', type).eq('title', title);
-    } catch (e) {
-      console.error('API updateService error:', e);
-    }
-  }
-  return { success: true };
-}
-
-export async function deleteServiceApi(domainSlug, type, title) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase
-        .from('services')
-        .delete()
-        .eq('domain_id', domainSlug)
-        .eq('type', type)
-        .eq('title', title);
-    } catch (e) {
-      console.error('API deleteService error:', e);
-    }
-  }
-  return { success: true };
-}
-
-// -------------------------------------------------------------
-// 2. Projects (Portfolio) API
-// -------------------------------------------------------------
-
-export async function getProjects() {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data: projects, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('sort_order', { ascending: true });
-
-      if (!error && projects && projects.length > 0) {
-        return projects.map((p) => ({
-          id: p.id,
-          title: p.title,
-          domain: p.domain,
-          domainLabel:
-            p.domain === 'web'
-              ? 'Web Development'
-              : p.domain === 'app'
-              ? 'App Development'
-              : 'AI Automation',
-          domainColor:
-            p.domain === 'web'
-              ? '#1d5cf0'
-              : p.domain === 'app'
-              ? '#12a150'
-              : '#7a2fd0',
-          clientCategory: p.client_category,
-          shortDescription: p.short_description,
-          technologies: p.technologies || [],
-          metrics: p.metrics || '',
-          image: p.image_url
-        }));
-      }
-    } catch (err) {
-      console.warn('API getProjects: Supabase unavailable, falling back to local data.', err);
-    }
-  }
-
-  // Fallback to localStorage or static content
-  try {
-    const cached = localStorage.getItem('zippy_local_projects');
-    if (cached) return JSON.parse(cached);
-  } catch {}
-  return initialContent.projects;
-}
-
-export async function createProjectApi(project) {
-  const cleanTitle = sanitizeInput(project.title);
-  const cleanDesc = sanitizeInput(project.shortDescription);
-  const cleanCategory = sanitizeInput(project.clientCategory);
-  const cleanMetrics = sanitizeInput(project.metrics);
-
-  const newProj = {
-    ...project,
-    id: project.id || 'proj-' + Date.now(),
-    title: cleanTitle,
-    shortDescription: cleanDesc,
-    clientCategory: cleanCategory,
-    metrics: cleanMetrics,
-    domainColor:
-      project.domain === 'web'
-        ? '#1d5cf0'
-        : project.domain === 'app'
-        ? '#12a150'
-        : '#7a2fd0',
-    domainLabel:
-      project.domain === 'web'
-        ? 'Web Development'
-        : project.domain === 'app'
-        ? 'App Development'
-        : 'AI Automation'
-  };
-
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('projects').insert({
-        title: newProj.title,
-        domain: newProj.domain,
-        client_category: newProj.clientCategory,
-        short_description: newProj.shortDescription,
-        technologies: newProj.technologies || [],
-        metrics: newProj.metrics || '',
-        image_url: newProj.image
-      });
-    } catch (e) {
-      console.error('API createProject error:', e);
-    }
-  }
-  return newProj;
-}
-
-export async function updateProjectApi(id, project) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('projects').update({
-        title: sanitizeInput(project.title),
-        domain: project.domain,
-        client_category: sanitizeInput(project.clientCategory),
-        short_description: sanitizeInput(project.shortDescription),
-        technologies: project.technologies,
-        metrics: sanitizeInput(project.metrics),
-        image_url: project.image
-      }).eq('id', id);
-    } catch (e) {
-      console.error('API updateProject error:', e);
-    }
-  }
-  return { success: true };
-}
-
-export async function deleteProjectApi(id) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('projects').delete().eq('id', id);
-    } catch (e) {
-      console.error('API deleteProject error:', e);
-    }
-  }
-  return { success: true };
-}
-
-export async function uploadProjectImageApi(file) {
-  if (!file) return null;
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('portfolio-images')
-        .upload(filePath, file);
-
-      if (!uploadError) {
-        const { data } = supabase.storage
-          .from('portfolio-images')
-          .getPublicUrl(filePath);
-        if (data?.publicUrl) return data.publicUrl;
-      }
-    } catch (err) {
-      console.warn('API uploadProjectImage: Storage upload failed, using Data URL fallback.', err);
-    }
-  }
-
-  // Local Data URL fallback
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = (e) => reject(e);
-    reader.readAsDataURL(file);
-  });
-}
-
-// -------------------------------------------------------------
-// 3. Settings API (Phone, WhatsApp, Social URLs, Taglines)
-// -------------------------------------------------------------
-
+// =========================================================================
+// 1. SETTINGS API
+// =========================================================================
 export async function getSettings() {
-  const defaultSettings = {
-    phone: initialContent.founder.phone, // 9542439498
-    phoneFormatted: initialContent.founder.phoneFormatted, // +91 95424 39498
-    phoneCall: initialContent.founder.phoneCall, // +919542439498
-    whatsappNumber: initialContent.founder.whatsappNumber, // 919542439498
-    defaultWhatsAppMessage: "Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.",
+  const fallback = {
+    phone: initialContent.founder.phone,
+    whatsappNumber: initialContent.founder.whatsappNumber,
+    defaultWhatsAppMessage: 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.',
     tagline: initialContent.company.tagline,
     secondaryTagline: initialContent.company.secondaryTagline,
     location: initialContent.company.location,
@@ -328,443 +46,805 @@ export async function getSettings() {
     youtubeUrl: initialContent.social?.youtube || 'https://www.youtube.com/@zippytechsystems'
   };
 
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data: rows, error } = await supabase.from('settings').select('*');
-      if (!error && rows && rows.length > 0) {
-        const map = { ...defaultSettings };
-        rows.forEach((r) => {
-          if (r.key === 'phone') {
-            map.phone = r.value;
-            map.phoneCall = `tel:+91${r.value.replace(/[^0-9]/g, '')}`;
-          }
-          if (r.key === 'phone_formatted') map.phoneFormatted = r.value;
-          if (r.key === 'whatsapp_number') map.whatsappNumber = r.value;
-          if (r.key === 'whatsapp_prefill') map.defaultWhatsAppMessage = r.value;
-          if (r.key === 'tagline') map.tagline = r.value;
-          if (r.key === 'secondary_tagline') map.secondaryTagline = r.value;
-          if (r.key === 'location') map.location = r.value;
-          if (r.key === 'instagram_url') map.instagramUrl = r.value;
-          if (r.key === 'youtube_url') map.youtubeUrl = r.value;
-        });
-        return map;
-      }
-    } catch (err) {
-      console.warn('API getSettings: Supabase unavailable, falling back to local settings.', err);
-    }
-  }
-
-  // Fallback to localStorage
-  try {
-    const cached = localStorage.getItem('zippy_local_settings');
-    if (cached) return { ...defaultSettings, ...JSON.parse(cached) };
-  } catch {}
-  return defaultSettings;
-}
-
-export async function updateSettingsApi(settingsObj) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const entries = [
-        { key: 'phone', value: sanitizeInput(settingsObj.phone) },
-        { key: 'phone_formatted', value: sanitizeInput(settingsObj.phoneFormatted || `+91 ${settingsObj.phone}`) },
-        { key: 'whatsapp_number', value: sanitizeInput(settingsObj.whatsappNumber) },
-        { key: 'whatsapp_prefill', value: sanitizeInput(settingsObj.defaultWhatsAppMessage) },
-        { key: 'tagline', value: sanitizeInput(settingsObj.tagline) },
-        { key: 'secondary_tagline', value: sanitizeInput(settingsObj.secondaryTagline) },
-        { key: 'location', value: sanitizeInput(settingsObj.location) },
-        { key: 'instagram_url', value: sanitizeInput(settingsObj.instagramUrl) },
-        { key: 'youtube_url', value: sanitizeInput(settingsObj.youtubeUrl) }
-      ];
-
-      for (const entry of entries) {
-        await supabase.from('settings').upsert(entry);
-      }
-    } catch (e) {
-      console.error('API updateSettings error:', e);
-    }
-  }
-  return { success: true };
-}
-
-// -------------------------------------------------------------
-// 4. Enquiries (Leads) API
-// -------------------------------------------------------------
-
-/**
- * Public enquiry submission. Sanitizes and validates inputs,
- * saves to Supabase (and local storage), and returns WhatsApp redirect info.
- */
-export async function createEnquiry({ name, phone, service, message }) {
-  const cleanName = sanitizeInput(name);
-  const cleanPhone = sanitizeInput(phone);
-  const cleanService = sanitizeInput(service);
-  const cleanMessage = sanitizeInput(message);
-
-  if (!cleanName) {
-    throw new Error('Please provide your name.');
-  }
-
-  if (!isValidPhone(cleanPhone)) {
-    throw new Error('Please provide a valid 10-digit mobile number.');
-  }
-
-  const newEnquiry = {
-    id: 'enq-' + Date.now(),
-    name: cleanName,
-    phone: cleanPhone,
-    service: cleanService || 'General Enquiry',
-    message: cleanMessage,
-    status: 'New',
-    created_at: new Date().toISOString()
-  };
-
-  // Try Supabase insert
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('enquiries').insert({
-        name: cleanName,
-        phone: cleanPhone,
-        service: cleanService || 'General Enquiry',
-        message: cleanMessage,
-        status: 'New'
-      });
-    } catch (err) {
-      console.warn('API createEnquiry: Supabase insert error, saved locally.', err);
-    }
-  }
-
-  // Also save locally for fallback persistence
-  try {
-    const cached = localStorage.getItem('zippy_local_enquiries');
-    const list = cached ? JSON.parse(cached) : [];
-    localStorage.setItem('zippy_local_enquiries', JSON.stringify([newEnquiry, ...list]));
-  } catch {}
-
-  return { success: true, enquiry: newEnquiry };
-}
-
-export async function getEnquiriesApi() {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('enquiries')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (!error && data) return data;
-    } catch (err) {
-      console.warn('API getEnquiries: Supabase unavailable, reading local enquiries.', err);
-    }
-  }
+  if (!isSupabaseConfigured || !supabase) return fallback;
 
   try {
-    const cached = localStorage.getItem('zippy_local_enquiries');
-    if (cached) return JSON.parse(cached);
-  } catch {}
-  return [];
+    const { data, error } = await supabase
+      .from('settings')
+      .select('*')
+      .eq('id', 1)
+      .maybeSingle();
+
+    if (error || !data) return fallback;
+
+    return {
+      phone: data.phone || fallback.phone,
+      whatsappNumber: data.whatsapp_number || fallback.whatsappNumber,
+      defaultWhatsAppMessage: data.default_whatsapp_message || fallback.defaultWhatsAppMessage,
+      tagline: data.tagline || fallback.tagline,
+      secondaryTagline: data.secondary_tagline || fallback.secondaryTagline,
+      location: data.location || fallback.location,
+      instagramUrl: data.instagram_url || fallback.instagramUrl,
+      youtubeUrl: data.youtube_url || fallback.youtubeUrl
+    };
+  } catch (err) {
+    console.warn('api.getSettings fallback:', err);
+    return fallback;
+  }
 }
 
-export async function updateEnquiryStatusApi(id, newStatus) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('enquiries').update({ status: newStatus }).eq('id', id);
-    } catch (e) {
-      console.error('API updateEnquiryStatus error:', e);
-    }
-  }
-  return { success: true };
-}
-
-export async function deleteEnquiryApi(id) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('enquiries').delete().eq('id', id);
-    } catch (e) {
-      console.error('API deleteEnquiry error:', e);
-    }
-  }
-  return { success: true };
-}
-
-// -------------------------------------------------------------
-// 5. Testimonials API
-// -------------------------------------------------------------
-
-export async function getTestimonials() {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('testimonials')
-        .select('*')
-        .order('sort_order', { ascending: true });
-      if (!error && data && data.length > 0) {
-        return data.map((t) => ({
-          id: t.id,
-          clientName: t.client_name,
-          roleOrCompany: t.role_or_company,
-          domain: t.domain,
-          rating: t.rating || 5,
-          content: t.content,
-          sortOrder: t.sort_order
-        }));
-      }
-    } catch (err) {
-      console.warn('API getTestimonials: Supabase unavailable, reading local data.', err);
-    }
-  }
+export async function updateSettingsApi(settingsData) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
 
   try {
-    const cached = localStorage.getItem('zippy_local_testimonials');
-    if (cached) return JSON.parse(cached);
-  } catch {}
-  return initialContent.testimonials || [];
+    const payload = {
+      phone: sanitizeString(settingsData.phone),
+      whatsapp_number: cleanPhone(settingsData.whatsappNumber),
+      default_whatsapp_message: sanitizeString(settingsData.defaultWhatsAppMessage),
+      tagline: sanitizeString(settingsData.tagline),
+      secondary_tagline: sanitizeString(settingsData.secondaryTagline),
+      location: sanitizeString(settingsData.location),
+      instagram_url: sanitizeString(settingsData.instagramUrl),
+      youtube_url: sanitizeString(settingsData.youtubeUrl),
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('settings')
+      .upsert({ id: 1, ...payload });
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updateSettingsApi error:', err);
+    return { success: false, error: err.message };
+  }
 }
 
-export async function createTestimonialApi(testimonial) {
-  const newT = {
-    id: testimonial.id || 'test-' + Date.now(),
-    clientName: sanitizeInput(testimonial.clientName),
-    roleOrCompany: sanitizeInput(testimonial.roleOrCompany),
-    domain: testimonial.domain || 'web',
-    rating: Number(testimonial.rating) || 5,
-    content: sanitizeInput(testimonial.content),
-    sortOrder: testimonial.sortOrder || 0
-  };
+// =========================================================================
+// 2. DOMAINS & STARTING PRICES API
+// =========================================================================
+export async function getDomains() {
+  const fallback = [
+    { id: 'web', key: 'web', name: 'Web Development', starting_price: 7000, price_label: 'Starting from', color: '#1d5cf0', intro: 'A modern, high-speed website that brings local customers to your door 24/7.' },
+    { id: 'app', key: 'app', name: 'App Development', starting_price: 10000, price_label: 'Starting from', color: '#12a150', intro: 'Custom billing, accounts, and inventory apps for retail and wholesale shops.' },
+    { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 6000, price_label: 'Starting from', color: '#7a2fd0', intro: 'Never lose another customer enquiry with 24/7 WhatsApp and voice agents.' }
+  ];
 
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('testimonials').insert({
-        id: newT.id,
-        client_name: newT.clientName,
-        role_or_company: newT.roleOrCompany,
-        domain: newT.domain,
-        rating: newT.rating,
-        content: newT.content,
-        sort_order: newT.sortOrder
-      });
-    } catch (e) {
-      console.error('API createTestimonial error:', e);
-    }
-  }
-  return newT;
-}
-
-export async function updateTestimonialApi(id, updates) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const payload = {};
-      if (updates.clientName !== undefined) payload.client_name = sanitizeInput(updates.clientName);
-      if (updates.roleOrCompany !== undefined) payload.role_or_company = sanitizeInput(updates.roleOrCompany);
-      if (updates.domain !== undefined) payload.domain = updates.domain;
-      if (updates.rating !== undefined) payload.rating = Number(updates.rating);
-      if (updates.content !== undefined) payload.content = sanitizeInput(updates.content);
-      if (updates.sortOrder !== undefined) payload.sort_order = updates.sortOrder;
-
-      await supabase.from('testimonials').update(payload).eq('id', id);
-    } catch (e) {
-      console.error('API updateTestimonial error:', e);
-    }
-  }
-  return { success: true };
-}
-
-export async function deleteTestimonialApi(id) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('testimonials').delete().eq('id', id);
-    } catch (e) {
-      console.error('API deleteTestimonial error:', e);
-    }
-  }
-  return { success: true };
-}
-
-// -------------------------------------------------------------
-// 6. FAQs API
-// -------------------------------------------------------------
-
-export async function getFaqs() {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('faqs')
-        .select('*')
-        .order('sort_order', { ascending: true });
-      if (!error && data && data.length > 0) {
-        return data.map((f) => ({
-          id: f.id,
-          category: f.category,
-          question: f.question,
-          answer: f.answer,
-          sortOrder: f.sort_order
-        }));
-      }
-    } catch (err) {
-      console.warn('API getFaqs: Supabase unavailable, reading local data.', err);
-    }
-  }
+  if (!isSupabaseConfigured || !supabase) return fallback;
 
   try {
-    const cached = localStorage.getItem('zippy_local_faqs');
-    if (cached) return JSON.parse(cached);
-  } catch {}
-  return initialContent.faqs || [];
-}
+    const { data, error } = await supabase
+      .from('domains')
+      .select('*')
+      .order('sort_order', { ascending: true });
 
-export async function createFaqApi(faq) {
-  const newF = {
-    id: faq.id || 'faq-' + Date.now(),
-    category: sanitizeInput(faq.category || 'General'),
-    question: sanitizeInput(faq.question),
-    answer: sanitizeInput(faq.answer),
-    sortOrder: faq.sortOrder || 0
-  };
+    if (error || !data || data.length === 0) return fallback;
 
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('faqs').insert({
-        id: newF.id,
-        category: newF.category,
-        question: newF.question,
-        answer: newF.answer,
-        sort_order: newF.sortOrder
-      });
-    } catch (e) {
-      console.error('API createFaq error:', e);
-    }
+    return data.map((d) => ({
+      ...d,
+      starting_price: Number(d.starting_price) || 0
+    }));
+  } catch (err) {
+    console.warn('api.getDomains fallback:', err);
+    return fallback;
   }
-  return newF;
 }
 
-export async function updateFaqApi(id, updates) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const payload = {};
-      if (updates.category !== undefined) payload.category = sanitizeInput(updates.category);
-      if (updates.question !== undefined) payload.question = sanitizeInput(updates.question);
-      if (updates.answer !== undefined) payload.answer = sanitizeInput(updates.answer);
-      if (updates.sortOrder !== undefined) payload.sort_order = updates.sortOrder;
+export async function updateDomainPriceApi(domainId, newPrice) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
 
-      await supabase.from('faqs').update(payload).eq('id', id);
-    } catch (e) {
-      console.error('API updateFaq error:', e);
-    }
+  try {
+    const numericPrice = Math.max(0, Number(newPrice) || 0);
+    const { error } = await supabase
+      .from('domains')
+      .update({
+        starting_price: numericPrice,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', domainId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updateDomainPriceApi error:', err);
+    return { success: false, error: err.message };
   }
-  return { success: true };
 }
 
-export async function deleteFaqApi(id) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('faqs').delete().eq('id', id);
-    } catch (e) {
-      console.error('API deleteFaq error:', e);
-    }
+export async function updateDomainApi(domainId, updates) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { error } = await supabase
+      .from('domains')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', domainId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updateDomainApi error:', err);
+    return { success: false, error: err.message };
   }
-  return { success: true };
 }
 
-// -------------------------------------------------------------
-// 7. Packages API
-// -------------------------------------------------------------
+// =========================================================================
+// 3. SERVICES API
+// =========================================================================
+export async function getServices() {
+  const fallback = initialContent.services;
+  if (!isSupabaseConfigured || !supabase) return fallback;
 
+  try {
+    const [{ data: domainsData }, { data: servicesData, error: sErr }] = await Promise.all([
+      supabase.from('domains').select('*').order('sort_order', { ascending: true }),
+      supabase.from('services').select('*').order('sort_order', { ascending: true })
+    ]);
+
+    if (sErr || !servicesData || servicesData.length === 0) return fallback;
+
+    const domainsList = domainsData && domainsData.length > 0 ? domainsData : [
+      { id: 'web', key: 'web', name: 'Web Development', starting_price: 7000, color: '#1d5cf0' },
+      { id: 'app', key: 'app', name: 'App Development', starting_price: 10000, color: '#12a150' },
+      { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 6000, color: '#7a2fd0' }
+    ];
+
+    return domainsList.map((d) => {
+      const matchingServices = servicesData.filter(
+        (s) => s.domain_id === d.id || s.domain_id === d.key
+      );
+
+      const mainServices = matchingServices
+        .filter((s) => s.type === 'main')
+        .map((s) => ({ id: s.id, title: s.name, desc: s.description, isActive: s.is_active }));
+
+      const moreServices = matchingServices
+        .filter((s) => s.type === 'more')
+        .map((s) => ({ id: s.id, title: s.name, desc: s.description, isActive: s.is_active }));
+
+      const baseFallback = fallback.find((fb) => fb.domain === d.key) || {};
+
+      return {
+        id: d.id,
+        slug: d.key === 'web' ? 'web-development' : d.key === 'app' ? 'app-development' : 'ai-automation',
+        domain: d.key,
+        domainLabel: d.name,
+        startingPrice: formatINR(d.starting_price),
+        startingPriceNum: Number(d.starting_price) || 0,
+        badgeColor: d.color,
+        gradient: baseFallback.gradient || 'linear-gradient(135deg, #0b1b4a 0%, #1d5cf0 100%)',
+        introLine: d.intro || baseFallback.introLine,
+        conceptCopy: baseFallback.conceptCopy || '',
+        whatsappMessage: baseFallback.whatsappMessage || '',
+        mainServices: mainServices.length > 0 ? mainServices : baseFallback.mainServices || [],
+        moreServices: moreServices.length > 0 ? moreServices : baseFallback.moreServices || []
+      };
+    });
+  } catch (err) {
+    console.warn('api.getServices fallback:', err);
+    return fallback;
+  }
+}
+
+export async function createServiceApi({ domain_id, name, description = '', type = 'main', sort_order = 0, is_active = true }) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { data, error } = await supabase
+      .from('services')
+      .insert([
+        {
+          domain_id,
+          name: sanitizeString(name),
+          description: sanitizeString(description),
+          type,
+          sort_order,
+          is_active
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (err) {
+    console.error('api.createServiceApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function updateServiceApi(id, updates) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const payload = { ...updates, updated_at: new Date().toISOString() };
+    if (payload.name) payload.name = sanitizeString(payload.name);
+    if (payload.description) payload.description = sanitizeString(payload.description);
+
+    const { error } = await supabase.from('services').update(payload).eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updateServiceApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteServiceApi(id) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { error } = await supabase.from('services').delete().eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.deleteServiceApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+// =========================================================================
+// 4. PACKAGES API
+// =========================================================================
 export async function getPackages() {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('packages')
-        .select('*')
-        .order('sort_order', { ascending: true });
-      if (!error && data && data.length > 0) {
-        return data.map((p) => ({
-          id: p.id,
-          domain: p.domain,
-          name: p.name,
-          price: p.price,
-          tagline: p.tagline,
-          deliverables: p.deliverables || [],
-          popular: p.popular || false,
-          sortOrder: p.sort_order
-        }));
-      }
-    } catch (err) {
-      console.warn('API getPackages: Supabase unavailable, reading local data.', err);
-    }
-  }
+  const fallback = initialContent.packages || [];
+  if (!isSupabaseConfigured || !supabase) return fallback;
 
   try {
-    const cached = localStorage.getItem('zippy_local_packages');
-    if (cached) return JSON.parse(cached);
-  } catch {}
-  return initialContent.packages || [];
+    const { data, error } = await supabase
+      .from('packages')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error || !data || data.length === 0) return fallback;
+
+    return data.map((pkg) => ({
+      id: pkg.id,
+      domain: pkg.domain_id,
+      name: pkg.name,
+      price: formatINR(pkg.price),
+      priceNum: Number(pkg.price) || 0,
+      tagline: pkg.tagline || '',
+      deliverables: Array.isArray(pkg.features) ? pkg.features : [],
+      popular: Boolean(pkg.is_popular),
+      isActive: pkg.is_active
+    }));
+  } catch (err) {
+    console.warn('api.getPackages fallback:', err);
+    return fallback;
+  }
 }
 
-export async function createPackageApi(pkg) {
-  const deliverables = Array.isArray(pkg.deliverables)
-    ? pkg.deliverables
-    : (pkg.deliverables || '').split('\n').map((d) => d.trim()).filter(Boolean);
+export async function createPackageApi(payload) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
 
-  const newP = {
-    id: pkg.id || 'pkg-' + Date.now(),
-    domain: pkg.domain || 'web',
-    name: sanitizeInput(pkg.name),
-    price: sanitizeInput(pkg.price),
-    tagline: sanitizeInput(pkg.tagline || ''),
-    deliverables,
-    popular: Boolean(pkg.popular),
-    sortOrder: pkg.sortOrder || 0
-  };
+  try {
+    const featuresArray = Array.isArray(payload.deliverables)
+      ? payload.deliverables
+      : typeof payload.deliverables === 'string'
+      ? payload.deliverables.split('\n').map((f) => f.trim()).filter(Boolean)
+      : [];
 
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('packages').insert({
-        id: newP.id,
-        domain: newP.domain,
-        name: newP.name,
-        price: newP.price,
-        tagline: newP.tagline,
-        deliverables: newP.deliverables,
-        popular: newP.popular,
-        sort_order: newP.sortOrder
-      });
-    } catch (e) {
-      console.error('API createPackage error:', e);
-    }
+    const { data, error } = await supabase
+      .from('packages')
+      .insert([
+        {
+          domain_id: payload.domain,
+          name: sanitizeString(payload.name),
+          price: Math.max(0, Number(payload.priceNum || payload.price) || 0),
+          features: featuresArray,
+          is_popular: Boolean(payload.popular),
+          sort_order: payload.sort_order || 0,
+          is_active: payload.isActive !== false
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (err) {
+    console.error('api.createPackageApi error:', err);
+    return { success: false, error: err.message };
   }
-  return newP;
 }
 
 export async function updatePackageApi(id, updates) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const payload = {};
-      if (updates.domain !== undefined) payload.domain = updates.domain;
-      if (updates.name !== undefined) payload.name = sanitizeInput(updates.name);
-      if (updates.price !== undefined) payload.price = sanitizeInput(updates.price);
-      if (updates.tagline !== undefined) payload.tagline = sanitizeInput(updates.tagline);
-      if (updates.deliverables !== undefined) {
-        payload.deliverables = Array.isArray(updates.deliverables)
-          ? updates.deliverables
-          : updates.deliverables.split('\n').map((d) => d.trim()).filter(Boolean);
-      }
-      if (updates.popular !== undefined) payload.popular = Boolean(updates.popular);
-      if (updates.sortOrder !== undefined) payload.sort_order = updates.sortOrder;
+  if (!isSupabaseConfigured || !supabase) return { success: true };
 
-      await supabase.from('packages').update(payload).eq('id', id);
-    } catch (e) {
-      console.error('API updatePackage error:', e);
+  try {
+    const payload = { updated_at: new Date().toISOString() };
+    if (updates.domain) payload.domain_id = updates.domain;
+    if (updates.name) payload.name = sanitizeString(updates.name);
+    if (updates.price !== undefined || updates.priceNum !== undefined) {
+      payload.price = Math.max(0, Number(updates.priceNum ?? updates.price) || 0);
     }
+    if (updates.deliverables !== undefined) {
+      payload.features = Array.isArray(updates.deliverables)
+        ? updates.deliverables
+        : typeof updates.deliverables === 'string'
+        ? updates.deliverables.split('\n').map((f) => f.trim()).filter(Boolean)
+        : [];
+    }
+    if (updates.popular !== undefined) payload.is_popular = Boolean(updates.popular);
+    if (updates.isActive !== undefined) payload.is_active = Boolean(updates.isActive);
+
+    const { error } = await supabase.from('packages').update(payload).eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updatePackageApi error:', err);
+    return { success: false, error: err.message };
   }
-  return { success: true };
+}
+
+export async function updatePackagePriceApi(id, newPrice) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const numericPrice = Math.max(0, Number(newPrice) || 0);
+    const { error } = await supabase
+      .from('packages')
+      .update({ price: numericPrice, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updatePackagePriceApi error:', err);
+    return { success: false, error: err.message };
+  }
 }
 
 export async function deletePackageApi(id) {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('packages').delete().eq('id', id);
-    } catch (e) {
-      console.error('API deletePackage error:', e);
-    }
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { error } = await supabase.from('packages').delete().eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.deletePackageApi error:', err);
+    return { success: false, error: err.message };
   }
-  return { success: true };
+}
+
+// =========================================================================
+// 5. PROJECTS API
+// =========================================================================
+export async function getProjects() {
+  const fallback = initialContent.projects;
+  if (!isSupabaseConfigured || !supabase) return fallback;
+
+  try {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error || !data || data.length === 0) return fallback;
+
+    return data.map((p) => ({
+      id: p.id,
+      title: p.title,
+      domain: p.domain_id,
+      clientCategory: p.client_category,
+      shortDescription: p.description,
+      technologies: Array.isArray(p.technologies) ? p.technologies : [],
+      metrics: p.metrics || '',
+      link: p.link || 'https://wa.me/919542439498',
+      image: p.image_url || '/projects/clinic-web.svg',
+      isActive: p.is_active
+    }));
+  } catch (err) {
+    console.warn('api.getProjects fallback:', err);
+    return fallback;
+  }
+}
+
+export async function createProjectApi(payload) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const techArray = Array.isArray(payload.technologies)
+      ? payload.technologies
+      : typeof payload.technologies === 'string'
+      ? payload.technologies.split(',').map((t) => t.trim()).filter(Boolean)
+      : [];
+
+    const { data, error } = await supabase
+      .from('projects')
+      .insert([
+        {
+          title: sanitizeString(payload.title),
+          domain_id: payload.domain || 'web',
+          client_category: sanitizeString(payload.clientCategory || 'Business Solutions'),
+          description: sanitizeString(payload.shortDescription || payload.description),
+          technologies: techArray,
+          metrics: sanitizeString(payload.metrics || ''),
+          link: payload.link || 'https://wa.me/919542439498',
+          image_url: payload.image || payload.image_url || '/projects/clinic-web.svg',
+          is_active: payload.isActive !== false
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (err) {
+    console.error('api.createProjectApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function updateProjectApi(id, updates) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const payload = { updated_at: new Date().toISOString() };
+    if (updates.title) payload.title = sanitizeString(updates.title);
+    if (updates.domain) payload.domain_id = updates.domain;
+    if (updates.clientCategory) payload.client_category = sanitizeString(updates.clientCategory);
+    if (updates.shortDescription || updates.description) {
+      payload.description = sanitizeString(updates.shortDescription || updates.description);
+    }
+    if (updates.technologies) {
+      payload.technologies = Array.isArray(updates.technologies)
+        ? updates.technologies
+        : String(updates.technologies).split(',').map((t) => t.trim()).filter(Boolean);
+    }
+    if (updates.metrics !== undefined) payload.metrics = sanitizeString(updates.metrics);
+    if (updates.link !== undefined) payload.link = updates.link;
+    if (updates.image || updates.image_url) payload.image_url = updates.image || updates.image_url;
+    if (updates.isActive !== undefined) payload.is_active = Boolean(updates.isActive);
+
+    const { error } = await supabase.from('projects').update(payload).eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updateProjectApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteProjectApi(id) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.deleteProjectApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function uploadProjectImageApi(file) {
+  if (!isSupabaseConfigured || !supabase) {
+    throw new Error('Supabase Storage is not configured. Falling back to local placeholder.');
+  }
+
+  // 1. File size validation (limit to 2 MB)
+  const MAX_SIZE_BYTES = 2 * 1024 * 1024;
+  if (file.size > MAX_SIZE_BYTES) {
+    throw new Error(`File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 2 MB.`);
+  }
+
+  // 2. MIME type validation (images only)
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error('Only image files (JPEG, PNG, WebP, SVG) are allowed.');
+  }
+
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+  const filePath = `projects/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('portfolio-images')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (uploadError) throw uploadError;
+
+  const { data } = supabase.storage
+    .from('portfolio-images')
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+}
+
+// =========================================================================
+// 6. TESTIMONIALS API
+// =========================================================================
+export async function getTestimonials() {
+  const fallback = initialContent.testimonials || [];
+  if (!isSupabaseConfigured || !supabase) return fallback;
+
+  try {
+    const { data, error } = await supabase
+      .from('testimonials')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error || !data || data.length === 0) return fallback;
+
+    return data.map((t) => ({
+      id: t.id,
+      clientName: t.client_name,
+      roleOrCompany: t.business,
+      domain: t.domain_id || 'web',
+      rating: t.rating || 5,
+      content: t.message,
+      isActive: t.is_active
+    }));
+  } catch (err) {
+    console.warn('api.getTestimonials fallback:', err);
+    return fallback;
+  }
+}
+
+export async function createTestimonialApi(payload) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { data, error } = await supabase
+      .from('testimonials')
+      .insert([
+        {
+          client_name: sanitizeString(payload.clientName),
+          business: sanitizeString(payload.roleOrCompany || payload.business),
+          domain_id: payload.domain || 'web',
+          rating: Math.min(5, Math.max(1, Number(payload.rating) || 5)),
+          message: sanitizeString(payload.content || payload.message),
+          is_active: payload.isActive !== false
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (err) {
+    console.error('api.createTestimonialApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function updateTestimonialApi(id, updates) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const payload = { updated_at: new Date().toISOString() };
+    if (updates.clientName) payload.client_name = sanitizeString(updates.clientName);
+    if (updates.roleOrCompany || updates.business) {
+      payload.business = sanitizeString(updates.roleOrCompany || updates.business);
+    }
+    if (updates.domain) payload.domain_id = updates.domain;
+    if (updates.rating) payload.rating = Math.min(5, Math.max(1, Number(updates.rating) || 5));
+    if (updates.content || updates.message) {
+      payload.message = sanitizeString(updates.content || updates.message);
+    }
+    if (updates.isActive !== undefined) payload.is_active = Boolean(updates.isActive);
+
+    const { error } = await supabase.from('testimonials').update(payload).eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updateTestimonialApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteTestimonialApi(id) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { error } = await supabase.from('testimonials').delete().eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.deleteTestimonialApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+// =========================================================================
+// 7. FAQS API
+// =========================================================================
+export async function getFaqs() {
+  const fallback = initialContent.faqs || [];
+  if (!isSupabaseConfigured || !supabase) return fallback;
+
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error || !data || data.length === 0) return fallback;
+
+    return data.map((f) => ({
+      id: f.id,
+      category: f.category || 'General',
+      question: f.question,
+      answer: f.answer,
+      isActive: f.is_active
+    }));
+  } catch (err) {
+    console.warn('api.getFaqs fallback:', err);
+    return fallback;
+  }
+}
+
+export async function createFaqApi(payload) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .insert([
+        {
+          category: sanitizeString(payload.category || 'General'),
+          question: sanitizeString(payload.question),
+          answer: sanitizeString(payload.answer),
+          is_active: payload.isActive !== false
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (err) {
+    console.error('api.createFaqApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function updateFaqApi(id, updates) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const payload = { updated_at: new Date().toISOString() };
+    if (updates.category) payload.category = sanitizeString(updates.category);
+    if (updates.question) payload.question = sanitizeString(updates.question);
+    if (updates.answer) payload.answer = sanitizeString(updates.answer);
+    if (updates.isActive !== undefined) payload.is_active = Boolean(updates.isActive);
+
+    const { error } = await supabase.from('faqs').update(payload).eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updateFaqApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteFaqApi(id) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { error } = await supabase.from('faqs').delete().eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.deleteFaqApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+// =========================================================================
+// 8. ENQUIRIES API (Contact & Quote Form Submissions)
+// =========================================================================
+export async function createEnquiry(enquiryData) {
+  const name = sanitizeString(enquiryData.name);
+  const phone = cleanPhone(enquiryData.phone);
+  const service = sanitizeString(enquiryData.service || 'General Enquiry');
+  const message = sanitizeString(enquiryData.message || '');
+  const source = enquiryData.source === 'quote' ? 'quote' : 'contact';
+
+  if (!name || phone.length < 10) {
+    return { success: false, error: 'Name and a valid 10-digit phone number are required.' };
+  }
+
+  if (!isSupabaseConfigured || !supabase) {
+    return { success: true, offline: true };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('enquiries')
+      .insert([
+        {
+          name,
+          phone,
+          service,
+          message,
+          status: 'New',
+          source
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (err) {
+    console.warn('api.createEnquiry database save fallback:', err);
+    return { success: true, offline: true, error: err.message };
+  }
+}
+
+export async function getEnquiriesApi() {
+  if (!isSupabaseConfigured || !supabase) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('enquiries')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !data) return [];
+    return data;
+  } catch (err) {
+    console.warn('api.getEnquiriesApi error:', err);
+    return [];
+  }
+}
+
+export async function updateEnquiryStatusApi(id, status) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { error } = await supabase
+      .from('enquiries')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.updateEnquiryStatusApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteEnquiryApi(id) {
+  if (!isSupabaseConfigured || !supabase) return { success: true };
+
+  try {
+    const { error } = await supabase.from('enquiries').delete().eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('api.deleteEnquiryApi error:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+// =========================================================================
+// 9. PRICE HISTORY API
+// =========================================================================
+export async function getPriceHistoryApi() {
+  if (!isSupabaseConfigured || !supabase) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('price_history')
+      .select('*')
+      .order('changed_at', { ascending: false })
+      .limit(30);
+
+    if (error || !data) return [];
+    return data;
+  } catch (err) {
+    console.warn('api.getPriceHistoryApi error:', err);
+    return [];
+  }
 }

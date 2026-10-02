@@ -128,6 +128,22 @@ export function AdminAuthProvider({ children }) {
     sessionStorage.removeItem('zippy_admin_user');
   };
 
+  const resetPassword = async (email) => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const targetEmail = (email || ADMIN_CREDENTIALS.email).trim().toLowerCase();
+        const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+          redirectTo: `${window.location.origin}/admin`
+        });
+        if (error) throw error;
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+    return { success: true };
+  };
+
   return (
     <AdminAuthContext.Provider
       value={{
@@ -135,7 +151,8 @@ export function AdminAuthProvider({ children }) {
         adminUser,
         loading,
         login,
-        logout
+        logout,
+        resetPassword
       }}
     >
       {children}
