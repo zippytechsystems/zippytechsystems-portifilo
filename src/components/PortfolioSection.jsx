@@ -5,7 +5,7 @@ import { useData } from '../context/DataContext';
 
 export default function PortfolioSection() {
   const [activeFilter, setActiveFilter] = useState('all');
-  const { projectsData } = useData();
+  const { projectsData, loading } = useData();
   const allProjects = projectsData && projectsData.length > 0 ? projectsData : content.projects;
 
   const filterTabs = [
@@ -77,10 +77,76 @@ export default function PortfolioSection() {
           })}
         </div>
 
+        {/* Loading Skeleton */}
+        {loading && (!allProjects || allProjects.length === 0) && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '2rem'
+            }}
+          >
+            {[1, 2, 3].map((n) => (
+              <div
+                key={n}
+                className="card"
+                style={{
+                  height: '380px',
+                  background: 'var(--bg-card)',
+                  animation: 'pulse 1.5s infinite ease-in-out',
+                  borderRadius: 'var(--radius-lg)'
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Friendly Empty State */}
+        {!loading && filteredProjects.length === 0 && (
+          <div
+            className="card"
+            style={{
+              textAlign: 'center',
+              padding: '4rem 2rem',
+              maxWidth: '560px',
+              margin: '0 auto'
+            }}
+          >
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'rgba(29, 92, 240, 0.1)',
+                color: '#1d5cf0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.25rem auto'
+              }}
+            >
+              <ExternalLink size={26} />
+            </div>
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '0.5rem' }}>
+              No Projects Found in this Domain Yet
+            </h3>
+            <p style={{ color: 'var(--text-body)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+              We are constantly developing custom business solutions. Reach out directly to founder Lingaswamy for bespoke requirements.
+            </p>
+            <button
+              onClick={() => setActiveFilter('all')}
+              className="btn btn-cta-yellow"
+              style={{ padding: '0.65rem 1.25rem' }}
+            >
+              View All Projects
+            </button>
+          </div>
+        )}
+
         {/* Projects Grid */}
         <div
           style={{
-            display: 'grid',
+            display: filteredProjects.length > 0 ? 'grid' : 'none',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '2rem'
           }}

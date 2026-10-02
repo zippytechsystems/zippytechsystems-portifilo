@@ -142,10 +142,10 @@ export const content = {
   },
   founder: {
     name: 'Lingaswamy',
-    phone: '9542439498',
-    phoneFormatted: '+91 95424 39498',
-    whatsappNumber: '919542439498',
-    whatsappLink: 'https://wa.me/919542439498',
+    phone: '6302690251',
+    phoneFormatted: '+91 63026 90251',
+    whatsappNumber: '916302690251',
+    whatsappLink: 'https://wa.me/916302690251',
     // ...
   }
 };
@@ -237,16 +237,22 @@ zippytechsystems-portfolio/
 │   │   ├── FloatingWhatsApp.jsx# Sticky pulsing WhatsApp button
 │   │   └── Footer.jsx          # Brand lockup, copyright, and quick links
 │   ├── context/
+│   │   ├── AdminAuthContext.jsx # Supabase Auth & session manager
+│   │   ├── DataContext.jsx     # Unified dynamic data state & offline cache
 │   │   └── ThemeContext.jsx    # Light / Dark mode state management
 │   ├── data/
 │   │   └── content.js          # CENTRAL CONTENT FILE (Edit everything here!)
-│   ├── pages/                  # Page routes (Home, Projects, About, Contact, Services)
+│   ├── lib/
+│   │   ├── api.js              # Full database abstraction layer (CRUD, fallback, sanitization)
+│   │   └── supabase.js         # Supabase client & environment configuration
+│   ├── pages/                  # Page routes (Home, Projects, About, Contact, Services, Admin)
 │   ├── styles/
 │   │   ├── tokens.css          # Brand color tokens & light/dark variables
 │   │   ├── animations.css      # Single tasteful hero ambient motion
 │   │   └── index.css           # Global typography & accessible controls
 │   ├── App.jsx                 # Router layout coordinator
 │   └── main.jsx                # Application root entry
+├── supabase_schema.sql         # Supabase Postgres tables, indexes & RLS policies
 ├── index.html                  # HTML entry with Bricolage Grotesque & JSON-LD
 ├── package.json                # Project dependencies and npm scripts
 ├── vercel.json                 # Vercel SPA routing rewrites
@@ -255,11 +261,38 @@ zippytechsystems-portfolio/
 
 ---
 
+## 🗄️ Supabase Backend & Database Setup
+
+The website supports Supabase for live dynamic content and administration with offline resilience:
+
+### 1. Environment Variables
+Create `.env` in the root:
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+### 2. Database Tables & Row-Level Security
+Run the SQL script provided in `supabase_schema.sql` in your Supabase SQL Editor:
+- **`services`**: Stores domain services (main and more offerings) with sort order and descriptions.
+- **`projects`**: Stores portfolio projects with tags, metrics, and image URLs.
+- **`enquiries`**: Captures customer leads directly from the contact form.
+- **`settings`**: Dynamic site key-value settings (phone, WhatsApp, taglines, social links).
+- **Storage Bucket (`portfolio-images`)**: Public read, authenticated admin upload.
+
+### Security Rules (RLS):
+- Public users can only read services, projects, settings, and submit enquiries.
+- Only the authenticated admin email (`lingaswamymaddeboina@gmail.com`) can edit or view leads.
+
+---
+
 ## 📞 Contact Information
 
 - **Company**: ZippyTechSystems Pvt. Ltd.
 - **Founder**: Lingaswamy
-- **Phone**: [+91 95424 39498](tel:9542439498)
-- **WhatsApp**: [wa.me/919542439498](https://wa.me/919542439498)
+- **Phone / Calling**: [+91 63026 90251](tel:+916302690251)
+- **WhatsApp**: [wa.me/916302690251](https://wa.me/916302690251)
+- **Instagram**: [instagram.com/zippytechsystems](https://www.instagram.com/zippytechsystems)
+- **YouTube**: [youtube.com/@zippytechsystems](https://www.youtube.com/@zippytechsystems)
 - **Location**: Hyderabad, Telangana, India
 - **Positioning**: Low budget, high value digital solutions for small and mid-size businesses in India.

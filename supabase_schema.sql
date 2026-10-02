@@ -167,11 +167,13 @@ INSERT INTO public.services (domain_id, type, title, description, sort_order) VA
 -- Insert Default Settings
 INSERT INTO public.settings (key, value) VALUES
 ('founder_name', 'Lingaswamy'),
-('phone', '9542439498'),
-('phone_formatted', '+91 95424 39498'),
-('whatsapp_number', '919542439498'),
+('phone', '6302690251'),
+('phone_formatted', '+91 63026 90251'),
+('whatsapp_number', '916302690251'),
 ('whatsapp_prefill', 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.'),
 ('tagline', 'Build • Automate • Grow'),
 ('secondary_tagline', 'Smart Technology for a Stronger Tomorrow'),
-('location', 'Hyderabad, Telangana, India')
-ON CONFLICT (key) DO NOTHING;
+('location', 'Hyderabad, Telangana, India'),
+('instagram_url', 'https://www.instagram.com/zippytechsystems'),
+('youtube_url', 'https://www.youtube.com/@zippytechsystems')
+ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;

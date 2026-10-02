@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useData } from '../context/DataContext';
 import {
@@ -133,6 +133,12 @@ export default function AdminPage() {
   // 4. Settings State
   // -------------------------------------------------------------
   const [settingsForm, setSettingsForm] = useState(settingsData);
+
+  useEffect(() => {
+    if (settingsData) {
+      setSettingsForm(settingsData);
+    }
+  }, [settingsData]);
 
   // -------------------------------------------------------------
   // Handler: Login
@@ -1990,7 +1996,7 @@ export default function AdminPage() {
                   />
                 </div>
 
-                <div className="form-group" style={{ marginBottom: '1.75rem' }}>
+                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                   <label className="form-label">Office Location</label>
                   <input
                     type="text"
@@ -1998,6 +2004,30 @@ export default function AdminPage() {
                     value={settingsForm.location || ''}
                     onChange={(e) => setSettingsForm({ ...settingsForm, location: e.target.value })}
                   />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.75rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">Instagram Profile URL</label>
+                    <input
+                      type="url"
+                      className="form-input"
+                      placeholder="https://www.instagram.com/zippytechsystems"
+                      value={settingsForm.instagramUrl || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, instagramUrl: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">YouTube Channel URL</label>
+                    <input
+                      type="url"
+                      className="form-input"
+                      placeholder="https://www.youtube.com/@zippytechsystems"
+                      value={settingsForm.youtubeUrl || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, youtubeUrl: e.target.value })}
+                    />
+                  </div>
                 </div>
 
                 <button type="submit" className="btn btn-cta-yellow" style={{ padding: '0.75rem 1.75rem', fontWeight: 700 }}>

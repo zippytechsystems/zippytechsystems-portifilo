@@ -17,7 +17,7 @@ export default function FloatingWhatsApp() {
         target="_blank"
         rel="noopener noreferrer"
         className="floating-whatsapp-btn animate-whatsapp-pulse"
-        aria-label="Direct WhatsApp chat with founder Lingaswamy at 9542439498"
+        aria-label={`Direct WhatsApp chat with founder Lingaswamy at ${content.founder.phone}`}
       >
         <MessageCircle size={30} fill="currentColor" strokeWidth={1.5} />
       </a>

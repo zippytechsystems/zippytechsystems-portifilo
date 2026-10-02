@@ -1,11 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, MessageCircle, MapPin, Heart, Shield } from 'lucide-react';
+import { Phone, MessageCircle, MapPin, Heart, Shield, Instagram, Youtube } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
+import { useData } from '../context/DataContext';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-  const whatsappUrl = buildWhatsAppUrl();
+  const { settingsData } = useData() || {};
+
+  const phone = settingsData?.phone || content.founder.phone;
+  const phoneFormatted = settingsData?.phoneFormatted || content.founder.phoneFormatted || phone;
+  const whatsappNumber = settingsData?.whatsappNumber || content.founder.whatsappNumber;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    settingsData?.defaultWhatsAppMessage || 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.'
+  )}`;
 
   return (
     <footer
@@ -65,7 +73,7 @@ export default function Footer() {
 
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <span className="badge badge-yellow" style={{ fontSize: '0.78rem' }}>
-                {content.company.tagline}
+                {settingsData?.tagline || content.company.tagline}
               </span>
             </div>
 
@@ -143,11 +151,11 @@ export default function Footer() {
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(18, 161, 80, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <MessageCircle size={16} color="#12a150" />
                 </div>
-                <span>WhatsApp: {content.founder.phone}</span>
+                <span>WhatsApp: {phone}</span>
               </a>
 
               <a
-                href={`tel:${content.founder.phone}`}
+                href={`tel:${phone}`}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -159,13 +167,66 @@ export default function Footer() {
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(29, 92, 240, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Phone size={16} color="#1d5cf0" />
                 </div>
-                <span>Call: {content.founder.phoneFormatted}</span>
+                <span>Call: {phoneFormatted}</span>
               </a>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontSize: '0.88rem', color: '#94a3b8' }}>
                 <MapPin size={16} color="#ffe500" />
-                <span>{content.company.location}</span>
+                <span>{settingsData?.location || content.company.location}</span>
               </div>
+
+              {/* Social links (only shown if present in settings) */}
+              {(settingsData?.instagramUrl || settingsData?.youtubeUrl) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', paddingTop: '0.5rem' }}>
+                  {settingsData?.instagramUrl && (
+                    <a
+                      href={settingsData.instagramUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        fontSize: '0.85rem',
+                        color: '#94a3b8',
+                        textDecoration: 'none',
+                        transition: 'color var(--transition-fast)'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = '#e1306c')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+                      title="Follow on Instagram"
+                      aria-label="Instagram"
+                    >
+                      <Instagram size={20} strokeWidth={1.75} />
+                      <span>Instagram</span>
+                    </a>
+                  )}
+
+                  {settingsData?.youtubeUrl && (
+                    <a
+                      href={settingsData.youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        fontSize: '0.85rem',
+                        color: '#94a3b8',
+                        textDecoration: 'none',
+                        transition: 'color var(--transition-fast)'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = '#ff0000')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+                      title="Subscribe on YouTube"
+                      aria-label="YouTube"
+                    >
+                      <Youtube size={20} strokeWidth={1.75} />
+                      <span>YouTube</span>
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -195,6 +256,35 @@ export default function Footer() {
             </span>
             <Link to="/privacy" style={{ color: '#94a3b8' }}>Privacy</Link>
             <Link to="/terms" style={{ color: '#94a3b8' }}>Terms</Link>
+
+            {/* Subtle bottom social icons */}
+            {settingsData?.instagramUrl && (
+              <a
+                href={settingsData.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#64748b', display: 'inline-flex', alignItems: 'center', transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#e1306c')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
+                aria-label="Instagram"
+              >
+                <Instagram size={18} />
+              </a>
+            )}
+            {settingsData?.youtubeUrl && (
+              <a
+                href={settingsData.youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#64748b', display: 'inline-flex', alignItems: 'center', transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#ff0000')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
+                aria-label="YouTube"
+              >
+                <Youtube size={18} />
+              </a>
+            )}
+
             {/* Discreet Admin link */}
             <Link
               to="/admin"

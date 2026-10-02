@@ -11,8 +11,13 @@ export default function ContactSection() {
     message: ''
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  const { saveEnquiry } = useData();
+  const { saveEnquiry, settingsData } = useData();
+
+  const activePhone = settingsData?.phone || content.founder.phone;
+  const activePhoneFormatted = settingsData?.phoneFormatted || content.founder.phoneFormatted;
+  const activeWhatsApp = (settingsData?.whatsappNumber || content.founder.whatsappNumber).replace(/[^0-9]/g, '');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,38 +26,51 @@ export default function ContactSection() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.phone.trim()) {
-      alert('Please provide your name and phone number so Lingaswamy can reply to your quote.');
+    setFormError('');
+
+    if (!formData.name.trim()) {
+      setFormError('Please enter your name.');
+      return;
+    }
+
+    const cleanDigits = formData.phone.replace(/[^0-9]/g, '');
+    if (cleanDigits.length < 10) {
+      setFormError('Please enter a valid 10-digit mobile number.');
       return;
     }
 
     // 1. Save to Supabase (or local fallback)
     try {
       await saveEnquiry({
-        name: formData.name,
-        phone: formData.phone,
+        name: formData.name.trim(),
+        phone: cleanDigits,
         service: formData.service,
-        message: formData.message
+        message: formData.message.trim()
       });
     } catch (err) {
       console.warn('Error saving enquiry to database:', err);
     }
 
     // 2. Open WhatsApp with prefilled message
-    const whatsappUrl = buildEnquiryWhatsAppUrl({
-      name: formData.name,
-      phone: formData.phone,
-      service: formData.service,
-      message: formData.message
-    });
+    const waNumber = activeWhatsApp.startsWith('91') ? activeWhatsApp : `91${activeWhatsApp}`;
+    const prefillText = encodeURIComponent(`*New Project Enquiry — ZippyTechSystems*
+-----------------------------
+👤 *Name:* ${formData.name.trim()}
+📱 *Phone:* ${cleanDigits}
+🛠️ *Service Needed:* ${formData.service}
+💬 *Project Details:* ${formData.message.trim() || 'I would like more information and a price quote.'}
+-----------------------------
+(Sent from zippytechsystems.com portfolio website)`);
+
+    const whatsappUrl = `https://wa.me/${waNumber}?text=${prefillText}`;
 
     setFormSubmitted(true);
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
-  const directWhatsAppUrl = buildWhatsAppUrl(
+  const directWhatsAppUrl = `https://wa.me/${activeWhatsApp.startsWith('91') ? activeWhatsApp : `91${activeWhatsApp}`}?text=${encodeURIComponent(
     'Hi Lingaswamy, I would like to get a quote and discuss a project with ZippyTechSystems.'
-  );
+  )}`;
 
   return (
     <section id="contact" style={{ padding: '5rem 0', background: 'var(--bg-canvas)' }} aria-labelledby="contact-heading">
@@ -103,16 +121,16 @@ export default function ContactSection() {
                   style={{ padding: '0.9rem', fontSize: '1rem' }}
                 >
                   <MessageCircle size={18} />
-                  <span>Chat on WhatsApp: {content.founder.phone}</span>
+                  <span>Chat on WhatsApp: {activePhone}</span>
                 </a>
 
                 <a
-                  href={`tel:${content.founder.phone}`}
+                  href={`tel:+91${activePhone}`}
                   className="btn btn-outline"
                   style={{ padding: '0.9rem', fontSize: '1rem' }}
                 >
                   <Phone size={18} color="#12a150" />
-                  <span>Call Directly: {content.founder.phoneFormatted}</span>
+                  <span>Call Directly: {activePhoneFormatted}</span>
                 </a>
               </div>
             </div>
@@ -125,7 +143,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>Phone &amp; WhatsApp</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)' }}>{content.founder.phoneFormatted}</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)' }}>{activePhoneFormatted}</div>
                 </div>
               </div>
 
@@ -159,6 +177,22 @@ export default function ContactSection() {
             <p style={{ color: 'var(--text-dim)', fontSize: '0.88rem', marginBottom: '1.75rem' }}>
               Fill in your requirement below. Clicking submit opens WhatsApp with your prefilled details.
             </p>
+
+            {formError && (
+              <div
+                style={{
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid #ef4444',
+                  color: '#ef4444',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  marginBottom: '1.25rem',
+                  fontSize: '0.9rem'
+                }}
+              >
+                {formError}
+              </div>
+            )}
 
             {formSubmitted && (
               <div
