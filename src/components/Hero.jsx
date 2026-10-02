@@ -6,11 +6,12 @@ import DomainPreviewCards from './DomainPreviewCards';
 
 export default function Hero({ onOpenQuoteModal, onExploreServices }) {
   const { settingsData } = useData();
-  const phone = settingsData?.phone || content.founder.phone;
   const secondaryTagline = settingsData?.secondaryTagline || content.company.secondaryTagline;
-  const whatsappNum = (settingsData?.whatsappNumber || content.founder.whatsappNumber).replace(/[^0-9]/g, '');
+  const rawWa = settingsData?.whatsappNumber || content.founder.whatsappNumber || '6302690251';
+  const cleanWa = String(rawWa).replace(/[^0-9]/g, '');
+  const whatsappNum = cleanWa.startsWith('91') ? cleanWa : `91${cleanWa}`;
 
-  const heroWhatsAppUrl = `https://wa.me/${whatsappNum.startsWith('91') ? whatsappNum : `91${whatsappNum}`}?text=${encodeURIComponent(
+  const heroWhatsAppUrl = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(
     settingsData?.defaultWhatsAppMessage || 'Hi Lingaswamy, I would like to get a quote for a website / app / AI automation for my business.'
   )}`;
 

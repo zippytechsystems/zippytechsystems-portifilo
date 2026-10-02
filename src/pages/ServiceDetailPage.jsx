@@ -121,7 +121,7 @@ export default function ServiceDetailPage() {
                   </a>
 
                   <a
-                    href={`tel:${content.founder.phone}`}
+                    href={`tel:+91${content.founder.phone}`}
                     className="btn btn-outline"
                     style={{ padding: '0.85rem 1.4rem', fontSize: '1rem' }}
                   >

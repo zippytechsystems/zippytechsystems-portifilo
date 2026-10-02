@@ -3,13 +3,21 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sun, Moon, Phone, MessageCircle } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useTheme } from '../context/ThemeContext';
+import { useData } from '../context/DataContext';
 
 export default function Navbar({ onOpenQuoteModal }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { settingsData } = useData() || {};
   const location = useLocation();
   const navigate = useNavigate();
+
+  const rawPhone = settingsData?.phone || content.founder.phone || '6302690251';
+  const cleanPhone = String(rawPhone).replace(/[^0-9]/g, '').replace(/^91/, '');
+  const activePhoneFormatted = cleanPhone.length === 10
+    ? `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`
+    : (settingsData?.phoneFormatted || content.founder.phoneFormatted || `+91 ${cleanPhone}`);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -208,7 +216,7 @@ export default function Navbar({ onOpenQuoteModal }) {
         >
           {/* Quick Call Link (Desktop/Tablet) */}
           <a
-            href={`tel:${content.founder.phone}`}
+            href={`tel:+91${cleanPhone}`}
             className="btn btn-outline"
             style={{
               display: 'none',
@@ -219,7 +227,7 @@ export default function Navbar({ onOpenQuoteModal }) {
             title="Call Lingaswamy"
           >
             <Phone size={14} color="#12a150" />
-            <span>{content.founder.phone}</span>
+            <span>{activePhoneFormatted}</span>
           </a>
 
           {/* Theme Toggle Button */}
@@ -332,12 +340,12 @@ export default function Navbar({ onOpenQuoteModal }) {
             </a>
 
             <a
-              href={`tel:${content.founder.phone}`}
+              href={`tel:+91${cleanPhone}`}
               className="btn btn-outline"
               style={{ width: '100%' }}
             >
               <Phone size={15} color="#12a150" />
-              <span>Call Lingaswamy: {content.founder.phoneFormatted}</span>
+              <span>Call Lingaswamy: {activePhoneFormatted}</span>
             </a>
 
             {/* Subtle mobile Admin link at bottom */}

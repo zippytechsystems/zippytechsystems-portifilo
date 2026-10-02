@@ -155,12 +155,12 @@ export default function AboutSection() {
               </a>
 
               <a
-                href={`tel:${content.founder.phone}`}
+                href={`tel:+91${content.founder.phone}`}
                 className="btn btn-outline"
                 style={{ flex: '1 0 140px', padding: '0.7rem 1rem', fontSize: '0.9rem' }}
               >
                 <Phone size={15} color="#12a150" />
-                <span>Call {content.founder.phone}</span>
+                <span>Call {content.founder.phoneFormatted}</span>
               </a>
             </div>
           </div>

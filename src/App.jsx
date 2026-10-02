@@ -17,7 +17,8 @@ import ContactPage from './pages/ContactPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import NotFoundPage from './pages/NotFoundPage';
-import AdminPage from './pages/AdminPage';
+
+const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 
 export default function App() {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
@@ -74,7 +75,17 @@ export default function App() {
                 />
                 <Route
                   path="/admin"
-                  element={<AdminPage />}
+                  element={
+                    <React.Suspense
+                      fallback={
+                        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: '0.95rem' }}>
+                          Loading Admin Portal...
+                        </div>
+                      }
+                    >
+                      <AdminPage />
+                    </React.Suspense>
+                  }
                 />
                 <Route
                   path="*"

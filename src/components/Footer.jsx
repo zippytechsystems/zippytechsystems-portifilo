@@ -8,9 +8,15 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { settingsData } = useData() || {};
 
-  const phone = settingsData?.phone || content.founder.phone;
-  const phoneFormatted = settingsData?.phoneFormatted || content.founder.phoneFormatted || phone;
-  const whatsappNumber = settingsData?.whatsappNumber || content.founder.whatsappNumber;
+  const rawPhone = settingsData?.phone || content.founder.phone || '6302690251';
+  const cleanPhone = String(rawPhone).replace(/[^0-9]/g, '').replace(/^91/, '');
+  const phoneFormatted = cleanPhone.length === 10
+    ? `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`
+    : (settingsData?.phoneFormatted || content.founder.phoneFormatted || `+91 ${cleanPhone}`);
+
+  const rawWa = settingsData?.whatsappNumber || content.founder.whatsappNumber || '6302690251';
+  const cleanWa = String(rawWa).replace(/[^0-9]/g, '');
+  const whatsappNumber = cleanWa.startsWith('91') ? cleanWa : `91${cleanWa}`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     settingsData?.defaultWhatsAppMessage || 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.'
   )}`;
@@ -151,11 +157,11 @@ export default function Footer() {
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(18, 161, 80, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <MessageCircle size={16} color="#12a150" />
                 </div>
-                <span>WhatsApp: {phone}</span>
+                <span>WhatsApp: {phoneFormatted}</span>
               </a>
 
               <a
-                href={`tel:${phone}`}
+                href={`tel:+91${cleanPhone}`}
                 style={{
                   display: 'flex',
                   alignItems: 'center',

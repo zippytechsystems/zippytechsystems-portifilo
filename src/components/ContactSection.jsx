@@ -15,9 +15,15 @@ export default function ContactSection() {
 
   const { saveEnquiry, settingsData, domainsData, formatINR } = useData();
 
-  const activePhone = settingsData?.phone || content.founder.phone;
-  const activePhoneFormatted = settingsData?.phoneFormatted || content.founder.phoneFormatted;
-  const activeWhatsApp = (settingsData?.whatsappNumber || content.founder.whatsappNumber).replace(/[^0-9]/g, '');
+  const rawPhone = settingsData?.phone || content.founder.phone || '6302690251';
+  const cleanActivePhone = String(rawPhone).replace(/[^0-9]/g, '').replace(/^91/, '');
+  const activePhoneFormatted = cleanActivePhone.length === 10
+    ? `+91 ${cleanActivePhone.slice(0, 5)} ${cleanActivePhone.slice(5)}`
+    : (settingsData?.phoneFormatted || content.founder.phoneFormatted || `+91 ${cleanActivePhone}`);
+
+  const rawWhatsApp = settingsData?.whatsappNumber || content.founder.whatsappNumber || '6302690251';
+  const cleanDigitsWa = String(rawWhatsApp).replace(/[^0-9]/g, '');
+  const activeWhatsApp = cleanDigitsWa.startsWith('91') ? cleanDigitsWa : `91${cleanDigitsWa}`;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,11 +127,11 @@ export default function ContactSection() {
                   style={{ padding: '0.9rem', fontSize: '1rem' }}
                 >
                   <MessageCircle size={18} />
-                  <span>Chat on WhatsApp: {activePhone}</span>
+                  <span>Chat on WhatsApp: {activePhoneFormatted}</span>
                 </a>
 
                 <a
-                  href={`tel:+91${activePhone}`}
+                  href={`tel:+91${cleanActivePhone}`}
                   className="btn btn-outline"
                   style={{ padding: '0.9rem', fontSize: '1rem' }}
                 >
