@@ -184,9 +184,9 @@ export async function updateSettingsApi(settingsData) {
 // =========================================================================
 export async function getDomains() {
   const fallback = [
-    { id: 'web', key: 'web', name: 'Web Development', starting_price: 7000, price_label: 'Starting from', color: '#1d5cf0', intro: 'A modern, high-speed website that brings local customers to your door 24/7.' },
-    { id: 'app', key: 'app', name: 'App Development', starting_price: 10000, price_label: 'Starting from', color: '#12a150', intro: 'Custom billing, accounts, and inventory apps for retail and wholesale shops.' },
-    { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 6000, price_label: 'Starting from', color: '#7a2fd0', intro: 'Never lose another customer enquiry with 24/7 WhatsApp and voice agents.' }
+    { id: 'web', key: 'web', name: 'Web Development', starting_price: 6500, price_label: 'Starting from', color: '#1d5cf0', intro: 'A modern, high-speed website that brings local customers to your door 24/7.' },
+    { id: 'app', key: 'app', name: 'App Development', starting_price: 20000, price_label: 'Starting from', color: '#12a150', intro: 'Custom billing, accounts, and inventory apps for retail and wholesale shops.' },
+    { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 7500, price_label: 'Starting from', color: '#7a2fd0', intro: 'Never lose another customer enquiry with 24/7 WhatsApp and voice agents.' }
   ];
 
   if (!isSupabaseConfigured || !supabase) return fallback;
@@ -263,9 +263,9 @@ export async function getServices() {
     if (sErr || !servicesData || servicesData.length === 0) return fallback;
 
     const domainsList = domainsData && domainsData.length > 0 ? domainsData : [
-      { id: 'web', key: 'web', name: 'Web Development', starting_price: 7000, color: '#1d5cf0' },
-      { id: 'app', key: 'app', name: 'App Development', starting_price: 10000, color: '#12a150' },
-      { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 6000, color: '#7a2fd0' }
+      { id: 'web', key: 'web', name: 'Web Development', starting_price: 6500, color: '#1d5cf0' },
+      { id: 'app', key: 'app', name: 'App Development', starting_price: 20000, color: '#12a150' },
+      { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 7500, color: '#7a2fd0' }
     ];
 
     return domainsList.map((d) => {

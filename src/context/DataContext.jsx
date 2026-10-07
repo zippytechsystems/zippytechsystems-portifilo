@@ -64,9 +64,9 @@ const DataContext = createContext();
 export function DataProvider({ children }) {
   // State for all dynamic entities + domains + price history
   const [domainsData, setDomainsData] = useState([
-    { id: 'web', key: 'web', name: 'Web Development', starting_price: 7000, price_label: 'Starting from', color: '#1d5cf0' },
-    { id: 'app', key: 'app', name: 'App Development', starting_price: 10000, price_label: 'Starting from', color: '#12a150' },
-    { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 6000, price_label: 'Starting from', color: '#7a2fd0' }
+    { id: 'web', key: 'web', name: 'Web Development', starting_price: 6500, price_label: 'Starting from', color: '#1d5cf0' },
+    { id: 'app', key: 'app', name: 'App Development', starting_price: 20000, price_label: 'Starting from', color: '#12a150' },
+    { id: 'ai', key: 'ai', name: 'AI Automation', starting_price: 7500, price_label: 'Starting from', color: '#7a2fd0' }
   ]);
 
   const [servicesData, setServicesData] = useState(initialContent.services);
@@ -309,10 +309,10 @@ export function DataProvider({ children }) {
   const getDomainPrice = (key) => {
     const d = domainsData.find((item) => item.key === key || item.id === key);
     if (!d) {
-      if (key === 'web') return '₹7,000';
-      if (key === 'app') return '₹10,000';
-      if (key === 'ai') return '₹6,000';
-      return '₹7,000';
+      if (key === 'web') return '₹6,500';
+      if (key === 'app') return '₹20,000';
+      if (key === 'ai') return '₹7,500';
+      return '₹6,500';
     }
     return formatINR(d.starting_price);
   };
@@ -320,10 +320,10 @@ export function DataProvider({ children }) {
   const getDomainPriceNum = (key) => {
     const d = domainsData.find((item) => item.key === key || item.id === key);
     if (!d) {
-      if (key === 'web') return 7000;
-      if (key === 'app') return 10000;
-      if (key === 'ai') return 6000;
-      return 7000;
+      if (key === 'web') return 6500;
+      if (key === 'app') return 20000;
+      if (key === 'ai') return 7500;
+      return 6500;
     }
     return Number(d.starting_price) || 0;
   };

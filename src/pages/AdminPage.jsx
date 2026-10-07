@@ -4231,7 +4231,7 @@ export default function AdminPage() {
                       <input
                         type="email"
                         className="form-input"
-                        placeholder="contact@zippytechsystems.com"
+                        placeholder="contact@zippysoftwares.in"
                         value={settingsForm.email || ''}
                         onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
                       />

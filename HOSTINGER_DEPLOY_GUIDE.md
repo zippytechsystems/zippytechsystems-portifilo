@@ -68,7 +68,7 @@ The resulting `hostinger_frontend_dist.zip` contains all production assets ready
 
 ### Step 4: Upload to Hostinger File Manager
 1. Log in to your **Hostinger hPanel** (`https://hpanel.hostinger.com`).
-2. Go to **Websites** and click **Manage** next to your domain (`zippytechsystems.com`).
+2. Go to **Websites** and click **Manage** next to your domain (`zippysoftwares.in`).
 3. Under the **Files** section, click **File Manager** (or access via FTP using FileZilla).
 4. Double-click to open the **`public_html/`** folder.
 5. If there are default files (such as `default.php`), delete or back them up.
