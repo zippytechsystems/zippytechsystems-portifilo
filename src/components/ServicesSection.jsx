@@ -14,10 +14,13 @@ import {
 } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export default function ServicesSection() {
   const { servicesData, loading } = useData();
   const services = servicesData && servicesData.length > 0 ? servicesData : content.services;
+  useScrollReveal([services]);
+
 
   const iconMap = {
     Globe: <Globe size={32} />,
@@ -111,6 +114,7 @@ export default function ServicesSection() {
               
               {/* Domain Header Banner */}
               <div
+                className="reveal-on-scroll"
                 style={{
                   background: `linear-gradient(180deg, var(--bg-card) 0%, ${lightGlow} 100%)`,
                   borderRadius: 'var(--radius-xl)',
@@ -120,6 +124,7 @@ export default function ServicesSection() {
                   boxShadow: 'var(--card-shadow)'
                 }}
               >
+
                 <div
                   style={{
                     display: 'flex',

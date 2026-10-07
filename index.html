@@ -51,9 +51,10 @@
       rel="stylesheet"
     />
 
-    <!-- Prevent Theme Flash -->
+    <!-- Prevent Theme Flash & Enable JS class early -->
     <script>
       (function() {
+        document.documentElement.classList.add('js');
         try {
           const savedTheme = localStorage.getItem('zippy_theme');
           if (savedTheme) {

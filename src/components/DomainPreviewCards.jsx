@@ -51,7 +51,7 @@ export default function DomainPreviewCards() {
               <div
                 key={service.id}
                 onClick={() => handleScroll(service.slug)}
-                className="card"
+                className="card frosted-glass"
                 style={{
                   padding: '1.75rem',
                   borderColor: borderColor,
@@ -63,6 +63,7 @@ export default function DomainPreviewCards() {
                   transition: 'all var(--transition-normal)'
                 }}
               >
+
                 <div>
                   {/* Top Bar with Icon and Badge */}
                   <div

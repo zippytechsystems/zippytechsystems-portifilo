@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, MessageCircle, MapPin, Heart, Shield, Instagram, Youtube } from 'lucide-react';
+import { Phone, MessageCircle, MapPin, Heart, Shield, Instagram, Youtube, Mail, Facebook, Linkedin } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
+import { useQualityTier } from '../context/QualityTierContext';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { settingsData } = useData() || {};
+  const { tier, toggleReducedMotion } = useQualityTier();
+
 
   const rawPhone = settingsData?.phone || content.founder.phone || '6302690251';
   const cleanPhone = String(rawPhone).replace(/[^0-9]/g, '').replace(/^91/, '');
@@ -84,7 +87,7 @@ export default function Footer() {
             </div>
 
             <div style={{ fontSize: '0.85rem', color: '#cbd5e1', marginTop: '0.5rem' }}>
-              Founder: <strong>{content.founder.name}</strong>
+              Founder: <strong>{settingsData?.founderName || content.founder.name || 'Lingaswamy Maddeboina'}</strong>
             </div>
           </div>
 
@@ -176,14 +179,32 @@ export default function Footer() {
                 <span>Call: {phoneFormatted}</span>
               </a>
 
+              {settingsData?.email && (
+                <a
+                  href={`mailto:${settingsData.email}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.65rem',
+                    fontSize: '0.92rem',
+                    color: '#ffffff'
+                  }}
+                >
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255, 229, 0, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Mail size={16} color="#ffe500" />
+                  </div>
+                  <span>Email: {settingsData.email}</span>
+                </a>
+              )}
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontSize: '0.88rem', color: '#94a3b8' }}>
                 <MapPin size={16} color="#ffe500" />
                 <span>{settingsData?.location || content.company.location}</span>
               </div>
 
               {/* Social links (only shown if present in settings) */}
-              {(settingsData?.instagramUrl || settingsData?.youtubeUrl) && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', paddingTop: '0.5rem' }}>
+              {(settingsData?.instagramUrl || settingsData?.youtubeUrl || settingsData?.facebookUrl || settingsData?.linkedinUrl) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '0.5rem', flexWrap: 'wrap' }}>
                   {settingsData?.instagramUrl && (
                     <a
                       href={settingsData.instagramUrl}
@@ -203,7 +224,7 @@ export default function Footer() {
                       title="Follow on Instagram"
                       aria-label="Instagram"
                     >
-                      <Instagram size={20} strokeWidth={1.75} />
+                      <Instagram size={18} strokeWidth={1.75} />
                       <span>Instagram</span>
                     </a>
                   )}
@@ -227,8 +248,56 @@ export default function Footer() {
                       title="Subscribe on YouTube"
                       aria-label="YouTube"
                     >
-                      <Youtube size={20} strokeWidth={1.75} />
+                      <Youtube size={18} strokeWidth={1.75} />
                       <span>YouTube</span>
+                    </a>
+                  )}
+
+                  {settingsData?.facebookUrl && (
+                    <a
+                      href={settingsData.facebookUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        fontSize: '0.85rem',
+                        color: '#94a3b8',
+                        textDecoration: 'none',
+                        transition: 'color var(--transition-fast)'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = '#1877f2')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+                      title="Follow on Facebook"
+                      aria-label="Facebook"
+                    >
+                      <Facebook size={18} strokeWidth={1.75} />
+                      <span>Facebook</span>
+                    </a>
+                  )}
+
+                  {settingsData?.linkedinUrl && (
+                    <a
+                      href={settingsData.linkedinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        fontSize: '0.85rem',
+                        color: '#94a3b8',
+                        textDecoration: 'none',
+                        transition: 'color var(--transition-fast)'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = '#0a66c2')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+                      title="Connect on LinkedIn"
+                      aria-label="LinkedIn"
+                    >
+                      <Linkedin size={18} strokeWidth={1.75} />
+                      <span>LinkedIn</span>
                     </a>
                   )}
                 </div>
@@ -256,12 +325,44 @@ export default function Footer() {
             &copy; {currentYear} {content.company.name}. All rights reserved.
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               Engineered with pride in India for Indian Businesses
             </span>
             <Link to="/privacy" style={{ color: '#94a3b8' }}>Privacy</Link>
             <Link to="/terms" style={{ color: '#94a3b8' }}>Terms</Link>
+
+            {/* Accessible Motion Toggle */}
+            <button
+              onClick={toggleReducedMotion}
+              type="button"
+              aria-label={`Motion is currently ${tier === 'reduced' ? 'reduced' : 'active'}. Click to toggle.`}
+              title="Toggle animations and motion"
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '6px',
+                padding: '2px 8px',
+                fontSize: '0.78rem',
+                color: tier === 'reduced' ? '#ffe500' : '#94a3b8',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: tier === 'reduced' ? '#94a3b8' : '#12a150',
+                  display: 'inline-block'
+                }}
+              />
+              <span>Motion: {tier === 'reduced' ? 'Off' : 'On'}</span>
+            </button>
 
             {/* Subtle bottom social icons */}
             {settingsData?.instagramUrl && (
@@ -288,6 +389,32 @@ export default function Footer() {
                 aria-label="YouTube"
               >
                 <Youtube size={18} />
+              </a>
+            )}
+            {settingsData?.facebookUrl && (
+              <a
+                href={settingsData.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#64748b', display: 'inline-flex', alignItems: 'center', transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#1877f2')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
+                aria-label="Facebook"
+              >
+                <Facebook size={18} />
+              </a>
+            )}
+            {settingsData?.linkedinUrl && (
+              <a
+                href={settingsData.linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#64748b', display: 'inline-flex', alignItems: 'center', transition: 'color 0.2s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#0a66c2')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={18} />
               </a>
             )}
 

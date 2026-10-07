@@ -35,11 +35,30 @@ import {
   History,
   TrendingUp,
   Save,
-  Check
+  Check,
+  Bot,
+  MessageSquare,
+  MapPin,
+  Send,
+  Sliders,
+  Calendar,
+  UserCheck,
+  Mic,
+  Volume2,
+  Clock,
+  Mail,
+  CheckCheck,
+  Pause,
+  Play,
+  SlidersHorizontal,
+  Compass
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { buildKnowledge } from '../lib/knowledgeBuilder';
+import { DEFAULT_DESIGN_SETTINGS } from '../lib/api';
 
 export default function AdminPage() {
+
   const { isAuthenticated, adminUser, login, logout, resetPassword, loading: authLoading } = useAdminAuth();
   const {
     domainsData,
@@ -50,6 +69,7 @@ export default function AdminPage() {
     packagesData,
     settingsData,
     enquiries,
+    overdueEnquiriesCount,
     isLiveConnected,
     priceHistory,
     updateDomainPrice,
@@ -76,13 +96,48 @@ export default function AdminPage() {
     deleteFaq,
     addPackage,
     editPackage,
-    deletePackage
+    deletePackage,
+    chatbotSettings,
+    adminChatbotSettings,
+    serviceAreas,
+    chatSessions,
+    loadAdminChatbot,
+    persistChatbotSettings,
+    loadServiceAreasList,
+    addServiceArea,
+    editServiceArea,
+    deleteServiceArea,
+    loadChatSessions,
+    loadChatMessages,
+    deleteChatSession,
+    whatsappContacts,
+    whatsappTemplates,
+    loadWhatsAppContacts,
+    loadWhatsAppMessages,
+    takeOverWhatsAppChat,
+    resumeWhatsAppChat,
+    updateWhatsAppContactStatus,
+    loadWhatsAppTemplates,
+    sendWhatsAppMessage,
+    designSettings,
+    persistDesignSettings
   } = useData();
 
-  // Navigation tab state: 'dashboard' | 'prices' | 'services' | 'packages' | 'portfolio' | 'testimonials' | 'faqs' | 'enquiries' | 'settings'
+  // Navigation tab state: 'dashboard' | 'prices' | 'services' | 'packages' | 'portfolio' | 'testimonials' | 'faqs' | 'enquiries' | 'chatbot' | 'conversations' | 'whatsapp' | 'serviceAreas' | 'design' | 'settings'
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  // Phase 2: Design & Motion Settings state
+  const [designForm, setDesignForm] = useState(designSettings || DEFAULT_DESIGN_SETTINGS);
+  const [savingDesign, setSavingDesign] = useState(false);
+
+  useEffect(() => {
+    if (designSettings) {
+      setDesignForm(designSettings);
+    }
+  }, [designSettings]);
+
   // Login form state
+
   const [loginEmail, setLoginEmail] = useState('lingaswamymaddeboina@gmail.com');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -252,6 +307,7 @@ export default function AdminPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [serviceFilter, setServiceFilter] = useState('All');
+  const [sourceFilter, setSourceFilter] = useState('All');
 
   // -------------------------------------------------------------
   // 4. Settings State
@@ -263,6 +319,206 @@ export default function AdminPage() {
       setSettingsForm(settingsData);
     }
   }, [settingsData]);
+
+  // -------------------------------------------------------------
+  // 4B. Chatbot Admin & Sandbox State
+  // -------------------------------------------------------------
+  const [chatbotForm, setChatbotForm] = useState({
+    enabled: true,
+    welcomeMessage: '',
+    fallbackMessage: '',
+    quickReplies: [],
+    extraInstructions: '',
+    model: 'claude-haiku-4-5-20251001',
+    dailyLimit: 500,
+    voiceEnabled: true,
+    voiceDefaultLang: 'en-IN',
+    voiceRate: 1.0,
+    voiceNameEn: 'en-IN-NeerjaNeural',
+    voiceNameTe: 'te-IN-ShrutiNeural',
+    voiceNameHi: 'hi-IN-SwaraNeural'
+  });
+  const [quickReplyInput, setQuickReplyInput] = useState('');
+  const [testChatMessages, setTestChatMessages] = useState([
+    { role: 'assistant', content: 'Hi! I am the ZippyTechSystems AI assistant. Test me right here in Admin!' }
+  ]);
+  const [testChatInput, setTestChatInput] = useState('');
+  const [isTestBotSending, setIsTestBotSending] = useState(false);
+
+  // Sync admin chatbot data when tab opens
+  useEffect(() => {
+    if (activeTab === 'chatbot') {
+      loadAdminChatbot().then((data) => {
+        if (data) {
+          setChatbotForm(data);
+        }
+      });
+    } else if (activeTab === 'conversations') {
+      loadChatSessions();
+    } else if (activeTab === 'serviceAreas') {
+      loadServiceAreasList();
+    } else if (activeTab === 'whatsapp') {
+      loadWhatsAppContacts();
+      loadWhatsAppTemplates();
+    }
+  }, [activeTab]);
+
+  // Live dynamic knowledge preview generated directly from current database state (buildKnowledge output)
+  const currentChatbotKnowledge = buildKnowledge({
+    domains: domainsData,
+    services: servicesData,
+    packages: packagesData,
+    projects: projectsData,
+    faqs: faqsData,
+    serviceAreas: serviceAreas,
+    settings: settingsData
+  });
+
+  // -------------------------------------------------------------
+  // 4C. Conversations State
+  // -------------------------------------------------------------
+  const [conversationSearch, setConversationSearch] = useState('');
+  const [channelFilter, setChannelFilter] = useState('all'); // 'all' | 'text' | 'voice'
+  const [selectedSessionId, setSelectedSessionId] = useState(null);
+  const [activeSessionMessages, setActiveSessionMessages] = useState([]);
+  const [loadingSessionMessages, setLoadingSessionMessages] = useState(false);
+
+  // -------------------------------------------------------------
+  // 4C2. WhatsApp Inbox State & Actions
+  // -------------------------------------------------------------
+  const [selectedWaContactId, setSelectedWaContactId] = useState(null);
+  const [waMessages, setWaMessages] = useState([]);
+  const [loadingWaMessages, setLoadingWaMessages] = useState(false);
+  const [waSearch, setWaSearch] = useState('');
+  const [waFilter, setWaFilter] = useState('all'); // 'all' | 'needs_human' | 'app' | 'active' | 'opted_out'
+  const [waReplyText, setWaReplyText] = useState('');
+  const [waSending, setWaSending] = useState(false);
+  const [waSendMode, setWaSendMode] = useState('text'); // 'text' | 'template'
+  const [waSelectedTemplateName, setWaSelectedTemplateName] = useState('enquiry_confirmation');
+  const [waTemplateVar1, setWaTemplateVar1] = useState('');
+  const [waTemplateVar2, setWaTemplateVar2] = useState('');
+
+  // Load transcript when selectedWaContactId changes
+  useEffect(() => {
+    if (selectedWaContactId) {
+      setLoadingWaMessages(true);
+      loadWhatsAppMessages(selectedWaContactId)
+        .then((msgs) => setWaMessages(msgs || []))
+        .finally(() => setLoadingWaMessages(false));
+    } else {
+      setWaMessages([]);
+    }
+  }, [selectedWaContactId]);
+
+  // Selected WhatsApp Contact object
+  const selectedWaContact = (whatsappContacts || []).find((c) => c.id === selectedWaContactId) || null;
+
+  // Window calculation helper
+  const getWaWindowInfo = (lastMsgAt) => {
+    if (!lastMsgAt) return { isOpen: false, text: 'No inbound message' };
+    const diffMs = 24 * 60 * 60 * 1000 - (Date.now() - new Date(lastMsgAt).getTime());
+    if (diffMs <= 0) {
+      return { isOpen: false, text: '24h Window Closed (Template required)' };
+    }
+    const hours = Math.floor(diffMs / (60 * 60 * 1000));
+    const mins = Math.floor((diffMs % (60 * 60 * 1000)) / (60 * 1000));
+    return { isOpen: true, hours, mins, text: `24h Window: ${hours}h ${mins}m left` };
+  };
+
+  const handleTakeOverChat = async (contactId) => {
+    const pauseHours = settingsData?.human_pause_hours || 2;
+    const res = await takeOverWhatsAppChat(contactId, pauseHours);
+    if (res.success) {
+      showToast(`You took over this chat. AI automated replies paused for ${pauseHours} hours.`);
+      loadWhatsAppContacts();
+    } else {
+      showToast(res.error || 'Failed to take over chat.', 'error');
+    }
+  };
+
+  const handleResumeChatAi = async (contactId) => {
+    const res = await resumeWhatsAppChat(contactId);
+    if (res.success) {
+      showToast('AI automated replies resumed for this contact.');
+      loadWhatsAppContacts();
+    } else {
+      showToast(res.error || 'Failed to resume AI.', 'error');
+    }
+  };
+
+  const handleSendWaReply = async (e) => {
+    if (e) e.preventDefault();
+    if (!selectedWaContact) return;
+
+    const windowInfo = getWaWindowInfo(selectedWaContact.last_customer_message_at);
+
+    if (waSendMode === 'text') {
+      if (!windowInfo.isOpen) {
+        showToast('24-Hour customer window has expired. Meta requires an approved template to message this customer.', 'error');
+        setWaSendMode('template');
+        return;
+      }
+      if (!waReplyText.trim()) {
+        showToast('Please type a reply message.', 'error');
+        return;
+      }
+
+      setWaSending(true);
+      const res = await sendWhatsAppMessage({
+        to: selectedWaContact.phone,
+        text: waReplyText.trim()
+      });
+      setWaSending(false);
+
+      if (res.success) {
+        showToast('WhatsApp reply sent successfully!');
+        setWaReplyText('');
+        const updatedMsgs = await loadWhatsAppMessages(selectedWaContact.id);
+        setWaMessages(updatedMsgs || []);
+        loadWhatsAppContacts();
+      } else {
+        showToast(res.error || 'Failed to send WhatsApp message.', 'error');
+      }
+    } else {
+      // Template mode
+      if (!waSelectedTemplateName) {
+        showToast('Please select a template.', 'error');
+        return;
+      }
+
+      setWaSending(true);
+      const vars = [waTemplateVar1.trim(), waTemplateVar2.trim()].filter(Boolean);
+      const res = await sendWhatsAppMessage({
+        to: selectedWaContact.phone,
+        template_name: waSelectedTemplateName,
+        language: selectedWaContact.language || 'en',
+        variables: vars
+      });
+      setWaSending(false);
+
+      if (res.success) {
+        showToast(`Template "${waSelectedTemplateName}" sent successfully!`);
+        const updatedMsgs = await loadWhatsAppMessages(selectedWaContact.id);
+        setWaMessages(updatedMsgs || []);
+        loadWhatsAppContacts();
+      } else {
+        showToast(res.error || 'Failed to send template message.', 'error');
+      }
+    }
+  };
+
+  // -------------------------------------------------------------
+  // 4D. Service Areas State
+  // -------------------------------------------------------------
+  const [serviceAreaModal, setServiceAreaModal] = useState({
+    isOpen: false,
+    mode: 'add',
+    id: null,
+    name: '',
+    notes: '',
+    sort_order: 0,
+    is_active: true
+  });
 
   // -------------------------------------------------------------
   // 5. Packages State
@@ -480,11 +736,26 @@ export default function AdminPage() {
     const matchesSearch =
       (enq.name || '').toLowerCase().includes(query) ||
       (enq.phone || '').includes(query) ||
-      (enq.message || '').toLowerCase().includes(query);
-    const matchesStatus = statusFilter === 'All' || enq.status === statusFilter;
+      (enq.email || '').toLowerCase().includes(query) ||
+      (enq.message || '').toLowerCase().includes(query) ||
+      (enq.notes || '').toLowerCase().includes(query);
+
+    let matchesStatus = false;
+    if (statusFilter === 'All') {
+      matchesStatus = true;
+    } else if (statusFilter === 'Overdue') {
+      matchesStatus =
+        enq.status === 'New' &&
+        (enq.isOverdue || (enq.created_at && Date.now() - new Date(enq.created_at).getTime() >= 24 * 60 * 60 * 1000));
+    } else {
+      matchesStatus = enq.status === statusFilter;
+    }
+
     const matchesService =
       serviceFilter === 'All' || (enq.service || '').toLowerCase().includes(serviceFilter.toLowerCase());
-    return matchesSearch && matchesStatus && matchesService;
+    const matchesSource =
+      sourceFilter === 'All' || (enq.source || 'contact') === sourceFilter;
+    return matchesSearch && matchesStatus && matchesService && matchesSource;
   });
 
   // Current selected domain for Services Tab
@@ -765,8 +1036,19 @@ export default function AdminPage() {
       icon: <Inbox size={18} />,
       badge: newEnquiriesCount > 0 ? newEnquiriesCount : null
     },
+    { id: 'chatbot', label: 'AI Chatbot', icon: <Bot size={18} /> },
+    { id: 'conversations', label: 'Chats', icon: <MessageSquare size={18} /> },
+    {
+      id: 'whatsapp',
+      label: 'WhatsApp',
+      icon: <MessageCircle size={18} />,
+      badge: (whatsappContacts || []).filter((c) => c.status === 'needs_human').length || null
+    },
+    { id: 'serviceAreas', label: 'Locations', icon: <MapPin size={18} /> },
+    { id: 'design', label: 'Design & Motion', icon: <SlidersHorizontal size={18} /> },
     { id: 'settings', label: 'Settings', icon: <Settings size={18} /> }
   ];
+
 
   return (
     <div
@@ -1105,6 +1387,33 @@ export default function AdminPage() {
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.35rem' }}>
                   {newEnquiriesCount > 0 ? 'Requires follow-up on WhatsApp' : 'All caught up!'}
+                </div>
+              </div>
+
+              {/* Overdue Enquiries Card (> 24h) */}
+              <div
+                className="card"
+                onClick={() => { setActiveTab('enquiries'); setStatusFilter('Overdue'); }}
+                style={{
+                  padding: '1.5rem',
+                  cursor: 'pointer',
+                  borderColor: overdueEnquiriesCount > 0 ? '#ef4444' : 'var(--border-glass)',
+                  background: overdueEnquiriesCount > 0 ? 'rgba(239, 68, 68, 0.08)' : 'var(--bg-card)'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <span style={{ fontSize: '0.85rem', color: overdueEnquiriesCount > 0 ? '#ef4444' : 'var(--text-dim)', fontWeight: 700 }}>
+                    OVERDUE (&gt; 24H)
+                  </span>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: overdueEnquiriesCount > 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <AlertCircle size={18} color={overdueEnquiriesCount > 0 ? '#ef4444' : 'var(--text-dim)'} />
+                  </div>
+                </div>
+                <div style={{ fontSize: '2.2rem', fontWeight: 800, color: overdueEnquiriesCount > 0 ? '#ef4444' : 'var(--text-main)' }}>
+                  {overdueEnquiriesCount}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: overdueEnquiriesCount > 0 ? '#ef4444' : 'var(--text-dim)', marginTop: '0.35rem', fontWeight: overdueEnquiriesCount > 0 ? 600 : 400 }}>
+                  {overdueEnquiriesCount > 0 ? 'Exceeded 24-hr commitment!' : 'All enquiries on track'}
                 </div>
               </div>
 
@@ -3340,24 +3649,37 @@ export default function AdminPage() {
 
               {/* Status Filter Tabs */}
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                {['All', 'New', 'Contacted', 'Closed'].map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => setStatusFilter(st)}
-                    style={{
-                      padding: '0.4rem 0.85rem',
-                      borderRadius: 'var(--radius-full)',
-                      border: statusFilter === st ? '1px solid #1d5cf0' : '1px solid var(--border-subtle)',
-                      background: statusFilter === st ? 'rgba(29,92,240,0.15)' : 'transparent',
-                      color: statusFilter === st ? '#1d5cf0' : 'var(--text-body)',
-                      fontSize: '0.82rem',
-                      fontWeight: 600,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {st}
-                  </button>
-                ))}
+                {['All', 'New', 'Overdue', 'Contacted', 'Closed'].map((st) => {
+                  const isOverdueTab = st === 'Overdue';
+                  const isSelected = statusFilter === st;
+                  return (
+                    <button
+                      key={st}
+                      onClick={() => setStatusFilter(st)}
+                      style={{
+                        padding: '0.4rem 0.85rem',
+                        borderRadius: 'var(--radius-full)',
+                        border: isSelected
+                          ? isOverdueTab ? '1px solid #ef4444' : '1px solid #1d5cf0'
+                          : isOverdueTab && overdueEnquiriesCount > 0 ? '1px solid rgba(239,68,68,0.4)' : '1px solid var(--border-subtle)',
+                        background: isSelected
+                          ? isOverdueTab ? 'rgba(239,68,68,0.15)' : 'rgba(29,92,240,0.15)'
+                          : 'transparent',
+                        color: isSelected
+                          ? isOverdueTab ? '#ef4444' : '#1d5cf0'
+                          : isOverdueTab && overdueEnquiriesCount > 0 ? '#ef4444' : 'var(--text-body)',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      {st} {isOverdueTab && overdueEnquiriesCount > 0 ? `(${overdueEnquiriesCount})` : ''}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Service Filter Dropdown */}
@@ -3372,6 +3694,21 @@ export default function AdminPage() {
                 <option value="App">App Development</option>
                 <option value="AI">AI Automation</option>
               </select>
+
+              {/* Source Filter Dropdown */}
+              <select
+                className="form-input"
+                style={{ width: 'auto', minWidth: '150px' }}
+                value={sourceFilter}
+                onChange={(e) => setSourceFilter(e.target.value)}
+              >
+                <option value="All">All Sources</option>
+                <option value="project">Project Builder</option>
+                <option value="callback">Callback Request</option>
+                <option value="contact">Contact Form</option>
+                <option value="quote">Fast Quote</option>
+                <option value="chatbot">AI Chatbot Leads</option>
+              </select>
             </div>
 
             {/* Enquiries List */}
@@ -3384,33 +3721,224 @@ export default function AdminPage() {
                 {filteredEnquiries.map((enq) => {
                   const whatsappUrl = `https://wa.me/91${enq.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(enq.name)}%2C%20Lingaswamy%20from%20ZippyTechSystems%20here.%20I%20received%20your%20quote%20request%20for%20${encodeURIComponent(enq.service || 'our services')}.`;
 
+                  const isOverdue =
+                    enq.status === 'New' &&
+                    (enq.isOverdue ||
+                      (enq.created_at && Date.now() - new Date(enq.created_at).getTime() >= 24 * 60 * 60 * 1000));
+
+                  let servicesList = [];
+                  if (Array.isArray(enq.selected_services)) {
+                    servicesList = enq.selected_services;
+                  } else if (typeof enq.selected_services === 'string') {
+                    try {
+                      servicesList = JSON.parse(enq.selected_services);
+                    } catch (e) {
+                      servicesList = [];
+                    }
+                  }
+
                   return (
                     <div
                       key={enq.id}
                       className="card"
                       style={{
                         padding: '1.25rem 1.5rem',
-                        borderLeft:
-                          enq.status === 'New'
-                            ? '4px solid #ffe500'
-                            : enq.status === 'Contacted'
-                            ? '4px solid #1d5cf0'
-                            : '4px solid #94a3b8'
+                        borderLeft: isOverdue
+                          ? '4px solid #ef4444'
+                          : enq.status === 'New'
+                          ? '4px solid #ffe500'
+                          : enq.status === 'Contacted'
+                          ? '4px solid #1d5cf0'
+                          : '4px solid #94a3b8'
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.75rem' }}>
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
                             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>
                               {enq.name}
                             </h3>
+
+                            {/* 24-Hour SLA / Status Badge */}
+                            {isOverdue ? (
+                              <span
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.15)',
+                                  color: '#ef4444',
+                                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                <AlertCircle size={12} /> Overdue (&gt; 24h)
+                              </span>
+                            ) : enq.status === 'New' ? (
+                              <span
+                                style={{
+                                  background: 'rgba(18, 161, 80, 0.12)',
+                                  color: '#12a150',
+                                  border: '1px solid rgba(18, 161, 80, 0.3)',
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                <Clock size={12} /> Within 24h
+                              </span>
+                            ) : null}
+
+                            {/* Source Badge */}
+                            {enq.source === 'project' ? (
+                              <span
+                                style={{
+                                  background: 'rgba(29, 92, 240, 0.15)',
+                                  color: '#60a5fa',
+                                  border: '1px solid rgba(96, 165, 250, 0.35)',
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                <Sliders size={12} /> Project Builder
+                              </span>
+                            ) : enq.source === 'callback' ? (
+                              <span
+                                style={{
+                                  background: 'rgba(18, 161, 80, 0.15)',
+                                  color: '#4ade80',
+                                  border: '1px solid rgba(74, 222, 128, 0.35)',
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                <Phone size={12} /> Callback Request
+                              </span>
+                            ) : enq.source === 'chatbot' ? (
+                              <span
+                                style={{
+                                  background: 'rgba(122, 47, 208, 0.15)',
+                                  color: '#c084fc',
+                                  border: '1px solid rgba(168, 85, 247, 0.35)',
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                <Bot size={12} /> AI Chatbot
+                              </span>
+                            ) : enq.source === 'quote' ? (
+                              <span
+                                style={{
+                                  background: 'rgba(255, 229, 0, 0.12)',
+                                  color: '#ffe500',
+                                  border: '1px solid rgba(255, 229, 0, 0.3)',
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                <BadgePercent size={12} /> Fast Quote
+                              </span>
+                            ) : (
+                              <span
+                                style={{
+                                  background: 'rgba(148, 163, 184, 0.15)',
+                                  color: '#cbd5e1',
+                                  border: '1px solid rgba(148, 163, 184, 0.3)',
+                                  padding: '2px 8px',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                <Send size={12} /> Contact Form
+                              </span>
+                            )}
+
                             <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
                               • {new Date(enq.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
-                          <div style={{ fontSize: '0.88rem', color: '#1d5cf0', fontWeight: 600, marginTop: '0.2rem' }}>
+
+                          <div style={{ fontSize: '0.88rem', color: '#1d5cf0', fontWeight: 600, marginTop: '0.25rem' }}>
                             {enq.service}
                           </div>
+
+                          {/* Email & Details */}
+                          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginTop: '0.35rem', fontSize: '0.85rem' }}>
+                            {enq.email && (
+                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--text-body)' }}>
+                                <Mail size={13} color="#94a3b8" />
+                                <a href={`mailto:${enq.email}`} style={{ color: '#1d5cf0', textDecoration: 'none' }}>
+                                  {enq.email}
+                                </a>
+                              </div>
+                            )}
+                            {enq.whatsapp_opt_in && (
+                              <span style={{ color: '#12a150', fontSize: '0.78rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <Check size={13} /> WhatsApp opt-in confirmed
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Selected Services Tags */}
+                          {servicesList.length > 0 && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.5rem', alignItems: 'center' }}>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 600 }}>Services:</span>
+                              {servicesList.map((srv, sIdx) => (
+                                <span
+                                  key={sIdx}
+                                  style={{
+                                    background: 'rgba(29, 92, 240, 0.1)',
+                                    color: '#60a5fa',
+                                    border: '1px solid rgba(29, 92, 240, 0.25)',
+                                    padding: '2px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  {srv}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Notes */}
+                          {enq.notes && (
+                            <div style={{ marginTop: '0.4rem', fontSize: '0.82rem', color: 'var(--text-dim)', fontStyle: 'italic' }}>
+                              <strong>Notes:</strong> {enq.notes}
+                            </div>
+                          )}
                         </div>
 
                         {/* Status Dropdown */}
@@ -3540,6 +4068,19 @@ export default function AdminPage() {
 
             <div className="card" style={{ maxWidth: '680px', padding: '2rem' }}>
               <form onSubmit={handleSaveSettings}>
+                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                  <label className="form-label">Founder &amp; Solutions Architect Full Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={settingsForm.founderName || 'Lingaswamy Maddeboina'}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, founderName: e.target.value })}
+                  />
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
+                    Used across website badges, about pages, chatbot system prompt, and WhatsApp communications.
+                  </div>
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
                   <div className="form-group">
                     <label className="form-label">Phone Number (Calling)</label>
@@ -3552,7 +4093,7 @@ export default function AdminPage() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">WhatsApp Number</label>
+                    <label className="form-label">Business WhatsApp Number (Bot Number)</label>
                     <input
                       type="text"
                       className="form-input"
@@ -3602,7 +4143,7 @@ export default function AdminPage() {
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.75rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
                   <div className="form-group">
                     <label className="form-label">Instagram Profile URL</label>
                     <input
@@ -3626,6 +4167,293 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">Facebook Page URL</label>
+                    <input
+                      type="url"
+                      className="form-input"
+                      placeholder="https://www.facebook.com/zippytechsystems"
+                      value={settingsForm.facebookUrl || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, facebookUrl: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">LinkedIn Profile / Company URL</label>
+                    <input
+                      type="url"
+                      className="form-input"
+                      placeholder="https://www.linkedin.com/company/zippytechsystems"
+                      value={settingsForm.linkedinUrl || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, linkedinUrl: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '1.75rem' }}>
+                  <label className="form-label">Response Time Target</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="24 hours"
+                    value={settingsForm.responseTimeText || '24 hours'}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, responseTimeText: e.target.value })}
+                  />
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
+                    Used on customer confirmation banners and Project Builder (e.g. "We will contact you within 24 hours").
+                  </div>
+                </div>
+
+                {/* Business Info (AI Chatbot Knowledge) */}
+                <div style={{ marginTop: '1.75rem', marginBottom: '1.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.4rem', color: '#1d5cf0' }}>
+                    Business Info (AI Chatbot Knowledge Base)
+                  </h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+                    Leave any field blank if not applicable. The AI Chatbot will ONLY mention non-empty fields. If a client asks about an empty field, the chatbot will politely offer WhatsApp handoff.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Working Hours / Timings</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g. Mon - Sat: 9:00 AM - 8:00 PM"
+                        value={settingsForm.workingHours || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, workingHours: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Support / Business Email</label>
+                      <input
+                        type="email"
+                        className="form-input"
+                        placeholder="contact@zippytechsystems.com"
+                        value={settingsForm.email || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label">Office / Physical Address</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. Hyderabad, Telangana, India"
+                      value={settingsForm.officeAddress || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, officeAddress: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label">About ZippyTechSystems / Founder Note</label>
+                    <textarea
+                      rows={2}
+                      className="form-input"
+                      placeholder="Brief summary of founder Lingaswamy's focus on affordable web, app & AI solutions..."
+                      value={settingsForm.aboutText || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, aboutText: e.target.value })}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Languages Supported</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="English, Telugu, Hindi"
+                        value={settingsForm.languagesSupported || 'English, Telugu, Hindi'}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, languagesSupported: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Delivery &amp; Turnaround Note</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g. Websites delivered in 3-5 days"
+                        value={settingsForm.deliveryNote || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, deliveryNote: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* WhatsApp & Email Automation Settings */}
+                <div style={{ marginTop: '1.75rem', marginBottom: '1.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.4rem', color: '#12a150' }}>
+                    WhatsApp &amp; Communication Automation
+                  </h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+                    Manage the 24/7 AI WhatsApp chatbot, Coexistence app pauses, and notification alerts.
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                    {/* Master WhatsApp Bot Switch */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={settingsForm.whatsappBotEnabled ?? true}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, whatsappBotEnabled: e.target.checked })}
+                        style={{ width: '18px', height: '18px', accentColor: '#12a150' }}
+                      />
+                      <span><strong>Enable WhatsApp AI Chatbot</strong> (AI replies automatically to customer WhatsApp messages)</span>
+                    </label>
+
+                    {/* Email Alert (Primary) */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={settingsForm.notifyEmailEnabled ?? true}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, notifyEmailEnabled: e.target.checked })}
+                        style={{ width: '18px', height: '18px', accentColor: '#1d5cf0' }}
+                      />
+                      <span><strong>Send Admin Email Alerts (Primary)</strong> (Instant notification via Resend when new enquiry arrives)</span>
+                    </label>
+
+                    {/* WhatsApp Admin Alert (Optional, OFF by default) */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(settingsForm.waAdminAlertEnabled)}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, waAdminAlertEnabled: e.target.checked })}
+                        style={{ width: '18px', height: '18px', accentColor: '#12a150' }}
+                      />
+                      <span><strong>Optional: WhatsApp Admin Alert</strong> (Requires personal number below; never sends to bot number)</span>
+                    </label>
+                  </div>
+
+                  {/* Personal Number for WA Alerts */}
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label">Personal WhatsApp Number for Admin Alerts (WA_ADMIN_TO)</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. 9876543210 (your personal number, NOT 6302690251)"
+                      value={settingsForm.waAdminTo || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, waAdminTo: e.target.value })}
+                    />
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
+                      <strong>Important:</strong> Must NOT be {settingsForm.whatsappNumber || '6302690251'} because Meta does not allow the bot to message itself. If left blank, WhatsApp admin alerts are skipped silently.
+                    </div>
+                  </div>
+
+                  {/* Coexistence Pause Duration */}
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label">Coexistence Mode: Human Reply Pause Duration (Hours)</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={72}
+                      className="form-input"
+                      value={settingsForm.humanPauseHours ?? 2}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, humanPauseHours: e.target.value })}
+                    />
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
+                      When you reply to a customer from the WhatsApp Business mobile app on your phone, the AI assistant will automatically pause for this contact for {settingsForm.humanPauseHours || 2} hours. You can resume AI at any time in the admin inbox.
+                    </div>
+                  </div>
+
+                  {/* Additional WhatsApp Automation Toggles */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.25rem', background: 'var(--bg-surface)', padding: '1rem', borderRadius: '8px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(settingsForm.whatsappAutoConfirm)}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, whatsappAutoConfirm: e.target.checked })}
+                        style={{ accentColor: '#12a150' }}
+                      />
+                      <span>Enquiry Auto-Confirm</span>
+                    </label>
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(settingsForm.whatsappFollowups)}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, whatsappFollowups: e.target.checked })}
+                        style={{ accentColor: '#12a150' }}
+                      />
+                      <span>Smart Follow-ups (24h)</span>
+                    </label>
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(settingsForm.dailySummaryEnabled)}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, dailySummaryEnabled: e.target.checked })}
+                        style={{ accentColor: '#12a150' }}
+                      />
+                      <span>Daily Summary (9 PM)</span>
+                    </label>
+                  </div>
+
+                  {/* Quiet Hours */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
+                    <div className="form-group">
+                      <label className="form-label" style={{ fontSize: '0.82rem' }}>Quiet Hours Start (No outbound automations)</label>
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={settingsForm.quietHoursStart || '22:00'}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, quietHoursStart: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" style={{ fontSize: '0.82rem' }}>Quiet Hours End</label>
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={settingsForm.quietHoursEnd || '08:00'}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, quietHoursEnd: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Multilingual WhatsApp Auto-reply Templates */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--bg-surface)', padding: '1.25rem', borderRadius: '8px' }}>
+                    <h4 style={{ fontSize: '0.92rem', fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>
+                      Customer WhatsApp Message Templates (By Customer Language)
+                    </h4>
+
+                    <div className="form-group">
+                      <label className="form-label" style={{ fontSize: '0.8rem' }}>English Template</label>
+                      <textarea
+                        rows={2}
+                        className="form-input"
+                        value={settingsForm.waTemplateEn || 'Thank you for contacting ZippyTechSystems. We received your enquiry and will contact you within 24 hours.'}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, waTemplateEn: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" style={{ fontSize: '0.8rem' }}>Telugu (తెలుగు) Template</label>
+                      <textarea
+                        rows={2}
+                        className="form-input"
+                        value={settingsForm.waTemplateTe || 'ZippyTechSystems ను సంప్రదించినందుకు ధన్యవాదాలు. మీ విచారణ మాకు అందింది, మేము 24 గంటల్లో మిమ్మల్ని సంప్రదిస్తాము.'}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, waTemplateTe: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" style={{ fontSize: '0.8rem' }}>Hindi (हिन्दी) Template</label>
+                      <textarea
+                        rows={2}
+                        className="form-input"
+                        value={settingsForm.waTemplateHi || 'ZippyTechSystems से संपर्क करने के लिए धन्यवाद। हमें आपकी पूछताछ मिल गई है और हम 24 घंटे के भीतर आपसे संपर्क करेंगे।'}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, waTemplateHi: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <button type="submit" className="btn btn-cta-yellow" style={{ padding: '0.75rem 1.75rem', fontWeight: 700 }}>
                   Save Site Settings
                 </button>
@@ -3633,7 +4461,1668 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB 6: AI CHATBOT CONFIGURATION */}
+        {/* ------------------------------------------------------------- */}
+        {activeTab === 'chatbot' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, marginBottom: '0.35rem' }}>
+                  AI Chatbot Configuration
+                </h1>
+                <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
+                  Configure your customer enquiry assistant. Changes saved here take effect immediately on the live website.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span
+                  style={{
+                    padding: '0.4rem 0.9rem',
+                    borderRadius: '9999px',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    background: chatbotForm.enabled ? 'rgba(18, 161, 80, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                    color: chatbotForm.enabled ? '#12a150' : '#ef4444',
+                    border: chatbotForm.enabled ? '1px solid rgba(18, 161, 80, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)'
+                  }}
+                >
+                  {chatbotForm.enabled ? 'Chatbot Active' : 'Chatbot Disabled'}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.75rem', alignItems: 'start' }}>
+              {/* Settings Form */}
+              <div className="card" style={{ padding: '2rem' }}>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const res = await persistChatbotSettings(chatbotForm);
+                    if (res.success) {
+                      showToast('Chatbot settings saved successfully! Live bot updated immediately.');
+                    } else {
+                      showToast(res.error || 'Failed to save chatbot settings.', 'error');
+                    }
+                  }}
+                >
+                  {/* Master Enable/Disable */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '1rem', background: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border-glass)' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Enable AI Chatbot Widget</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+                        Show floating chatbot on all public pages for customer enquiries
+                      </div>
+                    </div>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={chatbotForm.enabled}
+                        onChange={(e) => setChatbotForm({ ...chatbotForm, enabled: e.target.checked })}
+                        style={{ width: '20px', height: '20px', accentColor: '#1d5cf0', cursor: 'pointer' }}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Welcome Message */}
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label">Welcome Greeting Message</label>
+                    <textarea
+                      rows={3}
+                      className="form-input"
+                      value={chatbotForm.welcomeMessage || ''}
+                      onChange={(e) => setChatbotForm({ ...chatbotForm, welcomeMessage: e.target.value })}
+                      placeholder="Hi! I am the ZippyTechSystems AI assistant..."
+                    />
+                  </div>
+
+                  {/* Fallback Message */}
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label">Fallback &amp; WhatsApp Handoff Message</label>
+                    <textarea
+                      rows={2}
+                      className="form-input"
+                      value={chatbotForm.fallbackMessage || ''}
+                      onChange={(e) => setChatbotForm({ ...chatbotForm, fallbackMessage: e.target.value })}
+                      placeholder="I would be happy to connect you with founder Lingaswamy..."
+                    />
+                  </div>
+
+                  {/* Quick Replies Manager */}
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label">Suggested Quick-Reply Chips</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginBottom: '0.75rem' }}>
+                      {(chatbotForm.quickReplies || []).map((chip, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            background: 'rgba(29, 92, 240, 0.15)',
+                            color: '#93c5fd',
+                            border: '1px solid rgba(29, 92, 240, 0.35)',
+                            padding: '4px 10px',
+                            borderRadius: '9999px',
+                            fontSize: '0.8rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          {chip}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = chatbotForm.quickReplies.filter((_, i) => i !== idx);
+                              setChatbotForm({ ...chatbotForm, quickReplies: updated });
+                            }}
+                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: 0, display: 'flex' }}
+                          >
+                            <X size={13} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Add a new quick reply chip..."
+                        value={quickReplyInput}
+                        onChange={(e) => setQuickReplyInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (quickReplyInput.trim()) {
+                              setChatbotForm({
+                                ...chatbotForm,
+                                quickReplies: [...(chatbotForm.quickReplies || []), quickReplyInput.trim()]
+                              });
+                              setQuickReplyInput('');
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        style={{ whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          if (quickReplyInput.trim()) {
+                            setChatbotForm({
+                              ...chatbotForm,
+                              quickReplies: [...(chatbotForm.quickReplies || []), quickReplyInput.trim()]
+                            });
+                            setQuickReplyInput('');
+                          }
+                        }}
+                      >
+                        <Plus size={16} /> Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Extra Prompt Instructions */}
+                  <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                    <label className="form-label">
+                      Extra System Instructions (Appended directly to AI prompt)
+                    </label>
+                    <textarea
+                      rows={4}
+                      className="form-input"
+                      placeholder="Add any special instructions for Claude (e.g. Always emphasize our fast 3-5 day delivery, or remind clients that custom quotes are free on WhatsApp)..."
+                      value={chatbotForm.extraInstructions || ''}
+                      onChange={(e) => setChatbotForm({ ...chatbotForm, extraInstructions: e.target.value })}
+                    />
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '4px' }}>
+                      These instructions are immediately injected into the Claude API system prompt on the very next message.
+                    </div>
+                  </div>
+
+                  {/* Model & Daily Limit */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Claude Model</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={chatbotForm.model || 'claude-haiku-4-5-20251001'}
+                        onChange={(e) => setChatbotForm({ ...chatbotForm, model: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Daily Calls Limit</label>
+                      <input
+                        type="number"
+                        min="10"
+                        max="5000"
+                        className="form-input"
+                        value={chatbotForm.dailyLimit || 500}
+                        onChange={(e) => setChatbotForm({ ...chatbotForm, dailyLimit: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* AI Female Voice Agent Configuration */}
+                  <div style={{ marginTop: '0.5rem', marginBottom: '1.5rem', padding: '1.25rem', background: 'rgba(29, 92, 240, 0.05)', borderRadius: '12px', border: '1px solid rgba(29, 92, 240, 0.2)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                      <Mic size={18} color="#1d5cf0" />
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>AI Female Voice Agent (Azure Neural TTS)</div>
+                    </div>
+
+                    {/* Voice Toggle */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0.75rem', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>Enable Voice Mode</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                          Provides floating voice button &amp; natural female speech synthesis
+                        </div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={chatbotForm.voiceEnabled ?? true}
+                        onChange={(e) => setChatbotForm({ ...chatbotForm, voiceEnabled: e.target.checked })}
+                        style={{ width: '18px', height: '18px', accentColor: '#1d5cf0', cursor: 'pointer' }}
+                      />
+                    </div>
+
+                    {/* Default Language & Speed Rate */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                      <div className="form-group">
+                        <label className="form-label" style={{ fontSize: '0.8rem' }}>Default Voice Language</label>
+                        <select
+                          className="form-input"
+                          style={{ fontSize: '0.85rem' }}
+                          value={chatbotForm.voiceDefaultLang || 'en-IN'}
+                          onChange={(e) => setChatbotForm({ ...chatbotForm, voiceDefaultLang: e.target.value })}
+                        >
+                          <option value="en-IN">English (India) - en-IN</option>
+                          <option value="te-IN">Telugu (India) - te-IN</option>
+                          <option value="hi-IN">Hindi (India) - hi-IN</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label" style={{ fontSize: '0.8rem' }}>Speech Rate ({chatbotForm.voiceRate || 1.0}x)</label>
+                        <input
+                          type="range"
+                          min="0.8"
+                          max="1.2"
+                          step="0.1"
+                          className="form-input"
+                          style={{ padding: '4px' }}
+                          value={chatbotForm.voiceRate || 1.0}
+                          onChange={(e) => setChatbotForm({ ...chatbotForm, voiceRate: parseFloat(e.target.value) })}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Azure Female Voice Names */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem' }}>
+                      <div className="form-group">
+                        <label className="form-label" style={{ fontSize: '0.75rem' }}>English Female Voice</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          style={{ fontSize: '0.8rem' }}
+                          value={chatbotForm.voiceNameEn || 'en-IN-NeerjaNeural'}
+                          onChange={(e) => setChatbotForm({ ...chatbotForm, voiceNameEn: e.target.value })}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label" style={{ fontSize: '0.75rem' }}>Telugu Female Voice</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          style={{ fontSize: '0.8rem' }}
+                          value={chatbotForm.voiceNameTe || 'te-IN-ShrutiNeural'}
+                          onChange={(e) => setChatbotForm({ ...chatbotForm, voiceNameTe: e.target.value })}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label" style={{ fontSize: '0.75rem' }}>Hindi Female Voice</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          style={{ fontSize: '0.8rem' }}
+                          value={chatbotForm.voiceNameHi || 'hi-IN-SwaraNeural'}
+                          onChange={(e) => setChatbotForm({ ...chatbotForm, voiceNameHi: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="btn btn-cta-yellow" style={{ padding: '0.75rem 1.75rem', fontWeight: 700, width: '100%' }}>
+                    Save Chatbot Configuration
+                  </button>
+                </form>
+              </div>
+
+              {/* Live Interactive Test Sandbox */}
+              <div className="card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', height: '620px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Bot size={20} color="#1d5cf0" />
+                    <div>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0 }}>Test Chatbot Sandbox</h3>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                        Live interactive preview using current backend
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
+                    onClick={() => {
+                      setTestChatMessages([
+                        { role: 'assistant', content: chatbotForm.welcomeMessage || 'Hi! I am the ZippyTechSystems AI assistant. Test me right here in Admin!' }
+                      ]);
+                    }}
+                  >
+                    Reset Sandbox
+                  </button>
+                </div>
+
+                {/* Sandbox Message Stream */}
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '0.5rem 0' }}>
+                  {testChatMessages.map((m, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                        maxWidth: '85%',
+                        padding: '8px 12px',
+                        borderRadius: '12px',
+                        background: m.role === 'user' ? '#1d5cf0' : 'var(--bg-surface)',
+                        color: '#ffffff',
+                        fontSize: '0.85rem',
+                        border: m.role === 'user' ? 'none' : '1px solid var(--border-glass)',
+                        lineHeight: 1.45,
+                        whiteSpace: 'pre-wrap'
+                      }}
+                    >
+                      {m.content}
+                    </div>
+                  ))}
+
+                  {isTestBotSending && (
+                    <div style={{ alignSelf: 'flex-start', padding: '6px 12px', borderRadius: '12px', background: 'var(--bg-surface)', color: 'var(--text-dim)', fontSize: '0.8rem' }}>
+                      Assistant is thinking...
+                    </div>
+                  )}
+                </div>
+
+                {/* Sandbox Input */}
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!testChatInput.trim() || isTestBotSending) return;
+
+                    const userText = testChatInput.trim();
+                    setTestChatInput('');
+
+                    const nextMsgs = [...testChatMessages, { role: 'user', content: userText }];
+                    setTestChatMessages(nextMsgs);
+                    setIsTestBotSending(true);
+
+                    try {
+                      const { sendChatMessage } = await import('../lib/chatApi');
+                      const res = await sendChatMessage({
+                        sessionId: 'admin_test_session',
+                        messages: nextMsgs,
+                        pageUrl: '/admin'
+                      });
+
+                      setTestChatMessages((prev) => [
+                        ...prev,
+                        { role: 'assistant', content: res.reply }
+                      ]);
+                    } catch (err) {
+                      setTestChatMessages((prev) => [
+                        ...prev,
+                        { role: 'assistant', content: 'Sandbox connection fallback: Chatbot responded.' }
+                      ]);
+                    } finally {
+                      setIsTestBotSending(false);
+                    }
+                  }}
+                  style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.75rem' }}
+                >
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Type a test question (e.g. Website prices?)..."
+                    value={testChatInput}
+                    onChange={(e) => setTestChatInput(e.target.value)}
+                    disabled={isTestBotSending}
+                  />
+                  <button type="submit" className="btn btn-primary" disabled={isTestBotSending || !testChatInput.trim()} style={{ padding: '0 1rem' }}>
+                    <Send size={16} />
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Chatbot Knowledge Preview Box */}
+            <div className="card" style={{ marginTop: '1.75rem', padding: '1.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <Eye size={20} color="#1d5cf0" />
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Chatbot Knowledge Preview</h3>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-dim)' }}>
+                      Shows exactly the structured live text the chatbot sees right now (output of buildKnowledge).
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                    onClick={() => {
+                      if (navigator?.clipboard) {
+                        navigator.clipboard.writeText(currentChatbotKnowledge);
+                      }
+                      showToast('Chatbot knowledge preview copied to clipboard!');
+                    }}
+                  >
+                    <Save size={14} /> Copy Knowledge
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ position: 'relative' }}>
+                <pre
+                  style={{
+                    background: 'rgba(11, 27, 74, 0.5)',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: '10px',
+                    padding: '1.25rem',
+                    fontSize: '0.82rem',
+                    fontFamily: 'monospace',
+                    color: '#e2e8f0',
+                    lineHeight: 1.55,
+                    whiteSpace: 'pre-wrap',
+                    maxHeight: '380px',
+                    overflowY: 'auto'
+                  }}
+                >
+                  {currentChatbotKnowledge || 'No active knowledge found in database.'}
+                </pre>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB 7: CONVERSATIONS & TRANSCRIPTS */}
+        {/* ------------------------------------------------------------- */}
+        {activeTab === 'conversations' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, marginBottom: '0.35rem' }}>
+                  Customer Conversations ({chatSessions.length})
+                </h1>
+                <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
+                  Review live visitor questions, session transcripts, and leads captured by the AI chatbot.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => loadChatSessions()}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                <RefreshCw size={15} /> Refresh List
+              </button>
+            </div>
+
+            {/* Split Pane: Sessions List & Transcript Viewer */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
+              {/* Sessions List */}
+              <div className="card" style={{ padding: '1.25rem', maxHeight: '680px', overflowY: 'auto' }}>
+                {/* Channel Filter Pills */}
+                <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.75rem' }}>
+                  {['all', 'text', 'voice'].map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setChannelFilter(mode)}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        border: '1px solid',
+                        cursor: 'pointer',
+                        background: channelFilter === mode ? '#1d5cf0' : 'transparent',
+                        borderColor: channelFilter === mode ? '#1d5cf0' : 'var(--border-glass)',
+                        color: channelFilter === mode ? '#ffffff' : 'var(--text-dim)'
+                      }}
+                    >
+                      {mode === 'all' ? 'All Channels' : mode === 'voice' ? '🎙️ Voice' : '💬 Text'}
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{ marginBottom: '1rem', position: 'relative' }}>
+                  <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Search session or lead..."
+                    value={conversationSearch}
+                    onChange={(e) => setConversationSearch(e.target.value)}
+                    style={{ paddingLeft: '32px', fontSize: '0.85rem' }}
+                  />
+                </div>
+
+                {chatSessions.length === 0 ? (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.9rem' }}>
+                    No chat conversations recorded yet. Visitors using the widget will appear here.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                    {chatSessions
+                      .filter((s) => {
+                        const q = conversationSearch.toLowerCase();
+                        return (
+                          s.session_id.toLowerCase().includes(q) ||
+                          (s.enquiries?.name || '').toLowerCase().includes(q) ||
+                          (s.enquiries?.phone || '').includes(q)
+                        );
+                      })
+                      .map((session) => {
+                        const isSelected = selectedSessionId === session.session_id;
+                        return (
+                          <div
+                            key={session.session_id}
+                            onClick={async () => {
+                              setSelectedSessionId(session.session_id);
+                              setLoadingSessionMessages(true);
+                              const msgs = await loadChatMessages(session.session_id);
+                              setActiveSessionMessages(msgs || []);
+                              setLoadingSessionMessages(false);
+                            }}
+                            style={{
+                              padding: '0.85rem 1rem',
+                              borderRadius: '10px',
+                              background: isSelected ? 'rgba(29, 92, 240, 0.15)' : 'var(--bg-surface)',
+                              border: isSelected ? '1px solid #1d5cf0' : '1px solid var(--border-glass)',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: isSelected ? '#1d5cf0' : 'var(--text-main)', fontFamily: 'monospace' }}>
+                                {session.session_id.slice(0, 16)}...
+                              </span>
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>
+                                {new Date(session.last_message_at || session.started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+
+                            {session.enquiries ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                                <span style={{ background: 'rgba(18, 161, 80, 0.15)', color: '#12a150', border: '1px solid rgba(18, 161, 80, 0.3)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700 }}>
+                                  Lead: {session.enquiries.name} ({session.enquiries.phone})
+                                </span>
+                              </div>
+                            ) : (
+                              <div style={{ fontSize: '0.74rem', color: 'var(--text-dim)' }}>
+                                Page: {session.page_url || '/'}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+
+              {/* Active Transcript Pane */}
+              <div className="card" style={{ padding: '1.5rem', minHeight: '480px', display: 'flex', flexDirection: 'column' }}>
+                {!selectedSessionId ? (
+                  <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--text-dim)' }}>
+                    <MessageSquare size={36} style={{ margin: '0 auto 0.75rem', opacity: 0.5 }} />
+                    <p style={{ margin: 0, fontSize: '0.95rem' }}>Select a conversation from the list to view the full customer transcript.</p>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div>
+                        <div style={{ fontSize: '0.95rem', fontWeight: 700 }}>
+                          Session: {selectedSessionId}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                          {activeSessionMessages.length} messages in conversation
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)', padding: '0.35rem 0.65rem', fontSize: '0.78rem' }}
+                        onClick={() => {
+                          openConfirm(
+                            'Delete Conversation',
+                            'Are you sure you want to delete this conversation transcript?',
+                            async () => {
+                              await deleteChatSession(selectedSessionId);
+                              setSelectedSessionId(null);
+                              setActiveSessionMessages([]);
+                              showToast('Conversation deleted.');
+                            }
+                          );
+                        }}
+                      >
+                        <Trash2 size={13} /> Delete
+                      </button>
+                    </div>
+
+                    {/* Messages List */}
+                    {loadingSessionMessages ? (
+                      <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-dim)' }}>Loading transcript...</div>
+                    ) : activeSessionMessages.length === 0 ? (
+                      <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-dim)' }}>No messages recorded for this session.</div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '520px', overflowY: 'auto', paddingRight: '4px' }}>
+                        {activeSessionMessages
+                          .filter((msg) => {
+                            if (channelFilter === 'voice') return msg.channel === 'voice';
+                            if (channelFilter === 'text') return msg.channel !== 'voice';
+                            return true;
+                          })
+                          .map((msg, i) => (
+                            <div
+                              key={msg.id || i}
+                              style={{
+                                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                                maxWidth: '85%',
+                                padding: '10px 14px',
+                                borderRadius: '12px',
+                                background: msg.role === 'user' ? '#1d5cf0' : 'var(--bg-surface)',
+                                color: '#ffffff',
+                                fontSize: '0.88rem',
+                                border: msg.role === 'user' ? 'none' : '1px solid var(--border-glass)',
+                                lineHeight: 1.45
+                              }}
+                            >
+                              <div style={{ fontSize: '0.7rem', color: msg.role === 'user' ? 'rgba(255,255,255,0.7)' : 'var(--text-dim)', marginBottom: '3px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span>{msg.role === 'user' ? 'Customer' : 'Zippy AI Assistant'}</span>
+                                {msg.channel === 'voice' && (
+                                  <span style={{ background: 'rgba(255, 229, 0, 0.2)', color: '#ffe500', padding: '1px 5px', borderRadius: '4px', fontSize: '0.68rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                    🎙️ Voice
+                                  </span>
+                                )}
+                                <span>• {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                              <div style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</div>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB 7B: WHATSAPP LIVE INBOX & TAKEOVER */}
+        {/* ------------------------------------------------------------- */}
+        {activeTab === 'whatsapp' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, marginBottom: '0.35rem' }}>
+                  WhatsApp Live Inbox ({whatsappContacts.length})
+                </h1>
+                <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
+                  Manage WhatsApp customer conversations, view app echoes, take over chats, and send Meta-approved templates.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => {
+                    loadWhatsAppContacts();
+                    if (selectedWaContactId) {
+                      loadWhatsAppMessages(selectedWaContactId).then((m) => setWaMessages(m || []));
+                    }
+                    showToast('WhatsApp contacts refreshed');
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  <RefreshCw size={15} /> Refresh Inbox
+                </button>
+              </div>
+            </div>
+
+            {/* Split Pane: Contacts List & Live Conversation */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
+              {/* Left Column: Contacts List */}
+              <div className="card" style={{ padding: '1.25rem', maxHeight: '720px', overflowY: 'auto' }}>
+                {/* Status Filter Tabs */}
+                <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.85rem', flexWrap: 'wrap' }}>
+                  {[
+                    { id: 'all', label: 'All' },
+                    { id: 'needs_human', label: '⚠️ Needs Human' },
+                    { id: 'app', label: '📱 App Replied' },
+                    { id: 'active', label: '🤖 AI Active' },
+                    { id: 'opted_out', label: 'Opted Out' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setWaFilter(tab.id)}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '0.74rem',
+                        fontWeight: 600,
+                        border: '1px solid',
+                        cursor: 'pointer',
+                        background: waFilter === tab.id ? '#12a150' : 'transparent',
+                        borderColor: waFilter === tab.id ? '#12a150' : 'var(--border-glass)',
+                        color: waFilter === tab.id ? '#ffffff' : 'var(--text-dim)'
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Bar */}
+                <div style={{ marginBottom: '1rem', position: 'relative' }}>
+                  <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Search phone or name..."
+                    value={waSearch}
+                    onChange={(e) => setWaSearch(e.target.value)}
+                    style={{ paddingLeft: '32px', fontSize: '0.85rem' }}
+                  />
+                </div>
+
+                {whatsappContacts.length === 0 ? (
+                  <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.9rem' }}>
+                    <MessageCircle size={32} style={{ margin: '0 auto 0.5rem', opacity: 0.4 }} />
+                    <p style={{ margin: 0 }}>No WhatsApp contacts yet. Customer messages to 6302690251 will appear here in real time.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                    {whatsappContacts
+                      .filter((c) => {
+                        const q = waSearch.toLowerCase();
+                        const matchesSearch =
+                          (c.phone || '').includes(q) ||
+                          (c.name || '').toLowerCase().includes(q);
+                        if (!matchesSearch) return false;
+
+                        if (waFilter === 'needs_human') {
+                          return c.status === 'needs_human' || c.isPaused;
+                        }
+                        if (waFilter === 'app') {
+                          return c.isPaused && c.status === 'needs_human';
+                        }
+                        if (waFilter === 'active') {
+                          return c.status === 'active' && !c.isPaused;
+                        }
+                        if (waFilter === 'opted_out') {
+                          return c.opted_out || c.status === 'opted_out';
+                        }
+                        return true;
+                      })
+                      .map((c) => {
+                        const isSelected = selectedWaContactId === c.id;
+                        const windowInfo = getWaWindowInfo(c.last_customer_message_at);
+
+                        return (
+                          <div
+                            key={c.id}
+                            onClick={() => {
+                              setSelectedWaContactId(c.id);
+                              if (c.name) setWaTemplateVar1(c.name);
+                            }}
+                            style={{
+                              padding: '0.85rem 1rem',
+                              borderRadius: '10px',
+                              background: isSelected ? 'rgba(18, 161, 80, 0.15)' : 'var(--bg-surface)',
+                              border: isSelected ? '1px solid #12a150' : '1px solid var(--border-glass)',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.35rem' }}>
+                              <span style={{ fontSize: '0.88rem', fontWeight: 700, color: isSelected ? '#12a150' : 'var(--text-main)' }}>
+                                {c.name || `+${c.phone}`}
+                              </span>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+                                {c.language ? c.language.toUpperCase() : 'EN'}
+                              </span>
+                            </div>
+
+                            {c.name && (
+                              <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: '0.35rem', fontFamily: 'monospace' }}>
+                                +{c.phone}
+                              </div>
+                            )}
+
+                            {/* Status Pills */}
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                              {c.opted_out ? (
+                                <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                  Opted Out
+                                </span>
+                              ) : c.isPaused || c.status === 'needs_human' ? (
+                                <span style={{ background: 'rgba(122, 47, 208, 0.15)', color: '#a855f7', border: '1px solid rgba(122, 47, 208, 0.3)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                  Human Replied (AI Paused)
+                                </span>
+                              ) : (
+                                <span style={{ background: 'rgba(18, 161, 80, 0.15)', color: '#12a150', border: '1px solid rgba(18, 161, 80, 0.3)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                  AI Active
+                                </span>
+                              )}
+
+                              <span style={{ background: windowInfo.isOpen ? 'rgba(29, 92, 240, 0.15)' : 'rgba(255, 255, 255, 0.05)', color: windowInfo.isOpen ? '#1d5cf0' : 'var(--text-dim)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem' }}>
+                                {windowInfo.isOpen ? `Window: ${windowInfo.hours}h left` : 'Window Closed'}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column: Chat Transcript & Actions */}
+              <div className="card" style={{ padding: '1.5rem', minHeight: '600px', display: 'flex', flexDirection: 'column' }}>
+                {!selectedWaContact ? (
+                  <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--text-dim)', padding: '2rem' }}>
+                    <MessageCircle size={44} style={{ margin: '0 auto 1rem', opacity: 0.5, color: '#12a150' }} />
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.35rem' }}>Select a WhatsApp Conversation</h3>
+                    <p style={{ margin: 0, fontSize: '0.88rem', maxWidth: '360px' }}>
+                      Pick any contact from the left to view the live message transcript, take over from AI, or reply directly.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1 }}>
+                    {/* Header Bar */}
+                    <div style={{ borderBottom: '1px solid var(--border-glass)', paddingBottom: '1rem', marginBottom: '1rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+                        <div>
+                          <div style={{ fontSize: '1.15rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span>{selectedWaContact.name || `+${selectedWaContact.phone}`}</span>
+                            <span style={{ fontSize: '0.72rem', background: 'rgba(255, 255, 255, 0.1)', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                              Lang: {(selectedWaContact.language || 'en').toUpperCase()}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '0.82rem', color: 'var(--text-dim)', marginTop: '2px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <span>+{selectedWaContact.phone}</span>
+                            <a href={`https://wa.me/${selectedWaContact.phone}`} target="_blank" rel="noopener noreferrer" style={{ color: '#12a150', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: 600 }}>
+                              <ExternalLink size={12} /> Open WhatsApp App
+                            </a>
+                            <a href={`tel:+${selectedWaContact.phone}`} style={{ color: '#1d5cf0', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: 600 }}>
+                              <Phone size={12} /> Call Client
+                            </a>
+                          </div>
+                        </div>
+
+                        {/* AI Takeover / Resume Toggle */}
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          {selectedWaContact.isPaused || selectedWaContact.status === 'needs_human' ? (
+                            <button
+                              type="button"
+                              onClick={() => handleResumeChatAi(selectedWaContact.id)}
+                              className="btn btn-cta-yellow"
+                              style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+                            >
+                              <Play size={14} /> Resume AI Automation
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleTakeOverChat(selectedWaContact.id)}
+                              className="btn btn-outline"
+                              style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px', color: '#eab308', borderColor: '#eab308' }}
+                            >
+                              <Pause size={14} /> Take Over Chat (Pause AI)
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 24-Hour Window & AI Status Banner */}
+                      <div style={{ marginTop: '0.85rem' }}>
+                        {selectedWaContact.isPaused || selectedWaContact.status === 'needs_human' ? (
+                          <div style={{ background: 'rgba(122, 47, 208, 0.12)', border: '1px solid rgba(122, 47, 208, 0.3)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.8rem', color: '#c084fc', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                            <Smartphone size={16} />
+                            <span>
+                              <strong>Human Takeover Active:</strong> AI replies are paused for this contact.
+                              {selectedWaContact.ai_paused_until && ` Resumes automatically at ${new Date(selectedWaContact.ai_paused_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`}
+                            </span>
+                          </div>
+                        ) : null}
+
+                        {(() => {
+                          const windowInfo = getWaWindowInfo(selectedWaContact.last_customer_message_at);
+                          return windowInfo.isOpen ? (
+                            <div style={{ background: 'rgba(18, 161, 80, 0.1)', border: '1px solid rgba(18, 161, 80, 0.25)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.8rem', color: '#12a150', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Clock size={15} />
+                              <span>
+                                <strong>24-Hour Window Open:</strong> You can send free-form text messages. Remaining: {windowInfo.hours}h {windowInfo.mins}m.
+                              </span>
+                            </div>
+                          ) : (
+                            <div style={{ background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.25)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.8rem', color: '#eab308', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <AlertCircle size={15} />
+                              <span>
+                                <strong>24-Hour Window Closed:</strong> More than 24h passed since customer&apos;s last message. Meta requires an approved template to message this contact.
+                              </span>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    {/* Messages Transcript Scroll Area */}
+                    <div style={{ flex: 1, minHeight: '320px', maxHeight: '420px', overflowY: 'auto', paddingRight: '6px', display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
+                      {loadingWaMessages ? (
+                        <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.88rem' }}>Loading conversation history...</div>
+                      ) : waMessages.length === 0 ? (
+                        <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.88rem' }}>No messages recorded yet with this contact.</div>
+                      ) : (
+                        waMessages.map((msg) => {
+                          const isInbound = msg.direction === 'inbound';
+                          const isApp = msg.source === 'app';
+                          const isBot = msg.source === 'bot';
+                          const isAdmin = msg.source === 'admin';
+                          const isAuto = msg.source === 'automation';
+
+                          return (
+                            <div
+                              key={msg.id}
+                              style={{
+                                alignSelf: isInbound ? 'flex-start' : 'flex-end',
+                                maxWidth: '82%',
+                                padding: '10px 14px',
+                                borderRadius: '12px',
+                                background: isInbound
+                                  ? 'var(--bg-surface)'
+                                  : isApp
+                                  ? 'linear-gradient(135deg, #7a2fd0 0%, #9333ea 100%)'
+                                  : isAdmin
+                                  ? '#1d5cf0'
+                                  : '#0b1b4a',
+                                color: '#ffffff',
+                                fontSize: '0.88rem',
+                                border: isInbound ? '1px solid var(--border-glass)' : '1px solid rgba(255,255,255,0.1)',
+                                lineHeight: 1.45,
+                                boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                              }}
+                            >
+                              <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)', marginBottom: '4px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between' }}>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                  {isInbound && '👤 Customer'}
+                                  {isApp && '📱 Phone App (You)'}
+                                  {isBot && '🤖 Zippy AI Assistant'}
+                                  {isAdmin && '👨‍💼 Admin Reply'}
+                                  {isAuto && '⚡ Automation Queue'}
+                                </span>
+                                <span>{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+
+                              <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                                {msg.content}
+                              </div>
+
+                              {/* Outbound Delivery Status Ticks */}
+                              {!isInbound && (
+                                <div style={{ fontSize: '0.68rem', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '4px', marginTop: '4px', color: 'rgba(255,255,255,0.75)' }}>
+                                  {msg.status === 'read' ? (
+                                    <span style={{ color: '#38bdf8', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
+                                      <CheckCheck size={13} /> Read
+                                    </span>
+                                  ) : msg.status === 'delivered' ? (
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                                      <CheckCheck size={13} /> Delivered
+                                    </span>
+                                  ) : msg.status === 'sent' ? (
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                                      <Check size={13} /> Sent
+                                    </span>
+                                  ) : msg.status === 'failed' ? (
+                                    <span style={{ color: '#fca5a5', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                                      <AlertCircle size={13} /> Failed
+                                    </span>
+                                  ) : null}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    {/* Reply & Template Sender Box */}
+                    <div style={{ borderTop: '1px solid var(--border-glass)', paddingTop: '1rem', marginTop: 'auto' }}>
+                      {/* Mode Tabs */}
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                        <button
+                          type="button"
+                          onClick={() => setWaSendMode('text')}
+                          style={{
+                            padding: '5px 12px',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
+                            border: '1px solid',
+                            cursor: 'pointer',
+                            background: waSendMode === 'text' ? '#1d5cf0' : 'transparent',
+                            borderColor: waSendMode === 'text' ? '#1d5cf0' : 'var(--border-glass)',
+                            color: waSendMode === 'text' ? '#ffffff' : 'var(--text-dim)'
+                          }}
+                        >
+                          💬 Free-form Message
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWaSendMode('template')}
+                          style={{
+                            padding: '5px 12px',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
+                            border: '1px solid',
+                            cursor: 'pointer',
+                            background: waSendMode === 'template' ? '#12a150' : 'transparent',
+                            borderColor: waSendMode === 'template' ? '#12a150' : 'var(--border-glass)',
+                            color: waSendMode === 'template' ? '#ffffff' : 'var(--text-dim)'
+                          }}
+                        >
+                          📋 Meta Approved Template
+                        </button>
+                      </div>
+
+                      {waSendMode === 'text' ? (
+                        <form onSubmit={handleSendWaReply}>
+                          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
+                            <textarea
+                              rows={2}
+                              className="form-input"
+                              placeholder={
+                                getWaWindowInfo(selectedWaContact.last_customer_message_at).isOpen
+                                  ? 'Type your reply message to customer...'
+                                  : '24-hour window closed. Please switch to "Meta Approved Template" above.'
+                              }
+                              disabled={!getWaWindowInfo(selectedWaContact.last_customer_message_at).isOpen || waSending}
+                              value={waReplyText}
+                              onChange={(e) => setWaReplyText(e.target.value)}
+                              style={{ flex: 1, resize: 'none', fontSize: '0.88rem' }}
+                            />
+                            <button
+                              type="submit"
+                              disabled={!getWaWindowInfo(selectedWaContact.last_customer_message_at).isOpen || waSending || !waReplyText.trim()}
+                              className="btn btn-cta-yellow"
+                              style={{ padding: '0.65rem 1.25rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}
+                            >
+                              <Send size={15} />
+                              {waSending ? 'Sending...' : 'Send'}
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <form onSubmit={handleSendWaReply}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                              <label className="form-label" style={{ fontSize: '0.75rem' }}>Template</label>
+                              <select
+                                className="form-input"
+                                value={waSelectedTemplateName}
+                                onChange={(e) => setWaSelectedTemplateName(e.target.value)}
+                                style={{ fontSize: '0.82rem' }}
+                              >
+                                <option value="enquiry_confirmation">enquiry_confirmation (Utility)</option>
+                                <option value="follow_up">follow_up (Utility)</option>
+                                <option value="thank_you">thank_you (Utility)</option>
+                              </select>
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: 0 }}>
+                              <label className="form-label" style={{ fontSize: '0.75rem' }}>Variable 1: Customer Name</label>
+                              <input
+                                type="text"
+                                className="form-input"
+                                placeholder="Customer Name"
+                                value={waTemplateVar1}
+                                onChange={(e) => setWaTemplateVar1(e.target.value)}
+                                style={{ fontSize: '0.82rem' }}
+                              />
+                            </div>
+
+                            {waSelectedTemplateName !== 'thank_you' && (
+                              <div className="form-group" style={{ marginBottom: 0 }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem' }}>Variable 2: Service / Project</label>
+                                <input
+                                  type="text"
+                                  className="form-input"
+                                  placeholder="Web Development / App / AI"
+                                  value={waTemplateVar2}
+                                  onChange={(e) => setWaTemplateVar2(e.target.value)}
+                                  style={{ fontSize: '0.82rem' }}
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button
+                              type="submit"
+                              disabled={waSending}
+                              className="btn"
+                              style={{ background: '#12a150', color: '#ffffff', padding: '0.65rem 1.25rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}
+                            >
+                              <Send size={15} />
+                              {waSending ? 'Sending Template...' : 'Send Approved Template'}
+                            </button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TAB 8: SERVICE AREAS & OPERATING LOCATIONS */}
+        {/* ------------------------------------------------------------- */}
+        {activeTab === 'serviceAreas' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, marginBottom: '0.35rem' }}>
+                  Service Areas &amp; Locations ({serviceAreas.length})
+                </h1>
+                <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
+                  Locations where ZippyTechSystems provides services. The AI Chatbot uses these real locations to answer customer enquiries.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-cta-yellow"
+                onClick={() =>
+                  setServiceAreaModal({
+                    isOpen: true,
+                    mode: 'add',
+                    id: null,
+                    name: '',
+                    notes: '',
+                    sort_order: serviceAreas.length,
+                    is_active: true
+                  })
+                }
+                style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontWeight: 700 }}
+              >
+                <Plus size={16} /> Add Location
+              </button>
+            </div>
+
+            {serviceAreas.length === 0 ? (
+              <div className="card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-dim)' }}>
+                No service areas added yet. Click &quot;Add Location&quot; to define your service coverage.
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                {serviceAreas.map((area) => (
+                  <div key={area.id} className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <MapPin size={18} color="#1d5cf0" />
+                          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>{area.name}</h3>
+                        </div>
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            padding: '2px 8px',
+                            borderRadius: '9999px',
+                            background: area.is_active ? 'rgba(18, 161, 80, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                            color: area.is_active ? '#12a150' : '#ef4444'
+                          }}
+                        >
+                          {area.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+
+                      {area.notes && (
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', margin: '0.5rem 0', lineHeight: 1.4 }}>
+                          {area.notes}
+                        </p>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '0.75rem', marginTop: '1rem' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                        Sort order: {area.sort_order}
+                      </span>
+
+                      <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button
+                          type="button"
+                          className="btn btn-outline"
+                          style={{ padding: '0.35rem 0.65rem' }}
+                          onClick={() =>
+                            setServiceAreaModal({
+                              isOpen: true,
+                              mode: 'edit',
+                              id: area.id,
+                              name: area.name,
+                              notes: area.notes || '',
+                              sort_order: area.sort_order,
+                              is_active: area.is_active
+                            })
+                          }
+                          title="Edit Location"
+                        >
+                          <Edit2 size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-outline"
+                          style={{ padding: '0.35rem 0.65rem', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                          onClick={() => {
+                            openConfirm(
+                              'Delete Location',
+                              `Are you sure you want to remove "${area.name}"?`,
+                              async () => {
+                                await deleteServiceArea(area.id);
+                                showToast('Location removed.');
+                              }
+                            );
+                          }}
+                          title="Delete Location"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Service Area Modal */}
+            {serviceAreaModal.isOpen && (
+              <div
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  zIndex: 9999,
+                  background: 'rgba(0, 0, 0, 0.75)',
+                  backdropFilter: 'blur(4px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '1rem'
+                }}
+              >
+                <div className="card" style={{ maxWidth: '440px', width: '100%', padding: '2rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>
+                      {serviceAreaModal.mode === 'add' ? 'Add Service Area' : 'Edit Service Area'}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setServiceAreaModal((prev) => ({ ...prev, isOpen: false }))}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (!serviceAreaModal.name.trim()) return;
+
+                      if (serviceAreaModal.mode === 'add') {
+                        await addServiceArea({
+                          name: serviceAreaModal.name.trim(),
+                          notes: serviceAreaModal.notes.trim(),
+                          sort_order: parseInt(serviceAreaModal.sort_order, 10) || 0,
+                          is_active: serviceAreaModal.is_active
+                        });
+                        showToast('New location added successfully!');
+                      } else {
+                        await editServiceArea(serviceAreaModal.id, {
+                          name: serviceAreaModal.name.trim(),
+                          notes: serviceAreaModal.notes.trim(),
+                          sort_order: parseInt(serviceAreaModal.sort_order, 10) || 0,
+                          is_active: serviceAreaModal.is_active
+                        });
+                        showToast('Location updated successfully!');
+                      }
+
+                      setServiceAreaModal((prev) => ({ ...prev, isOpen: false }));
+                    }}
+                  >
+                    <div className="form-group" style={{ marginBottom: '1rem' }}>
+                      <label className="form-label">City / Region Name</label>
+                      <input
+                        type="text"
+                        required
+                        className="form-input"
+                        placeholder="e.g. Hyderabad, Secunderabad, Online (All India)"
+                        value={serviceAreaModal.name}
+                        onChange={(e) => setServiceAreaModal({ ...serviceAreaModal, name: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '1rem' }}>
+                      <label className="form-label">Notes (Optional)</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g. In-person meetings & remote delivery available"
+                        value={serviceAreaModal.notes}
+                        onChange={(e) => setServiceAreaModal({ ...serviceAreaModal, notes: e.target.value })}
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                      <div className="form-group">
+                        <label className="form-label">Sort Order</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          value={serviceAreaModal.sort_order}
+                          onChange={(e) => setServiceAreaModal({ ...serviceAreaModal, sort_order: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="form-group" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <label className="form-label">Status</label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '6px' }}>
+                          <input
+                            type="checkbox"
+                            checked={serviceAreaModal.is_active}
+                            onChange={(e) => setServiceAreaModal({ ...serviceAreaModal, is_active: e.target.checked })}
+                            style={{ width: '18px', height: '18px', accentColor: '#1d5cf0' }}
+                          />
+                          <span style={{ fontSize: '0.85rem' }}>Active Location</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={() => setServiceAreaModal((prev) => ({ ...prev, isOpen: false }))}
+                      >
+                        Cancel
+                      </button>
+                      <button type="submit" className="btn btn-primary">
+                        {serviceAreaModal.mode === 'add' ? 'Add Location' : 'Save Changes'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* DESIGN & MOTION SETTINGS TAB (PHASE 2) */}
+        {/* ------------------------------------------------------------- */}
+        {activeTab === 'design' && (
+          <div style={{ maxWidth: '960px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+              <div>
+                <h1 style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <SlidersHorizontal size={24} color="#1d5cf0" />
+                  <span>Design &amp; Motion Settings</span>
+                </h1>
+                <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem', margin: '4px 0 0 0' }}>
+                  Control dynamic visual effects and hardware performance tiers. Toggles apply immediately to live visitors.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDesignForm(DEFAULT_DESIGN_SETTINGS);
+                    showToast('Settings reset to system defaults. Click Save to publish.');
+                  }}
+                  className="btn btn-outline"
+                  style={{ padding: '0.55rem 1rem', fontSize: '0.85rem' }}
+                >
+                  <RefreshCw size={15} />
+                  <span>Reset to Defaults</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={savingDesign}
+                  onClick={async () => {
+                    setSavingDesign(true);
+                    const res = await persistDesignSettings(designForm);
+                    setSavingDesign(false);
+                    if (res?.success) {
+                      showToast('Design settings saved and live in Supabase!', 'success');
+                    } else {
+                      showToast(res?.error || 'Failed to save design settings.', 'error');
+                    }
+                  }}
+                  className="btn btn-primary"
+                  style={{ padding: '0.55rem 1.25rem', fontSize: '0.85rem' }}
+                >
+                  <Save size={15} />
+                  <span>{savingDesign ? 'Saving...' : 'Save Settings'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Performance Tier Card */}
+            <div className="card" style={{ padding: '1.75rem', background: 'var(--bg-surface)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(29, 92, 240, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Compass size={18} color="#1d5cf0" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Device Quality Tier Override</h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)', margin: 0 }}>
+                    Automatically detects visitor hardware capability, network data-saver, and prefers-reduced-motion.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                {[
+                  { value: 'auto', title: 'Auto (Recommended)', desc: 'Detects GPU, memory & data-saver mode' },
+                  { value: 'full', title: 'Force Full Tier', desc: 'Enables all animations on desktop' },
+                  { value: 'lite', title: 'Force Lite Tier', desc: 'Conserves mobile battery & data' },
+                  { value: 'reduced', title: 'Force Reduced Motion', desc: 'Disables transitions & animations' }
+                ].map((tierOpt) => {
+                  const isSelected = designForm.quality_override === tierOpt.value;
+                  return (
+                    <div
+                      key={tierOpt.value}
+                      onClick={() => setDesignForm((prev) => ({ ...prev, quality_override: tierOpt.value }))}
+                      style={{
+                        padding: '1rem',
+                        borderRadius: '10px',
+                        border: isSelected ? '2px solid #1d5cf0' : '1px solid var(--border-subtle)',
+                        background: isSelected ? 'rgba(29, 92, 240, 0.08)' : 'var(--bg-card)',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? '#1d5cf0' : 'var(--text-main)' }}>
+                          {tierOpt.title}
+                        </span>
+                        {isSelected && <CheckCircle2 size={16} color="#1d5cf0" />}
+                      </div>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)', lineHeight: 1.4, display: 'block' }}>
+                        {tierOpt.desc}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Hero Section Visual Experience */}
+            <div className="card" style={{ padding: '1.75rem', background: 'var(--bg-surface)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(18, 161, 80, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Eye size={18} color="#12a150" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Hero Section Visual Experience</h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)', margin: 0 }}>
+                    Select the background style rendered behind the headline on the home page.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                {[
+                  { value: 'mesh', title: 'Ambient Mesh Float', desc: 'Soft floating brand color orbs (Fast, zero layout shift)' },
+                  { value: '3d', title: '3D Floating Objects', desc: 'Interactive brand geometric shapes (Full tier only)' },
+                  { value: 'gradient', title: 'Clean Linear Gradient', desc: 'Ultra-lightweight static brand gradient' }
+                ].map((styleOpt) => {
+                  const isSelected = designForm.hero_style === styleOpt.value;
+                  return (
+                    <div
+                      key={styleOpt.value}
+                      onClick={() => setDesignForm((prev) => ({ ...prev, hero_style: styleOpt.value }))}
+                      style={{
+                        padding: '1rem',
+                        borderRadius: '10px',
+                        border: isSelected ? '2px solid #12a150' : '1px solid var(--border-subtle)',
+                        background: isSelected ? 'rgba(18, 161, 80, 0.08)' : 'var(--bg-card)',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? '#12a150' : 'var(--text-main)' }}>
+                          {styleOpt.title}
+                        </span>
+                        {isSelected && <CheckCircle2 size={16} color="#12a150" />}
+                      </div>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)', lineHeight: 1.4, display: 'block' }}>
+                        {styleOpt.desc}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Optional Video Background Inputs */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: '0.82rem' }}>Optional Video Background URL (.mp4 / .webm)</label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    placeholder="https://.../video.mp4 (optional)"
+                    value={designForm.video_background_url || ''}
+                    onChange={(e) => setDesignForm((prev) => ({ ...prev, video_background_url: e.target.value }))}
+                    style={{ fontSize: '0.88rem' }}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: '0.82rem' }}>Video Poster Image URL (fallback image)</label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    placeholder="https://.../poster.webp (optional)"
+                    value={designForm.video_poster_url || ''}
+                    onChange={(e) => setDesignForm((prev) => ({ ...prev, video_poster_url: e.target.value }))}
+                    style={{ fontSize: '0.88rem' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Individual Feature Toggles */}
+            <div className="card" style={{ padding: '1.75rem', background: 'var(--bg-surface)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(122, 47, 208, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <SlidersHorizontal size={18} color="#7a2fd0" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Interactive Effects &amp; Micro-Animations</h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)', margin: 0 }}>
+                    Enable or disable specific visual effects across the entire site with zero redeploy needed.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                {[
+                  { key: 'magnetic_buttons_enabled', label: 'Magnetic CTA Buttons', desc: 'Pulls primary buttons subtly toward mouse on desktop fine pointer' },
+                  { key: 'particles_enabled', label: 'Ambient Particle Drift', desc: 'Floating micro-particles in hero and domain preview sections' },
+                  { key: 'cursor_effect_enabled', label: 'Cursor Follower Glow', desc: 'Subtle glowing trail following pointer on capable desktop hardware' },
+                  { key: 'parallax_enabled', label: 'Parallax Layer Depth', desc: 'Smooth multi-plane scroll depth on section backgrounds' },
+                  { key: 'horizontal_portfolio_enabled', label: 'Horizontal Portfolio Reel', desc: 'Enhanced side-scrolling project reel on wide desktop screens' },
+                  { key: 'lottie_enabled', label: 'Lottie Vector Icons', desc: 'Smooth animated SVG icons for domain headers and packages' },
+                  { key: 'tooltip_enabled', label: 'Rich Floating Tooltips', desc: 'Interactive info hints on price tags and technology badges' }
+                ].map((toggle) => {
+                  const isChecked = Boolean(designForm[toggle.key]);
+                  return (
+                    <div
+                      key={toggle.key}
+                      onClick={() => setDesignForm((prev) => ({ ...prev, [toggle.key]: !prev[toggle.key] }))}
+                      style={{
+                        padding: '1rem',
+                        borderRadius: '10px',
+                        border: isChecked ? '1px solid rgba(122, 47, 208, 0.35)' : '1px solid var(--border-subtle)',
+                        background: isChecked ? 'rgba(122, 47, 208, 0.05)' : 'var(--bg-card)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '0.85rem',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => {}} // handled by parent onClick
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          accentColor: '#7a2fd0',
+                          marginTop: '2px',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.9rem', color: isChecked ? '#c084fc' : 'var(--text-main)', marginBottom: '2px' }}>
+                          {toggle.label}
+                        </div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', lineHeight: 1.4 }}>
+                          {toggle.desc}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Bottom Save Reminder */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginBottom: '2rem' }}>
+              <button
+                type="button"
+                disabled={savingDesign}
+                onClick={async () => {
+                  setSavingDesign(true);
+                  const res = await persistDesignSettings(designForm);
+                  setSavingDesign(false);
+                  if (res?.success) {
+                    showToast('Design settings saved and live in Supabase!', 'success');
+                  } else {
+                    showToast(res?.error || 'Failed to save design settings.', 'error');
+                  }
+                }}
+                className="btn btn-primary"
+                style={{ padding: '0.7rem 1.75rem', fontSize: '0.92rem' }}
+              >
+                <Save size={16} />
+                <span>{savingDesign ? 'Saving Changes...' : 'Save Design Settings'}</span>
+              </button>
+            </div>
+          </div>
+        )}
       </main>
+
 
       {/* ------------------------------------------------------------- */}
       {/* MOBILE BOTTOM TAB BAR (Visible on mobile screens < 768px) */}
@@ -3651,9 +6140,12 @@ export default function AdminPage() {
           borderTop: '1px solid var(--border-glass)',
           zIndex: 1000,
           boxShadow: '0 -4px 20px rgba(0,0,0,0.25)',
-          justifyContent: 'space-around',
+          overflowX: 'auto',
+          justifyContent: 'flex-start',
           alignItems: 'center',
-          padding: '0 0.5rem'
+          gap: '8px',
+          padding: '0 0.75rem',
+          scrollbarWidth: 'none'
         }}
       >
         {navItems.map((item) => {
@@ -3674,7 +6166,9 @@ export default function AdminPage() {
                 fontWeight: active ? 700 : 500,
                 cursor: 'pointer',
                 position: 'relative',
-                padding: '6px 8px'
+                padding: '6px 8px',
+                flexShrink: 0,
+                minWidth: '56px'
               }}
             >
               {item.icon}

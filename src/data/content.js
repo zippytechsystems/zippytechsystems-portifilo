@@ -32,7 +32,7 @@ export const content = {
 
   // Founder & Direct Contact Person
   founder: {
-    name: 'Lingaswamy',
+    name: 'Lingaswamy Maddeboina',
     role: 'Founder & Solutions Architect',
     bio: 'Direct technical guidance without middlemen or inflated agency fees. Experienced in building practical web platforms, business accounting apps, and AI automations for growing Indian enterprises.',
     phone: '6302690251',
@@ -49,34 +49,34 @@ export const content = {
     youtube: 'https://www.youtube.com/@zippytechsystems'
   },
 
-  // Trust Points
+  // Trust Points (Used for Bento Grid and Hero pillars with zero fabricated stats)
   trustPoints: [
     {
       id: 'fast-delivery',
       title: 'Fast Delivery',
-      shortText: 'Rapid turnaround in 48h to 7 days',
-      description: 'Get your business live without frustrating delays. We ship tested code on strict schedules.',
+      shortText: 'Rapid turnaround without delays',
+      description: 'Get your business live quickly without frustrating delays. We ship clean, tested code on clear schedules.',
       icon: 'Zap'
     },
     {
       id: 'reliable-secure',
-      title: 'Reliable & Secure',
-      shortText: '100% bug-tested, secure code & high uptime',
+      title: 'Reliable and Secure',
+      shortText: 'Bug-tested code & cloud protection',
       description: 'Built on rock-solid architecture with SSL security, automated cloud backups, and data protection.',
       icon: 'ShieldCheck'
     },
     {
       id: 'affordable-pricing',
       title: 'Affordable Pricing',
-      shortText: 'Transparent INR rates starting from ₹6,000',
+      shortText: 'Transparent rates for Indian businesses',
       description: 'Low-budget, high-value packages designed specifically for small and mid-size businesses in India.',
       icon: 'BadgePercent'
     },
     {
       id: 'full-support',
       title: 'Full Support',
-      shortText: 'Direct WhatsApp assistance & maintenance',
-      description: 'Dedicated post-launch handholding, updates, and direct support from founder Lingaswamy.',
+      shortText: 'Direct WhatsApp assistance & care',
+      description: 'Dedicated post-launch guidance, regular updates, and direct founder support whenever you need help.',
       icon: 'Headphones'
     }
   ],

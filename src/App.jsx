@@ -3,10 +3,13 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { DataProvider } from './context/DataContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
+import { QualityTierProvider } from './context/QualityTierContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
+import ChatWidget from './components/ChatWidget';
 import ScrollToTop from './components/ScrollToTop';
+import ScrollProgress from './components/ScrollProgress';
 import QuoteModal from './components/QuoteModal';
 
 import HomePage from './pages/HomePage';
@@ -37,11 +40,13 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <DataProvider>
-        <AdminAuthProvider>
-          <div className="app-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <ScrollToTop />
-            <Navbar onOpenQuoteModal={() => handleOpenQuoteModal('Web Development')} />
+      <QualityTierProvider>
+        <DataProvider>
+          <AdminAuthProvider>
+            <div className="app-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+              <ScrollProgress />
+              <ScrollToTop />
+              <Navbar onOpenQuoteModal={() => handleOpenQuoteModal('Web Development')} />
 
             <div style={{ flex: '1 0 auto' }}>
               <Routes>
@@ -99,6 +104,9 @@ export default function App() {
             {/* Floating WhatsApp CTA button on public pages (hidden on /admin so it doesn't block admin controls) */}
             {!isAdminRoute && <FloatingWhatsApp />}
 
+            {/* Floating AI Chatbot Assistant on public pages (Bottom-Left, no overlap with WhatsApp) */}
+            {!isAdminRoute && <ChatWidget />}
+
             {/* Fast Quote Modal */}
             <QuoteModal
               isOpen={isQuoteModalOpen}
@@ -108,6 +116,8 @@ export default function App() {
           </div>
         </AdminAuthProvider>
       </DataProvider>
-    </ThemeProvider>
-  );
+    </QualityTierProvider>
+  </ThemeProvider>
+);
+
 }

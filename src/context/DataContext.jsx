@@ -33,13 +33,36 @@ import {
   getEnquiriesApi,
   updateEnquiryStatusApi,
   deleteEnquiryApi,
-  getPriceHistoryApi
+  getPriceHistoryApi,
+  getChatbotPublicSettings,
+  getAdminChatbotSettings,
+  updateChatbotSettingsApi,
+  getServiceAreas,
+  createServiceAreaApi,
+  updateServiceAreaApi,
+  deleteServiceAreaApi,
+  getChatSessionsApi,
+  getChatMessagesApi,
+  deleteChatSessionApi,
+  getWhatsAppContactsApi,
+  getWhatsAppMessagesApi,
+  takeOverWhatsAppChatApi,
+  resumeWhatsAppChatApi,
+  updateWhatsAppContactStatusApi,
+  getWhatsAppTemplatesApi,
+  sendWhatsAppMessageApi,
+  getDesignSettingsApi,
+  updateDesignSettingsApi,
+  getClientsApi,
+  getProcessStepsApi,
+  DEFAULT_DESIGN_SETTINGS
 } from '../lib/api';
 
 const DataContext = createContext();
 
+
 export function DataProvider({ children }) {
-  // State for all 7 dynamic entities + domains + price history
+  // State for all dynamic entities + domains + price history
   const [domainsData, setDomainsData] = useState([
     { id: 'web', key: 'web', name: 'Web Development', starting_price: 7000, price_label: 'Starting from', color: '#1d5cf0' },
     { id: 'app', key: 'app', name: 'App Development', starting_price: 10000, price_label: 'Starting from', color: '#12a150' },
@@ -52,6 +75,7 @@ export function DataProvider({ children }) {
   const [testimonialsData, setTestimonialsData] = useState(initialContent.testimonials || []);
   const [faqsData, setFaqsData] = useState(initialContent.faqs || []);
   const [settingsData, setSettingsData] = useState({
+    founderName: 'Lingaswamy Maddeboina',
     phone: initialContent.founder.phone,
     whatsappNumber: initialContent.founder.whatsappNumber,
     defaultWhatsAppMessage: 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.',
@@ -59,10 +83,62 @@ export function DataProvider({ children }) {
     secondaryTagline: initialContent.company.secondaryTagline,
     location: initialContent.company.location,
     instagramUrl: initialContent.social?.instagram || 'https://www.instagram.com/zippytechsystems',
-    youtubeUrl: initialContent.social?.youtube || 'https://www.youtube.com/@zippytechsystems'
+    youtubeUrl: initialContent.social?.youtube || 'https://www.youtube.com/@zippytechsystems',
+    facebookUrl: '',
+    linkedinUrl: '',
+    email: '',
+    responseTimeText: '24 hours',
+    notifyEmailEnabled: true,
+    waAutoReplyEnabled: false,
+    waAdminAlertEnabled: false,
+    waTemplateEn: 'Thank you for contacting ZippyTechSystems. We received your enquiry and will contact you within 24 hours.',
+    waTemplateTe: 'ZippyTechSystems ను సంప్రదించినందుకు ధన్యవాదాలు. మీ విచారణ మాకు అందింది, మేము 24 గంటల్లో మిమ్మల్ని సంప్రదిస్తాము.',
+    waTemplateHi: 'ZippyTechSystems से संपर्क करने के लिए धन्यवाद। हमें आपकी पूछताछ मिल गई है और हम 24 घंटे के भीतर आपसे संपर्क करेंगे।',
+    whatsappBotEnabled: true,
+    whatsappAutoConfirm: false,
+    whatsappFollowups: false,
+    whatsappStatusUpdates: false,
+    quietHoursStart: '22:00',
+    quietHoursEnd: '08:00',
+    dailySummaryEnabled: false,
+    googleSheetExportEnabled: false,
+    humanPauseHours: 2,
+    waAdminTo: ''
   });
   const [enquiries, setEnquiries] = useState([]);
   const [priceHistory, setPriceHistory] = useState([]);
+
+  // Chatbot & Service Areas State
+  const [chatbotSettings, setChatbotSettings] = useState({
+    enabled: true,
+    welcomeMessage:
+      'Hi! I am the ZippyTechSystems AI assistant. How can I help you grow your business with Web Development, App Development, or AI Automation today?',
+    quickReplies: [
+      'Website services',
+      'App for my shop',
+      'AI chatbot / WhatsApp automation',
+      'Prices',
+      'Talk to Lingaswamy'
+    ],
+    voiceEnabled: true,
+    voiceDefaultLang: 'en-IN',
+    voiceRate: 1.0,
+    voiceNameEn: 'en-IN-NeerjaNeural',
+    voiceNameTe: 'te-IN-ShrutiNeural',
+    voiceNameHi: 'hi-IN-SwaraNeural'
+  });
+  const [adminChatbotSettings, setAdminChatbotSettings] = useState(null);
+  const [serviceAreas, setServiceAreas] = useState([]);
+  const [chatSessions, setChatSessions] = useState([]);
+
+  // WhatsApp Automation & Live Inbox State
+  const [whatsappContacts, setWhatsappContacts] = useState([]);
+  const [whatsappTemplates, setWhatsappTemplates] = useState([]);
+
+  // Phase 2: Design Settings & Dynamic Motion State
+  const [designSettings, setDesignSettings] = useState(DEFAULT_DESIGN_SETTINGS);
+  const [clientsData, setClientsData] = useState([]);
+  const [processStepsData, setProcessStepsData] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [isLiveConnected, setIsLiveConnected] = useState(isSupabaseConfigured);
@@ -71,7 +147,24 @@ export function DataProvider({ children }) {
   const loadAllData = useCallback(async () => {
     setLoading(true);
     try {
-      const [doms, srvs, pkgs, projs, tests, fqs, sttngs, enqs, phist] = await Promise.all([
+      const [
+        doms,
+        srvs,
+        pkgs,
+        projs,
+        tests,
+        fqs,
+        sttngs,
+        enqs,
+        phist,
+        botSettings,
+        areas,
+        waContacts,
+        waTemplates,
+        dSettings,
+        cls,
+        pSteps
+      ] = await Promise.all([
         getDomains(),
         getServices(),
         getPackages(),
@@ -80,7 +173,14 @@ export function DataProvider({ children }) {
         getFaqs(),
         getSettings(),
         getEnquiriesApi(),
-        getPriceHistoryApi()
+        getPriceHistoryApi(),
+        getChatbotPublicSettings(),
+        getServiceAreas(),
+        getWhatsAppContactsApi(),
+        getWhatsAppTemplatesApi(),
+        getDesignSettingsApi(),
+        getClientsApi(),
+        getProcessStepsApi()
       ]);
 
       if (doms && doms.length > 0) setDomainsData(doms);
@@ -92,6 +192,13 @@ export function DataProvider({ children }) {
       if (sttngs) setSettingsData(sttngs);
       if (enqs) setEnquiries(enqs);
       if (phist) setPriceHistory(phist);
+      if (botSettings) setChatbotSettings(botSettings);
+      if (areas && areas.length > 0) setServiceAreas(areas);
+      if (waContacts) setWhatsappContacts(waContacts);
+      if (waTemplates) setWhatsappTemplates(waTemplates);
+      if (dSettings) setDesignSettings(dSettings);
+      if (cls && cls.length > 0) setClientsData(cls);
+      if (pSteps && pSteps.length > 0) setProcessStepsData(pSteps);
 
       setIsLiveConnected(isSupabaseConfigured && Boolean(supabase));
     } catch (err) {
@@ -101,12 +208,13 @@ export function DataProvider({ children }) {
     }
   }, []);
 
+
   // Initial load
   useEffect(() => {
     loadAllData();
   }, [loadAllData]);
 
-  // Realtime Subscriptions: Auto-update live website on changes to domains, packages, settings
+  // Realtime Subscriptions: Auto-update live website on changes to domains, packages, settings, whatsapp
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return;
 
@@ -180,6 +288,14 @@ export function DataProvider({ children }) {
         async () => {
           const freshEnqs = await getEnquiriesApi();
           setEnquiries(freshEnqs);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'whatsapp_contacts' },
+        async () => {
+          const freshContacts = await getWhatsAppContactsApi();
+          setWhatsappContacts(freshContacts);
         }
       )
       .subscribe();
@@ -446,6 +562,164 @@ export function DataProvider({ children }) {
     return true;
   };
 
+  // Chatbot Admin Helpers
+  const loadAdminChatbot = async () => {
+    const data = await getAdminChatbotSettings();
+    setAdminChatbotSettings(data);
+    return data;
+  };
+
+  const persistChatbotSettings = async (newSettings) => {
+    const res = await updateChatbotSettingsApi(newSettings);
+    if (res.success) {
+      setAdminChatbotSettings(newSettings);
+      setChatbotSettings({
+        enabled: newSettings.enabled,
+        welcomeMessage: newSettings.welcomeMessage,
+        quickReplies: newSettings.quickReplies,
+        voiceEnabled: newSettings.voiceEnabled,
+        voiceDefaultLang: newSettings.voiceDefaultLang,
+        voiceRate: newSettings.voiceRate,
+        voiceNameEn: newSettings.voiceNameEn,
+        voiceNameTe: newSettings.voiceNameTe,
+        voiceNameHi: newSettings.voiceNameHi
+      });
+    }
+    return res;
+  };
+
+  // Service Areas Helpers
+  const loadServiceAreasList = async () => {
+    const data = await getServiceAreas();
+    setServiceAreas(data);
+    return data;
+  };
+
+  const addServiceArea = async (area) => {
+    const res = await createServiceAreaApi(area);
+    if (res.success && res.data) {
+      setServiceAreas((prev) => [...prev, res.data]);
+    }
+    return res;
+  };
+
+  const editServiceArea = async (id, updates) => {
+    const res = await updateServiceAreaApi(id, updates);
+    if (res.success) {
+      setServiceAreas((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...updates } : a))
+      );
+    }
+    return res;
+  };
+
+  const deleteServiceArea = async (id) => {
+    const res = await deleteServiceAreaApi(id);
+    if (res.success) {
+      setServiceAreas((prev) => prev.filter((a) => a.id !== id));
+    }
+    return res;
+  };
+
+  // Chat Sessions & Conversations
+  const loadChatSessions = async () => {
+    const data = await getChatSessionsApi();
+    setChatSessions(data);
+    return data;
+  };
+
+  const loadChatMessages = async (sessionId) => {
+    return await getChatMessagesApi(sessionId);
+  };
+
+  const deleteChatSession = async (sessionId) => {
+    const res = await deleteChatSessionApi(sessionId);
+    if (res.success) {
+      setChatSessions((prev) => prev.filter((s) => s.session_id !== sessionId));
+    }
+    return res;
+  };
+
+  // WhatsApp Admin Helpers
+  const loadWhatsAppContacts = async () => {
+    const data = await getWhatsAppContactsApi();
+    setWhatsappContacts(data);
+    return data;
+  };
+
+  const loadWhatsAppMessages = async (contactId) => {
+    return await getWhatsAppMessagesApi(contactId);
+  };
+
+  const takeOverWhatsAppChat = async (contactId, pauseHours = 2) => {
+    const res = await takeOverWhatsAppChatApi(contactId, pauseHours);
+    if (res.success) {
+      setWhatsappContacts((prev) =>
+        prev.map((c) =>
+          c.id === contactId
+            ? { ...c, status: 'needs_human', isPaused: true, ai_paused_until: res.ai_paused_until }
+            : c
+        )
+      );
+    }
+    return res;
+  };
+
+  const resumeWhatsAppChat = async (contactId) => {
+    const res = await resumeWhatsAppChatApi(contactId);
+    if (res.success) {
+      setWhatsappContacts((prev) =>
+        prev.map((c) =>
+          c.id === contactId
+            ? { ...c, status: 'active', isPaused: false, ai_paused_until: null }
+            : c
+        )
+      );
+    }
+    return res;
+  };
+
+  const updateWhatsAppContactStatus = async (contactId, status) => {
+    const res = await updateWhatsAppContactStatusApi(contactId, status);
+    if (res.success) {
+      setWhatsappContacts((prev) =>
+        prev.map((c) => (c.id === contactId ? { ...c, status } : c))
+      );
+    }
+    return res;
+  };
+
+  const loadWhatsAppTemplates = async () => {
+    const data = await getWhatsAppTemplatesApi();
+    setWhatsappTemplates(data);
+    return data;
+  };
+
+  const sendWhatsAppMessage = async (payload) => {
+    return await sendWhatsAppMessageApi(payload);
+  };
+
+  // Overdue inquiries count (older than 24 hours and still in 'New' status)
+  const overdueEnquiriesCount = enquiries.filter((e) => {
+    if (e.status !== 'New') return false;
+    if (e.isOverdue) return true;
+    const createdTime = new Date(e.created_at).getTime();
+    return !isNaN(createdTime) && Date.now() - createdTime >= 24 * 60 * 60 * 1000;
+  }).length;
+
+  const persistDesignSettings = async (updates) => {
+    try {
+      const res = await updateDesignSettingsApi(updates);
+      if (res.success && res.data) {
+        setDesignSettings(res.data);
+      }
+      return res;
+    } catch (err) {
+      console.error('persistDesignSettings error:', err);
+      return { success: false, error: err.message };
+    }
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -457,6 +731,7 @@ export function DataProvider({ children }) {
         faqsData,
         settingsData,
         enquiries,
+        overdueEnquiriesCount,
         priceHistory,
         loading,
         isLiveConnected,
@@ -487,8 +762,35 @@ export function DataProvider({ children }) {
         saveEnquiry,
         updateEnquiryStatus,
         deleteEnquiry,
-        exportEnquiriesCSV
+        exportEnquiriesCSV,
+        chatbotSettings,
+        adminChatbotSettings,
+        serviceAreas,
+        chatSessions,
+        loadAdminChatbot,
+        persistChatbotSettings,
+        loadServiceAreasList,
+        addServiceArea,
+        editServiceArea,
+        deleteServiceArea,
+        loadChatSessions,
+        loadChatMessages,
+        deleteChatSession,
+        whatsappContacts,
+        whatsappTemplates,
+        loadWhatsAppContacts,
+        loadWhatsAppMessages,
+        takeOverWhatsAppChat,
+        resumeWhatsAppChat,
+        updateWhatsAppContactStatus,
+        loadWhatsAppTemplates,
+        sendWhatsAppMessage,
+        designSettings,
+        persistDesignSettings,
+        clientsData,
+        processStepsData
       }}
+
     >
       {children}
     </DataContext.Provider>

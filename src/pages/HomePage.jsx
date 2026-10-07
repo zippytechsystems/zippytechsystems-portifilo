@@ -7,10 +7,15 @@ import WhyChooseUs from '../components/WhyChooseUs';
 import TestimonialsSection from '../components/TestimonialsSection';
 import AboutSection from '../components/AboutSection';
 import FAQSection from '../components/FAQSection';
+import ServiceSelectionBuilder from '../components/ServiceSelectionBuilder';
 import ContactSection from '../components/ContactSection';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export default function HomePage({ onOpenQuoteModal }) {
+  useScrollReveal();
+
   const handleExploreServices = () => {
+
     const el = document.getElementById('services');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -46,7 +51,10 @@ export default function HomePage({ onOpenQuoteModal }) {
       {/* 8. Frequently Asked Questions */}
       <FAQSection />
 
-      {/* 9. Final Contact CTA & Zero-Backend WhatsApp Enquiry Form */}
+      {/* 9. Interactive "Tell Us What You Need" Step-by-Step Project Builder */}
+      <ServiceSelectionBuilder />
+
+      {/* 10. Final Contact CTA & WhatsApp Enquiry Form */}
       <ContactSection />
     </main>
   );

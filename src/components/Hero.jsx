@@ -3,6 +3,8 @@ import { MessageCircle, ArrowRight, ShieldCheck, Zap, BadgePercent, Headphones, 
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
 import DomainPreviewCards from './DomainPreviewCards';
+import TextReveal from './TextReveal';
+import MagneticButton from './MagneticButton';
 
 export default function Hero({ onOpenQuoteModal, onExploreServices }) {
   const { settingsData } = useData();
@@ -10,10 +12,12 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
   const rawWa = settingsData?.whatsappNumber || content.founder.whatsappNumber || '6302690251';
   const cleanWa = String(rawWa).replace(/[^0-9]/g, '');
   const whatsappNum = cleanWa.startsWith('91') ? cleanWa : `91${cleanWa}`;
+  const phone = settingsData?.phoneFormatted || content.founder.phoneFormatted || '+91 63026 90251';
 
   const heroWhatsAppUrl = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(
     settingsData?.defaultWhatsAppMessage || 'Hi Lingaswamy, I would like to get a quote for a website / app / AI automation for my business.'
   )}`;
+
 
   return (
     <section
@@ -85,17 +89,13 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               fontWeight: 800
             }}
           >
-            Websites, apps and{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #1d5cf0 0%, #7a2fd0 60%, #12a150 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                display: 'inline-block'
-              }}
-            >
-              AI for your business
-            </span>
+            <TextReveal text="Websites, apps and" baseDelay={40} staggerDelay={40} />{' '}
+            <TextReveal
+              text="AI for your business"
+              baseDelay={160}
+              staggerDelay={40}
+              className="hero-headline-gradient"
+            />
           </h1>
 
           {/* Subtitle / Positioning */}
@@ -127,32 +127,37 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               marginBottom: '3rem'
             }}
           >
-            <a
-              href={heroWhatsAppUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-cta-yellow"
-              style={{
-                padding: '0.9rem 1.8rem',
-                fontSize: '1.05rem'
-              }}
-            >
-              <MessageCircle size={20} color="#0b1b4a" />
-              <span>Get a Quote on WhatsApp</span>
-            </a>
+            <MagneticButton strength={0.25} maxDistance={8}>
+              <a
+                href={heroWhatsAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-cta-yellow"
+                style={{
+                  padding: '0.9rem 1.8rem',
+                  fontSize: '1.05rem'
+                }}
+              >
+                <MessageCircle size={20} color="#0b1b4a" />
+                <span>Get a Quote on WhatsApp</span>
+              </a>
+            </MagneticButton>
 
-            <button
-              onClick={onExploreServices}
-              className="btn btn-outline"
-              style={{
-                padding: '0.9rem 1.6rem',
-                fontSize: '1rem'
-              }}
-            >
-              <span>Explore 3 Domains</span>
-              <ArrowRight size={17} />
-            </button>
+            <MagneticButton strength={0.2} maxDistance={6}>
+              <button
+                onClick={onExploreServices}
+                className="btn btn-outline"
+                style={{
+                  padding: '0.9rem 1.6rem',
+                  fontSize: '1rem'
+                }}
+              >
+                <span>Explore 3 Domains</span>
+                <ArrowRight size={17} />
+              </button>
+            </MagneticButton>
           </div>
+
 
           {/* Trust Points Grid (4 Pillars) */}
           <div
