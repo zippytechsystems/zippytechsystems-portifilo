@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { isBackendConfigured } from '../lib/api';
 import { content as initialContent } from '../data/content';
 import {
   formatINR,
@@ -141,7 +141,7 @@ export function DataProvider({ children }) {
   const [processStepsData, setProcessStepsData] = useState([]);
 
   const [loading, setLoading] = useState(true);
-  const [isLiveConnected, setIsLiveConnected] = useState(isSupabaseConfigured);
+  const [isLiveConnected, setIsLiveConnected] = useState(true);
 
   // Fetch all fresh data
   const loadAllData = useCallback(async () => {
@@ -200,7 +200,7 @@ export function DataProvider({ children }) {
       if (cls && cls.length > 0) setClientsData(cls);
       if (pSteps && pSteps.length > 0) setProcessStepsData(pSteps);
 
-      setIsLiveConnected(isSupabaseConfigured && Boolean(supabase));
+      setIsLiveConnected(true);
     } catch (err) {
       console.warn('DataContext synchronization warning:', err);
     } finally {
@@ -214,96 +214,13 @@ export function DataProvider({ children }) {
     loadAllData();
   }, [loadAllData]);
 
-  // Realtime Subscriptions: Auto-update live website on changes to domains, packages, settings, whatsapp
+  // Periodic background refresh (every 3 minutes)
   useEffect(() => {
-    if (!isSupabaseConfigured || !supabase) return;
-
-    const channel = supabase
-      .channel('zippy_live_website_sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'domains' },
-        async () => {
-          const freshDomains = await getDomains();
-          setDomainsData(freshDomains);
-          const freshServices = await getServices();
-          setServicesData(freshServices);
-          const freshHistory = await getPriceHistoryApi();
-          setPriceHistory(freshHistory);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'packages' },
-        async () => {
-          const freshPkgs = await getPackages();
-          setPackagesData(freshPkgs);
-          const freshHistory = await getPriceHistoryApi();
-          setPriceHistory(freshHistory);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'settings' },
-        async () => {
-          const freshSettings = await getSettings();
-          setSettingsData(freshSettings);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'services' },
-        async () => {
-          const freshServices = await getServices();
-          setServicesData(freshServices);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'projects' },
-        async () => {
-          const freshProjs = await getProjects();
-          setProjectsData(freshProjs);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'testimonials' },
-        async () => {
-          const freshTests = await getTestimonials();
-          setTestimonialsData(freshTests);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'faqs' },
-        async () => {
-          const freshFaqs = await getFaqs();
-          setFaqsData(freshFaqs);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'enquiries' },
-        async () => {
-          const freshEnqs = await getEnquiriesApi();
-          setEnquiries(freshEnqs);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'whatsapp_contacts' },
-        async () => {
-          const freshContacts = await getWhatsAppContactsApi();
-          setWhatsappContacts(freshContacts);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+    const interval = setInterval(() => {
+      loadAllData();
+    }, 180000);
+    return () => clearInterval(interval);
+  }, [loadAllData]);
 
   // Helper: Retrieve formatted price for any domain ('web', 'app', 'ai')
   const getDomainPrice = (key) => {
