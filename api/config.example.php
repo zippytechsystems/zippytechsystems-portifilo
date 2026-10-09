@@ -58,15 +58,19 @@ return [
     // File Uploads
     // -------------------------------------------------------------------------
     'upload' => [
-        'directory'        => __DIR__ . '/../uploads',
-        'public_path'      => '/uploads',
-        'max_size_bytes'   => 10 * 1024 * 1024, // 10MB
-        'allowed_types'    => [
+        'directory'            => __DIR__ . '/../uploads',
+        'public_path'          => '/uploads',
+        'max_size_bytes'       => 10 * 1024 * 1024, // 10MB for images & documents
+        'max_video_size_bytes' => 50 * 1024 * 1024, // 50MB for project videos
+        'allowed_types'        => [
             'image/jpeg'        => 'jpg',
             'image/png'         => 'png',
             'image/webp'        => 'webp',
-            'image/svg+xml'     => 'svg',
             'application/pdf'   => 'pdf',
+        ],
+        'allowed_video_types'  => [
+            'video/mp4'         => 'mp4',
+            'video/webm'        => 'webm',
         ],
     ],
 
@@ -98,23 +102,31 @@ return [
     ],
 
     // -------------------------------------------------------------------------
-    // Voice / TTS Providers (Optional: Azure Neural TTS or ElevenLabs)
+    // Voice / TTS Providers (Azure Speech Service)
     // -------------------------------------------------------------------------
     'tts' => [
         'provider'         => 'azure', // 'azure' or 'browser'
         'azure_key'        => getenv('AZURE_SPEECH_KEY')    ?: '',
         'azure_region'     => getenv('AZURE_SPEECH_REGION') ?: 'centralindia',
         'default_voice'    => 'en-IN-NeerjaNeural',
+        'allowed_voices'   => [
+            'en-IN-NeerjaNeural',
+            'te-IN-ShrutiNeural',
+            'hi-IN-SwaraNeural',
+        ],
+        'daily_cap'        => 500, // Max requests per day across the site
     ],
 
     // -------------------------------------------------------------------------
-    // WhatsApp Meta Cloud API (Optional)
+    // WhatsApp Meta Cloud API
     // -------------------------------------------------------------------------
     'whatsapp' => [
         'enabled'          => false,
         'phone_number_id'  => getenv('WHATSAPP_PHONE_ID')   ?: '',
         'access_token'     => getenv('WHATSAPP_TOKEN')      ?: '',
-        'verify_token'     => getenv('WHATSAPP_VERIFY')     ?: 'zippy_webhook_verify_token_2026',
+        'app_secret'       => getenv('WHATSAPP_APP_SECRET') ?: '', // App Secret from Meta App Dashboard
+        'verify_token'     => getenv('WHATSAPP_VERIFY')     ?: '', // Webhook Verify Token (leave empty until set)
         'admin_phone'      => '916302690251',
     ],
 ];
+

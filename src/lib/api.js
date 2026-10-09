@@ -28,23 +28,76 @@ export function cleanPhone(phone) {
   return String(phone).replace(/[^0-9]/g, '');
 }
 
-export const isSupabaseConfigured = true;
+export const isSupabaseConfigured = false;
 export const isBackendConfigured = true;
 
 // ---------------------------------------------------------------------------
-// Base API Client Helper
+// Base API Client Helper & CSRF Management
 // ---------------------------------------------------------------------------
 const API_BASE = '/api';
 
+let cachedCsrfToken = null;
+
+export function setCsrfToken(token) {
+  cachedCsrfToken = token;
+  if (token) {
+    try { sessionStorage.setItem('zippy_csrf_token', token); } catch {}
+  } else {
+    try { sessionStorage.removeItem('zippy_csrf_token'); } catch {}
+  }
+}
+
+export function getCsrfToken() {
+  if (!cachedCsrfToken) {
+    try { cachedCsrfToken = sessionStorage.getItem('zippy_csrf_token'); } catch {}
+  }
+  return cachedCsrfToken;
+}
+
+export async function fetchCsrfToken() {
+  try {
+    const res = await fetch(`${API_BASE}/auth.php?action=csrf`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.csrf_token) {
+        setCsrfToken(data.csrf_token);
+        return data.csrf_token;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch CSRF token:', err);
+  }
+  return getCsrfToken();
+}
+
 async function apiFetch(path, options = {}) {
+  const method = (options.method || 'GET').toUpperCase();
   const url = path.startsWith('http') ? path : `${API_BASE}${path.startsWith('/') ? path : '/' + path}`;
+
+  const headers = {
+    'Accept': 'application/json',
+    ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+    ...(options.headers || {})
+  };
+
+  // Automatically attach X-CSRF-Token header on mutating requests
+  if (['POST', 'PUT', 'DELETE'].includes(method)) {
+    let token = getCsrfToken();
+    if (!token) {
+      token = await fetchCsrfToken();
+    }
+    if (token && !headers['X-CSRF-Token']) {
+      headers['X-CSRF-Token'] = token;
+    }
+  }
+
   const config = {
-    method: options.method || 'GET',
-    headers: {
-      'Accept': 'application/json',
-      ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
-      ...(options.headers || {})
-    },
+    method,
+    headers,
     credentials: 'include',
     ...options
   };

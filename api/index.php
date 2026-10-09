@@ -195,7 +195,7 @@ if ($method === 'GET') {
         json_response($output);
     } catch (PDOException $e) {
         error_log("API GET Error [{$endpoint}]: " . $e->getMessage());
-        error_response('Database query error: ' . $e->getMessage(), 500);
+        error_response('Database query error.', 500);
     }
 }
 
@@ -248,7 +248,7 @@ if ($method === 'POST') {
             ]);
         } catch (PDOException $e) {
             error_log("Enquiry insert error: " . $e->getMessage());
-            error_response('Failed to submit enquiry: ' . $e->getMessage(), 500);
+            error_response('Failed to submit enquiry. Please try again.', 500);
         }
     }
 
@@ -317,7 +317,7 @@ if ($method === 'POST') {
         ], 201);
     } catch (PDOException $e) {
         error_log("Insert error [{$endpoint}]: " . $e->getMessage());
-        error_response('Database insert error: ' . $e->getMessage(), 500);
+        error_response('Database insert error.', 500);
     }
 }
 
@@ -375,7 +375,7 @@ if ($method === 'PUT') {
         ]);
     } catch (PDOException $e) {
         error_log("Update error [{$endpoint}]: " . $e->getMessage());
-        error_response('Database update error: ' . $e->getMessage(), 500);
+        error_response('Database update error.', 500);
     }
 }
 
@@ -410,7 +410,7 @@ if ($method === 'DELETE') {
         ]);
     } catch (PDOException $e) {
         error_log("Delete error [{$endpoint}]: " . $e->getMessage());
-        error_response('Database delete error: ' . $e->getMessage(), 500);
+        error_response('Database delete error.', 500);
     }
 }
 

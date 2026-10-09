@@ -82,13 +82,8 @@ You can change your password anytime directly inside the Admin Panel under Setti
 
 ---
 
-## 🔄 Importing Existing Data from Supabase (Optional)
-If you want to migrate existing live data from your old Supabase project:
-1. In your Hostinger terminal or SSH (or local machine pointing to the MySQL DB):
-   ```bash
-   php database/import_from_supabase.php
-   ```
-2. Or open `https://zippysoftwares.in/database/import_from_supabase.php` in your browser after logging in as admin.
+## 🗄️ Database Verification & Maintenance
+All data and models are managed directly in Hostinger MySQL using `database/schema.sql`. You can inspect and manage your tables in Hostinger phpMyAdmin at any time. All updates from the admin panel persist instantly to MySQL.
 
 ---
 

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { setCsrfToken, getCsrfToken } from '../lib/api';
 
 const AdminAuthContext = createContext();
 
@@ -36,6 +37,9 @@ export function AdminAuthProvider({ children }) {
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
+        if (data?.csrf_token) {
+          setCsrfToken(data.csrf_token);
+        }
         if (data?.authenticated && data?.user) {
           setIsAuthenticated(true);
           setAdminUser(data.user);
@@ -68,6 +72,9 @@ export function AdminAuthProvider({ children }) {
 
       if (response.ok) {
         const data = await response.json();
+        if (data?.csrf_token) {
+          setCsrfToken(data.csrf_token);
+        }
         if (data?.success && data?.user) {
           setIsAuthenticated(true);
           setAdminUser(data.user);
@@ -113,12 +120,15 @@ export function AdminAuthProvider({ children }) {
 
   const logout = async () => {
     try {
+      const token = getCsrfToken();
       await fetch('/api/auth.php?action=logout', {
         method: 'POST',
+        headers: token ? { 'X-CSRF-Token': token } : {},
         credentials: 'include'
       });
     } catch (e) {}
 
+    setCsrfToken(null);
     setIsAuthenticated(false);
     setAdminUser(null);
     sessionStorage.removeItem('zippy_admin_logged_in');

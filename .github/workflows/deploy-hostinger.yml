@@ -25,16 +25,22 @@ jobs:
         run: npm ci
 
       - name: 🔨 Build Vite production assets
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://cdrwrbmabcyhxngvyrxh.supabase.co' }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'sb_publishable_G1oB1splS3Wb92LbNZ90pA_NAxOUXpC' }}
         run: npm run build
+
+      - name: 🔍 Check Hostinger FTP credentials
+        id: check_ftp
+        run: |
+          if [ -n "${{ secrets.FTP_SERVER }}" ]; then
+            echo "has_ftp=true" >> "$GITHUB_OUTPUT"
+            echo "FTP_SERVER secret detected. Deployment step enabled."
+          else
+            echo "has_ftp=false" >> "$GITHUB_OUTPUT"
+            echo "FTP_SERVER secret not set. Deployment step will be skipped."
+          fi
 
       - name: 🚀 Deploy dist folder to Hostinger public_html
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        if: env.FTP_SERVER != ''
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+        if: steps.check_ftp.outputs.has_ftp == 'true'
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}

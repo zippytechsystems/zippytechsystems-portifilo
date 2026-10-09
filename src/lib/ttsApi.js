@@ -1,4 +1,4 @@
-export const isSupabaseConfigured = true;
+export const isSupabaseConfigured = false;
 
 const clientAudioCache = new Map();
 let currentAudioInstance = null;

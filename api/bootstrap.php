@@ -45,31 +45,33 @@ $allowedOrigins = $config['app']['allowed_origins'] ?? [
     'http://localhost:3000',
 ];
 
-if (!empty($origin) && in_array($origin, $allowedOrigins, true)) {
-    header("Access-Control-Allow-Origin: {$origin}");
-    header('Access-Control-Allow-Credentials: true');
-} elseif (empty($origin)) {
-    // Same-origin request
-    header('Access-Control-Allow-Origin: *');
-}
+if (PHP_SAPI !== 'cli') {
+    if (!empty($origin) && in_array($origin, $allowedOrigins, true)) {
+        header("Access-Control-Allow-Origin: {$origin}");
+        header('Access-Control-Allow-Credentials: true');
+    } elseif (empty($origin)) {
+        // Same-origin request or direct CLI/Server call (never allow credentials for unknown origins)
+        header('Access-Control-Allow-Origin: https://zippysoftwares.in');
+    }
 
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin, X-CSRF-Token');
-header('Access-Control-Max-Age: 86400');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin, X-CSRF-Token');
+    header('Access-Control-Max-Age: 86400');
 
-// Strict Security Headers
-header('X-Content-Type-Options: nosniff');
-header('X-Frame-Options: SAMEORIGIN');
-header('Referrer-Policy: strict-origin-when-cross-origin');
+    // Strict Security Headers
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
 
-// Pre-flight OPTIONS request
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
+    // Pre-flight OPTIONS request
+    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+        http_response_code(200);
+        exit;
+    }
 }
 
 // -----------------------------------------------------------------------------
-// Session Management (Secure HttpOnly SameSite=Lax Cookie)
+// Session Management (Secure HttpOnly SameSite=Strict Cookie in Production)
 // -----------------------------------------------------------------------------
 if (session_status() === PHP_SESSION_NONE) {
     $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
@@ -78,16 +80,25 @@ if (session_status() === PHP_SESSION_NONE) {
     $sessionName = $config['auth']['session_name'] ?? 'ZIPPY_ADMIN_SESS';
     $sessionLifetime = $config['auth']['session_lifetime'] ?? (86400 * 7);
 
-    session_name($sessionName);
-    session_set_cookie_params([
-        'lifetime' => $sessionLifetime,
-        'path'     => '/',
-        'domain'   => '',
-        'secure'   => $isSecure,
-        'httponly' => true,
-        'samesite' => 'Lax',
-    ]);
-    session_start();
+    // Use Strict in production; in local dev fallback to Lax to prevent cross-port fetch blocking
+    $isLocalhost = !empty($_SERVER['HTTP_HOST']) && (
+        strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+        strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false
+    );
+    $sameSite = $isLocalhost ? 'Lax' : 'Strict';
+
+    if (PHP_SAPI !== 'cli') {
+        session_name($sessionName);
+        session_set_cookie_params([
+            'lifetime' => $sessionLifetime,
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => $isSecure,
+            'httponly' => true,
+            'samesite' => $sameSite,
+        ]);
+    }
+    @session_start();
 }
 
 // -----------------------------------------------------------------------------
@@ -141,6 +152,20 @@ function json_response($data, int $statusCode = 200): void {
 }
 
 function error_response(string $message, int $statusCode = 400, array $extra = []): void {
+    global $config;
+    $isDebug = !empty($config['app']['debug']);
+
+    // Never leak raw SQL, PDOException, or stack traces to clients
+    if (!$isDebug) {
+        if (
+            stripos($message, 'SQLSTATE') !== false ||
+            stripos($message, 'PDOException') !== false ||
+            stripos($message, 'SQL syntax') !== false ||
+            stripos($message, 'table') !== false && stripos($message, 'doesn\'t exist') !== false
+        ) {
+            $message = 'A database error occurred. Please try again later.';
+        }
+    }
     json_response(array_merge(['error' => $message, 'success' => false], $extra), $statusCode);
 }
 
@@ -167,14 +192,47 @@ function is_authenticated(): bool {
     return !empty($_SESSION['admin_user_id']) && !empty($_SESSION['admin_user']);
 }
 
-function require_admin(): array {
+// -----------------------------------------------------------------------------
+// CSRF Protection Helpers
+// -----------------------------------------------------------------------------
+function get_or_create_csrf_token(): string {
+    if (empty($_SESSION['csrf_token'])) {
+        try {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        } catch (Exception $e) {
+            $_SESSION['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
+        }
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function verify_csrf_token(): bool {
+    $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (empty($token) && !empty($_POST['_csrf_token'])) {
+        $token = (string)$_POST['_csrf_token'];
+    }
+    $sessionToken = $_SESSION['csrf_token'] ?? '';
+    if (empty($token) || empty($sessionToken)) {
+        return false;
+    }
+    return hash_equals($sessionToken, $token);
+}
+
+function require_admin(bool $verifyCsrfOnMutations = true): array {
     if (!is_authenticated()) {
         error_response('Unauthorized. Admin session required.', 401);
+    }
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    if ($verifyCsrfOnMutations && in_array($method, ['POST', 'PUT', 'DELETE'], true)) {
+        if (!verify_csrf_token()) {
+            error_response('CSRF validation failed. Missing or invalid X-CSRF-Token header.', 403);
+        }
     }
     return $_SESSION['admin_user'];
 }
 
 function rate_limit_check(string $key, int $maxHits = 10, int $periodSeconds = 60): bool {
+    // Store rate limit counters in secure system temp outside web root
     $cacheDir = sys_get_temp_dir() . '/zippy_limits';
     if (!is_dir($cacheDir)) {
         @mkdir($cacheDir, 0777, true);

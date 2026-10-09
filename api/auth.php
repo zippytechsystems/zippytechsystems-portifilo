@@ -11,6 +11,16 @@ require_once __DIR__ . '/bootstrap.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
+// Support PATH_INFO like /api/auth/csrf or /api/auth/me
+if (empty($action)) {
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    $pathParts = explode('/', trim((string)$path, '/'));
+    $authIdx = array_search('auth', $pathParts, true);
+    if ($authIdx !== false && isset($pathParts[$authIdx + 1])) {
+        $action = $pathParts[$authIdx + 1];
+    }
+}
+
 // Support JSON body specifying action
 if (empty($action) && in_array($method, ['POST', 'PUT'], true)) {
     $input = get_json_input();
@@ -18,18 +28,30 @@ if (empty($action) && in_array($method, ['POST', 'PUT'], true)) {
 }
 
 // -----------------------------------------------------------------------------
+// GET /api/auth.php?action=csrf (or GET /api/auth/csrf)
+// -----------------------------------------------------------------------------
+if ($action === 'csrf') {
+    json_response([
+        'success'    => true,
+        'csrf_token' => get_or_create_csrf_token(),
+    ]);
+}
+
+// -----------------------------------------------------------------------------
 // GET /api/auth.php?action=me (or GET /api/auth.php)
 // -----------------------------------------------------------------------------
-if ($method === 'GET' || $action === 'me') {
+if ($method === 'GET' && ($action === 'me' || empty($action))) {
     if (is_authenticated()) {
         json_response([
             'authenticated' => true,
             'user'          => $_SESSION['admin_user'],
+            'csrf_token'    => get_or_create_csrf_token(),
         ]);
     } else {
         json_response([
             'authenticated' => false,
             'user'          => null,
+            'csrf_token'    => get_or_create_csrf_token(),
         ]);
     }
 }
@@ -147,11 +169,13 @@ if ($method === 'POST' && ($action === 'login' || empty($action))) {
 
     $_SESSION['admin_user_id'] = $adminUserData['id'];
     $_SESSION['admin_user']    = $adminUserData;
+    $csrfToken = get_or_create_csrf_token();
 
     json_response([
-        'success' => true,
-        'message' => 'Logged in successfully.',
-        'user'    => $adminUserData,
+        'success'    => true,
+        'message'    => 'Logged in successfully.',
+        'user'       => $adminUserData,
+        'csrf_token' => $csrfToken,
     ]);
 }
 
@@ -159,6 +183,8 @@ if ($method === 'POST' && ($action === 'login' || empty($action))) {
 // POST /api/auth.php?action=logout
 // -----------------------------------------------------------------------------
 if ($method === 'POST' && $action === 'logout') {
+    require_admin(); // checks CSRF
+
     $db = get_db();
     if ($db !== null && !empty($_SESSION['admin_user_id'])) {
         try {
@@ -190,7 +216,7 @@ if ($method === 'POST' && $action === 'logout') {
 // POST /api/auth.php?action=change_password
 // -----------------------------------------------------------------------------
 if ($method === 'POST' && $action === 'change_password') {
-    $admin = require_admin();
+    $admin = require_admin(); // checks CSRF
     $input = get_json_input();
     $currentPass = trim((string)($input['current_password'] ?? ''));
     $newPass     = trim((string)($input['new_password'] ?? ''));
