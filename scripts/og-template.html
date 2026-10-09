@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background-color: #0b1b4a;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(29, 92, 240, 0.35) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(122, 47, 208, 0.3) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(18, 161, 80, 0.15) 0%, transparent 55%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 60px 80px;
+      color: #ffffff;
+      position: relative;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .logo-badge {
+      width: 72px;
+      height: 72px;
+      background: #0b1b4a;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .company-title {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+    .domain-tag {
+      font-size: 18px;
+      color: #ffe500;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .main {
+      margin-top: 10px;
+    }
+    .tagline {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffe500;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 12px;
+    }
+    .headline {
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff 40%, #dbeafe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      max-width: 950px;
+    }
+    .cards-row {
+      display: flex;
+      gap: 20px;
+      margin-top: 36px;
+    }
+    .card {
+      flex: 1;
+      padding: 16px 20px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .card-price {
+      font-size: 24px;
+      font-weight: 800;
+    }
+    .card-blue { border-left: 4px solid #1d5cf0; }
+    .card-blue .card-price { color: #60a5fa; }
+    .card-green { border-left: 4px solid #12a150; }
+    .card-green .card-price { color: #4ade80; }
+    .card-purple { border-left: 4px solid #7a2fd0; }
+    .card-purple .card-price { color: #c084fc; }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+      color: #94a3b8;
+      font-size: 16px;
+    }
+    .founder-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #cbd5e1;
+    }
+    .domain-badge {
+      background: rgba(29, 92, 240, 0.2);
+      border: 1px solid rgba(29, 92, 240, 0.4);
+      color: #93c5fd;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-badge">
+      <svg width="42" height="42" viewBox="0 0 48 48">
+        <path d="M13 15h22l-16 18h16" stroke="#ffe500" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="34" cy="15" r="2.5" fill="#1d5cf0"/>
+        <circle cx="14" cy="33" r="2.5" fill="#12a150"/>
+      </svg>
+    </div>
+    <div>
+      <div class="company-title">ZippyTechSystems</div>
+      <div class="domain-tag">zippysoftwares.in</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="tagline">Build • Automate • Grow</div>
+    <div class="headline">Websites, Apps and AI for Your Business</div>
+    
+    <div class="cards-row">
+      <div class="card card-blue">
+        <div class="card-title">🌐 Web Development</div>
+        <div class="card-price">From ₹6,500</div>
+      </div>
+      <div class="card card-green">
+        <div class="card-title">📱 App Development</div>
+        <div class="card-price">From ₹20,000</div>
+      </div>
+      <div class="card card-purple">
+        <div class="card-title">⚡ AI Automation</div>
+        <div class="card-price">From ₹7,500</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="founder-line">
+      <span>Architected by Lingaswamy (+91 63026 90251)</span>
+    </div>
+    <div class="domain-badge">
+      Low Budget • High Value • Indian SMBs
+    </div>
+  </div>
+</body>
+</html>

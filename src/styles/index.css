@@ -342,3 +342,12 @@ a {
   border-width: 0;
 }
 
+/* Accessibility: prefers-reduced-motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  .floating-whatsapp-tooltip {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+

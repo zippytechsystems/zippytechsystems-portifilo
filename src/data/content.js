@@ -27,7 +27,7 @@ export const content = {
     location: 'Hyderabad, Telangana, India',
     yearFounded: '2024',
     currenciesAccepted: 'INR',
-    priceRange: '₹6,500 - ₹50,000'
+    priceRange: '₹6,500+'
   },
 
   // Founder & Direct Contact Person

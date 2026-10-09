@@ -29,6 +29,21 @@ export default function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
 
+  // Enforce noindex, nofollow meta tag on admin routes
+  React.useEffect(() => {
+    let metaRobots = document.querySelector('meta[name="robots"]');
+    if (isAdminRoute) {
+      if (!metaRobots) {
+        metaRobots = document.createElement('meta');
+        metaRobots.setAttribute('name', 'robots');
+        document.head.appendChild(metaRobots);
+      }
+      metaRobots.setAttribute('content', 'noindex, nofollow');
+    } else if (metaRobots) {
+      metaRobots.setAttribute('content', 'index, follow');
+    }
+  }, [isAdminRoute]);
+
   const handleOpenQuoteModal = (service = 'Web Development') => {
     setQuoteDefaultService(service);
     setIsQuoteModalOpen(true);

@@ -58,10 +58,11 @@ if (PHP_SAPI !== 'cli') {
     header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin, X-CSRF-Token');
     header('Access-Control-Max-Age: 86400');
 
-    // Strict Security Headers
+    // Strict Security & Bot Indexing Headers
     header('X-Content-Type-Options: nosniff');
     header('X-Frame-Options: SAMEORIGIN');
     header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('X-Robots-Tag: noindex, nofollow');
 
     // Pre-flight OPTIONS request
     if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {

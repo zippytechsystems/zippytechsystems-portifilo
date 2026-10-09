@@ -748,4 +748,24 @@
   }
 }
 
+/* Accessibility: prefers-reduced-motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  .zippy-chat-trigger,
+  .zippy-chat-avatar,
+  .zippy-chat-window,
+  .zippy-chat-box,
+  .zippy-msg,
+  .zippy-typing-dot,
+  .zippy-chat-notification,
+  .zippy-voice-listening,
+  .zippy-voice-speaking,
+  .zippy-voice-bubble,
+  .zippy-quick-reply,
+  .zippy-faq-chip,
+  .zippy-modal-content {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 
