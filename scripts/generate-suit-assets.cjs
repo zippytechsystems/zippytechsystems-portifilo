@@ -3,7 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 async function main() {
-  const src = 'C:/Users/madya/.gemini/antigravity-ide/brain/4f049cab-39be-4065-8b3c-e33824cca7d7/founder_suit_portrait_1791657443069.jpg';
+  // New bright, radiant executive suit portrait
+  const src = 'C:/Users/madya/.gemini/antigravity-ide/brain/4f049cab-39be-4065-8b3c-e33824cca7d7/founder_bright_suit_1791659724471.jpg';
 
   const rootDir = 'C:/Users/madya/.gemini/antigravity-ide/scratch/zippytechsystems-portifilo-website';
   const dirs = [
@@ -15,40 +16,40 @@ async function main() {
   for (const dir of dirs) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-    // 1. founder-suit files (New cache-busting filename)
+    // 1. founder-suit files
     await sharp(src)
       .resize(800, 800, { fit: 'cover', position: 'center' })
-      .jpeg({ quality: 94, mozjpeg: true })
+      .jpeg({ quality: 95, mozjpeg: true })
       .toFile(path.join(dir, 'founder-suit.jpg'));
 
     await sharp(src)
       .resize(400, 400, { fit: 'cover', position: 'center' })
-      .webp({ quality: 90 })
+      .webp({ quality: 92 })
       .toFile(path.join(dir, 'founder-suit.webp'));
 
     await sharp(src)
       .resize(800, 800, { fit: 'cover', position: 'center' })
-      .webp({ quality: 92 })
+      .webp({ quality: 94 })
       .toFile(path.join(dir, 'founder-suit@2x.webp'));
 
-    // 2. Overwrite founder-portrait files as well
+    // 2. founder-portrait files (legacy paths)
     await sharp(src)
       .resize(800, 800, { fit: 'cover', position: 'center' })
-      .jpeg({ quality: 94, mozjpeg: true })
+      .jpeg({ quality: 95, mozjpeg: true })
       .toFile(path.join(dir, 'founder-portrait.jpg'));
 
     await sharp(src)
       .resize(400, 400, { fit: 'cover', position: 'center' })
-      .webp({ quality: 90 })
+      .webp({ quality: 92 })
       .toFile(path.join(dir, 'founder-portrait.webp'));
 
     await sharp(src)
       .resize(800, 800, { fit: 'cover', position: 'center' })
-      .webp({ quality: 92 })
+      .webp({ quality: 94 })
       .toFile(path.join(dir, 'founder-portrait@2x.webp'));
   }
 
-  console.log('All founder suit assets created and updated across public, root, and dist!');
+  console.log('Processed new bright radiant founder suit portrait successfully!');
 }
 
 main().catch(err => {

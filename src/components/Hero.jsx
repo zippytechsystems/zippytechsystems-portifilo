@@ -148,7 +148,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             marginBottom: '2.5rem'
           }}
         >
-          {/* LEFT WING: 3D Rotating Circle with ZippyTech Logo (Desktop View) */}
+          {/* LEFT WING: 3D Rotating Circle with Founder Lingaswamy (Desktop View) */}
           <div
             className="hero-wing-desktop hero-wing-left"
             style={{
@@ -158,13 +158,14 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             }}
           >
             <Hero3DCircle
-              type="logo"
-              imageSrc="/images/logo.png"
-              fallbackSrc="/images/logo.webp"
-              title="ZippyTech Systems"
-              subtitle="Official Software Agency"
-              badgeText="Verified Agency"
-              accentColor="blue"
+              type="founder"
+              imageSrc="/images/founder-suit.webp"
+              fallbackSrc="/images/founder-suit.jpg"
+              title="Lingaswamy Maddeboina"
+              subtitle="Founder & Tech Lead"
+              badgeText="Founder Proof"
+              phone={phone}
+              accentColor="gold"
               size={185}
             />
           </div>
@@ -178,7 +179,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               padding: '0 0.5rem'
             }}
           >
-            {/* Main Headline - Razor-sharp, pure white + electric cyan gradient in all modes */}
+            {/* Main Headline - Ultra-crisp pure white in all modes */}
             <h1
               id="hero-heading"
               style={{
@@ -187,7 +188,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
                 fontWeight: 800,
                 fontSize: 'clamp(2.3rem, 4.4vw, 3.6rem)',
                 letterSpacing: '-0.025em',
-                textShadow: '0 3px 18px rgba(0, 0, 0, 0.7)'
+                color: '#ffffff',
+                textShadow: '0 4px 24px rgba(0, 0, 0, 0.9), 0 1px 4px rgba(0, 0, 0, 0.9)'
               }}
             >
               <span style={{ color: '#ffffff', display: 'inline' }}>
@@ -195,28 +197,26 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               </span>
               <span
                 style={{
+                  color: '#ffffff',
                   display: 'inline',
-                  background: 'linear-gradient(135deg, #00f0ff 0%, #38bdf8 45%, #ffe500 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  filter: 'drop-shadow(0 2px 14px rgba(0, 240, 255, 0.35))'
+                  textShadow: '0 0 25px rgba(255, 255, 255, 0.35), 0 3px 18px rgba(0, 0, 0, 0.8)'
                 }}
               >
                 AI for your business
               </span>
             </h1>
 
-            {/* Subtitle / Positioning - High Contrast Crisp White Text */}
+            {/* Subtitle / Positioning - High Contrast Pure White Text */}
             <p
               style={{
                 fontSize: 'clamp(1.05rem, 1.8vw, 1.25rem)',
-                color: '#f1f5f9',
+                color: '#ffffff',
                 lineHeight: 1.6,
                 marginBottom: '2rem',
                 maxWidth: '680px',
                 marginLeft: 'auto',
                 marginRight: 'auto',
-                textShadow: '0 1px 6px rgba(0, 0, 0, 0.6)'
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.75)'
               }}
             >
               {content.company.positioning}{' '}
@@ -225,7 +225,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               </strong>
             </p>
 
-            {/* MOBILE & TABLET: Dual 3D Rotating Circles Showcase (Stacked Under Headline) */}
+            {/* MOBILE & TABLET: Dual 3D Rotating Circles Showcase (Founder on Left, Logo on Right) */}
             <div
               className="hero-wing-mobile-dual"
               style={{
@@ -238,16 +238,6 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               }}
             >
               <Hero3DCircle
-                type="logo"
-                imageSrc="/images/logo.png"
-                fallbackSrc="/images/logo.webp"
-                title="ZippyTech Systems"
-                subtitle="Official Agency"
-                badgeText="Verified Agency"
-                accentColor="blue"
-                size={145}
-              />
-              <Hero3DCircle
                 type="founder"
                 imageSrc="/images/founder-suit.webp"
                 fallbackSrc="/images/founder-suit.jpg"
@@ -256,6 +246,16 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
                 badgeText="Founder Proof"
                 phone={phone}
                 accentColor="gold"
+                size={145}
+              />
+              <Hero3DCircle
+                type="logo"
+                imageSrc="/images/logo.png"
+                fallbackSrc="/images/logo.webp"
+                title="ZippyTech Systems"
+                subtitle="Official Agency"
+                badgeText="Verified Agency"
+                accentColor="blue"
                 size={145}
               />
             </div>
@@ -309,7 +309,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             </div>
           </div>
 
-          {/* RIGHT WING: 3D Rotating Circle with Founder Lingaswamy's Photo (Desktop View) */}
+          {/* RIGHT WING: 3D Rotating Circle with ZippyTech Company Logo (Desktop View) */}
           <div
             className="hero-wing-desktop hero-wing-right"
             style={{
@@ -319,14 +319,13 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             }}
           >
             <Hero3DCircle
-              type="founder"
-              imageSrc="/images/founder-suit.webp"
-              fallbackSrc="/images/founder-suit.jpg"
-              title="Lingaswamy Maddeboina"
-              subtitle="Founded by ZippyTech"
-              badgeText="Founder Proof"
-              phone={phone}
-              accentColor="gold"
+              type="logo"
+              imageSrc="/images/logo.png"
+              fallbackSrc="/images/logo.webp"
+              title="ZippyTech Systems"
+              subtitle="Official Software Agency"
+              badgeText="Verified Agency"
+              accentColor="blue"
               size={185}
             />
           </div>
