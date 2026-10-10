@@ -2,6 +2,7 @@ import React from 'react';
 import Hero from '../components/Hero';
 import ServicesSection from '../components/ServicesSection';
 import PackagesSection from '../components/PackagesSection';
+import TechEcosystemSection from '../components/TechEcosystemSection';
 import PortfolioSection from '../components/PortfolioSection';
 import WhyChooseUs from '../components/WhyChooseUs';
 import TestimonialsSection from '../components/TestimonialsSection';
@@ -30,13 +31,16 @@ export default function HomePage({ onOpenQuoteModal }) {
         onExploreServices={handleExploreServices}
       />
 
-      {/* 2. Services Overview with domain colors & ₹7k, ₹10k, ₹6k starting prices */}
+      {/* 2. Services Overview with domain colors & starting prices */}
       <ServicesSection />
 
       {/* 3. Turnkey Solution Packages */}
       <PackagesSection />
 
-      {/* 4. Portfolio with domain filtering */}
+      {/* 4. Battle-Tested Tech Ecosystem & Orbiting Skills Cloud */}
+      <TechEcosystemSection />
+
+      {/* 5. Portfolio with 3D Coverflow Showcase & 3D Tilt Grid */}
       <PortfolioSection />
 
       {/* 5. Why Choose Us / Value Proposition for Indian SMBs */}
