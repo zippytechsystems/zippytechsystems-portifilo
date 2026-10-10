@@ -5,6 +5,8 @@ import { useData } from '../context/DataContext';
 import DomainPreviewCards from './DomainPreviewCards';
 import TextReveal from './TextReveal';
 import MagneticButton from './MagneticButton';
+import HeroLiquidMask from './HeroLiquidMask';
+import ParticleSphere from './ParticleSphere';
 
 export default function Hero({ onOpenQuoteModal, onExploreServices }) {
   const { settingsData } = useData();
@@ -29,7 +31,28 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
       }}
       aria-labelledby="hero-heading"
     >
-      {/* Background Ambient Mesh — The Single Tasteful Hero Motion */}
+      {/* 1. Dual-Layer Liquid Cursor-Mask Canvas (Background Layer) */}
+      <HeroLiquidMask />
+
+      {/* 2. Interactive 3D Particle Constellation Sphere Accent */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '2%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'min(520px, 92vw)',
+          height: 'min(520px, 92vw)',
+          pointerEvents: 'none',
+          opacity: 0.6,
+          zIndex: 0
+        }}
+        aria-hidden="true"
+      >
+        <ParticleSphere radius={175} particleCount={340} interactive={true} />
+      </div>
+
+      {/* 3. Background Ambient Mesh — Soft glow enhancer */}
       <div
         className="animate-hero-mesh"
         style={{
