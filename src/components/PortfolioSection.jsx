@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, MessageCircle, ArrowUpRight, LayoutGrid, SlidersHorizontal, Eye } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';

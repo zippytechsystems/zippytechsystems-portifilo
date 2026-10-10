@@ -25,6 +25,38 @@ import NotFoundPage from './pages/NotFoundPage';
 
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('Unhandled Application Error caught by ErrorBoundary:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0b132b', color: '#fff', padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
+          <div style={{ maxWidth: 500, background: 'rgba(255,255,255,0.05)', padding: '2.5rem', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#ffe500' }}>Something went wrong</h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '1.5rem' }}>We apologize for the inconvenience. Please refresh or return to home.</p>
+            <button
+              onClick={() => { this.setState({ hasError: false }); window.location.href = '/'; }}
+              style={{ background: '#1d5cf0', color: '#fff', border: 'none', padding: '0.75rem 1.5rem', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [quoteDefaultService, setQuoteDefaultService] = useState('Web Development');
@@ -56,10 +88,11 @@ export default function App() {
   };
 
   return (
-    <ThemeProvider>
-      <DataProvider>
-        <QualityTierProvider>
-          <AdminAuthProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <DataProvider>
+          <QualityTierProvider>
+            <AdminAuthProvider>
             <SmoothScroll>
               <CursorFollower />
               <div className="app-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -146,6 +179,7 @@ export default function App() {
     </QualityTierProvider>
   </DataProvider>
 </ThemeProvider>
+</ErrorBoundary>
 );
 
 }
