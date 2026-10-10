@@ -357,4 +357,23 @@ a {
   }
 }
 
+/* Responsive 3D Hero Flanking Circles (Logo & Founder) */
+@media (max-width: 1023px) {
+  .hero-wing-desktop {
+    display: none !important;
+  }
+  .hero-wing-mobile-dual {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-wing-desktop {
+    display: flex !important;
+  }
+  .hero-wing-mobile-dual {
+    display: none !important;
+  }
+}
+
 

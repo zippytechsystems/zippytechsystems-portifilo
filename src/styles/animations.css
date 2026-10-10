@@ -52,6 +52,33 @@
   animation: pulseGlow 3s ease-in-out infinite;
 }
 
+/* 3D Gyro Orbit Spin Animations */
+@keyframes spinClockwise {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinCounterClockwise {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinClockwise 20s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spinCounterClockwise 14s linear infinite;
+}
+
 /* ==========================================================================
    Phase 1 Premium Design & Motion Utilities
    ========================================================================== */
