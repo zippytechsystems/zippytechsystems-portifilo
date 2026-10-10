@@ -40,10 +40,10 @@ export default function TechEcosystemSection() {
           </div>
         )}
 
-        {/* Dual Infinite Looping Marquee */}
+        {/* Dual Infinite Looping Marquee: Tech Stack & Trusted Client Businesses */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <TechMarquee speed={30} direction="left" />
-          <TechMarquee speed={34} direction="right" />
+          <TechMarquee speed={30} direction="left" type="tech" />
+          <TechMarquee speed={36} direction="right" type="clients" />
         </div>
       </div>
     </section>
