@@ -48,24 +48,24 @@ export default function Footer() {
           {/* Brand Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-              <div
+              <img
+                src="/images/logo.webp"
+                alt="ZippyTech Softwares"
+                width={40}
+                height={40}
                 style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #0b1b4a 0%, #1d5cf0 100%)',
-                  border: '1px solid rgba(255, 229, 0, 0.5)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  color: '#ffe500',
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '1.2rem'
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  objectFit: 'contain',
+                  border: '1px solid rgba(29, 92, 240, 0.4)',
+                  boxShadow: '0 0 15px rgba(29, 92, 240, 0.25)'
                 }}
-              >
-                Z
-              </div>
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/images/logo.png';
+                }}
+              />
               <div>
                 <div style={{ fontWeight: 800, fontSize: '1.2rem', fontFamily: 'var(--font-display)', color: '#ffffff' }}>
                   ZippyTech<span style={{ color: '#1d5cf0' }}>Systems</span>

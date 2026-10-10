@@ -2,6 +2,7 @@ import React from 'react';
 import { MessageCircle, Phone, Award, Target, UserCheck, Shield } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
+import ProcessTimeline from './ProcessTimeline';
 
 export default function AboutSection() {
   const { settingsData } = useData() || {};
@@ -184,6 +185,22 @@ export default function AboutSection() {
               </a>
             </div>
           </div>
+        </div>
+
+        {/* How We Work Story Scroll / Step Process */}
+        <div style={{ marginBottom: '4.5rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <span className="badge badge-web" style={{ marginBottom: '0.75rem' }}>
+              OUR PROVEN METHODOLOGY
+            </span>
+            <h3 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 800, margin: 0 }}>
+              How We Work: <span style={{ color: '#12a150' }}>5 Steps to Launch</span>
+            </h3>
+            <p style={{ color: 'var(--text-body)', fontSize: '0.96rem', marginTop: '0.5rem' }}>
+              Clear milestones, zero surprises, and weekly demos until your system is live.
+            </p>
+          </div>
+          <ProcessTimeline />
         </div>
 
         {/* 4 Stats Grid */}

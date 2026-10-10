@@ -2,6 +2,7 @@ import React from 'react';
 import { Star, Quote, MessageCircle } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
+import TiltCard from './TiltCard';
 
 export default function TestimonialsSection() {
   const { testimonialsData, loading } = useData();
@@ -97,19 +98,20 @@ export default function TestimonialsSection() {
                 : 'AI Automation';
 
               return (
-                <div
-                  key={item.id}
-                  className="card"
-                  style={{
-                    padding: '2rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    position: 'relative',
-                    borderTop: `4px solid ${domainColor}`,
-                    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)'
-                  }}
-                >
+                <TiltCard key={item.id} maxTilt={5} glare={true} style={{ height: '100%' }}>
+                  <div
+                    className="card frosted-glass"
+                    style={{
+                      padding: '2rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      height: '100%',
+                      position: 'relative',
+                      borderTop: `4px solid ${domainColor}`,
+                      boxShadow: '0 8px 30px rgba(0, 0, 0, 0.06)'
+                    }}
+                  >
                   <div>
                     {/* Stars + Domain Badge */}
                     <div
@@ -198,8 +200,9 @@ export default function TestimonialsSection() {
                     </div>
                   </div>
                 </div>
-              );
-            })}
+              </TiltCard>
+            );
+          })}
           </div>
         )}
       </div>
