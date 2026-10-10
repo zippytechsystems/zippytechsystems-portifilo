@@ -169,7 +169,8 @@ export default function Hero3DCircle({
     setIsHovered(false);
   };
 
-  const avatarSize = Math.floor(size * 0.52);
+  // Optimized Avatar Dimension (Founder portrait gets higher visibility & prominence)
+  const avatarSize = Math.floor(size * (type === 'founder' ? 0.65 : 0.52));
 
   return (
     <div
@@ -294,6 +295,9 @@ export default function Hero3DCircle({
               width: type === 'logo' ? '76%' : '100%',
               height: type === 'logo' ? '76%' : '100%',
               objectFit: type === 'logo' ? 'contain' : 'cover',
+              objectPosition: type === 'founder' ? 'center 12%' : 'center',
+              imageRendering: '-webkit-optimize-contrast',
+              filter: type === 'founder' ? 'contrast(1.03) brightness(1.02)' : 'none',
               borderRadius: type === 'founder' ? '50%' : '0'
             }}
           />
