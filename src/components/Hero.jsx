@@ -73,6 +73,31 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
         aria-hidden="true"
       />
 
+      {/* 4. Optional Background Video Layer */}
+      {designSettings?.video_background_url && (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={designSettings?.video_poster_url || undefined}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: 0.2,
+            pointerEvents: 'none',
+            zIndex: 0
+          }}
+          aria-hidden="true"
+        >
+          <source src={designSettings.video_background_url} type="video/mp4" />
+        </video>
+      )}
+
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
           

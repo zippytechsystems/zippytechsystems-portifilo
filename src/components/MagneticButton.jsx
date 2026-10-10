@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useQualityTier } from '../context/QualityTierContext';
+import { useData } from '../context/DataContext';
 
 export default function MagneticButton({
   children,
@@ -10,6 +11,8 @@ export default function MagneticButton({
   ...props
 }) {
   const { isFull, isReduced } = useQualityTier();
+  const { designSettings } = useData() || {};
+  const isMagneticAllowed = designSettings?.magnetic_buttons_enabled !== false;
   const buttonRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -21,8 +24,8 @@ export default function MagneticButton({
     }
   }, []);
 
-  // If not in Full tier, if reduced motion, or if touch device, render standard element
-  if (!isFull || isReduced || !isPointerFine) {
+  // If not in Full tier, if reduced motion, if disabled by admin, or if touch device, render standard element
+  if (!isFull || isReduced || !isPointerFine || !isMagneticAllowed) {
     return (
       <div className={`magnetic-wrapper ${className}`} style={{ display: 'inline-block', ...style }} {...props}>
         {children}

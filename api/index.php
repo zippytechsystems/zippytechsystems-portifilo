@@ -106,7 +106,7 @@ function format_row_output(array $row, string $endpoint, array $jsonFields): arr
     }
     // Cast booleans
     foreach ($row as $k => $v) {
-        if ($k === 'is_active' || $k === 'is_popular' || $k === 'is_featured' || $k === 'verified') {
+        if ($k === 'is_active' || $k === 'is_popular' || $k === 'is_featured' || $k === 'verified' || str_ends_with((string)$k, '_enabled')) {
             $row[$k] = (bool)$v;
         }
     }

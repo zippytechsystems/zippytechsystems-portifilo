@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useData } from './DataContext';
 
 const QualityTierContext = createContext();
 
@@ -51,14 +52,22 @@ export function detectHardwareTier() {
   return 'lite';
 }
 
-function resolveEffectiveTier(userOverride) {
+function resolveEffectiveTier(userOverride, serverOverride) {
+  // Visitor's local preference takes highest priority for accessibility
   if (userOverride === 'reduced' || userOverride === 'full' || userOverride === 'lite') {
     return userOverride;
+  }
+  // Server-side quality override from Admin Design Settings
+  if (serverOverride === 'reduced' || serverOverride === 'full' || serverOverride === 'lite') {
+    return serverOverride;
   }
   return detectHardwareTier();
 }
 
 export function QualityTierProvider({ children }) {
+  const { designSettings } = useData() || {};
+  const serverOverride = designSettings?.quality_override;
+
   const [userOverride, setUserOverride] = useState(() => {
     try {
       return localStorage.getItem('zippy_motion_preference') || 'auto';
@@ -74,7 +83,8 @@ export function QualityTierProvider({ children }) {
       } catch {
         return 'auto';
       }
-    })()
+    })(),
+    serverOverride
   ));
 
   // Sync DOM attributes whenever tier changes
@@ -86,10 +96,7 @@ export function QualityTierProvider({ children }) {
     );
   }, [tier]);
 
-  // Requirement 2:
-  // useQualityTier must react to changes, not run once:
-  // Listen to matchMedia change events for prefers-reduced-motion, (pointer: fine) and min-width,
-  // plus the footer toggle, and update the tier live.
+  // React to hardware changes, media queries, and server quality override updates
   useEffect(() => {
     const evaluateLiveTier = () => {
       const currentOverride = (() => {
@@ -100,14 +107,11 @@ export function QualityTierProvider({ children }) {
         }
       })();
 
-      if (currentOverride !== 'auto') {
-        setTier(currentOverride);
-        return;
-      }
-
-      const nextTier = detectHardwareTier();
+      const nextTier = resolveEffectiveTier(currentOverride, serverOverride);
       setTier(nextTier);
     };
+
+    evaluateLiveTier();
 
     // Media Queries to monitor
     const mqlReducedMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
@@ -150,7 +154,7 @@ export function QualityTierProvider({ children }) {
       if (e.key === 'zippy_motion_preference') {
         const newOverride = e.newValue || 'auto';
         setUserOverride(newOverride);
-        setTier(resolveEffectiveTier(newOverride));
+        setTier(resolveEffectiveTier(newOverride, serverOverride));
       }
     };
     window.addEventListener('storage', handleStorage);
@@ -163,7 +167,7 @@ export function QualityTierProvider({ children }) {
       window.removeEventListener('storage', handleStorage);
       if (resizeTimer) cancelAnimationFrame(resizeTimer);
     };
-  }, [userOverride]);
+  }, [userOverride, serverOverride]);
 
   const setMotionPreference = useCallback((pref) => {
     // pref: 'auto' | 'reduced' | 'full' | 'lite'
@@ -172,9 +176,9 @@ export function QualityTierProvider({ children }) {
       localStorage.setItem('zippy_motion_preference', pref);
     } catch {}
 
-    const resolved = resolveEffectiveTier(pref);
+    const resolved = resolveEffectiveTier(pref, serverOverride);
     setTier(resolved);
-  }, []);
+  }, [serverOverride]);
 
   const toggleReducedMotion = useCallback(() => {
     // Live toggle from footer or settings

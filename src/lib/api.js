@@ -811,12 +811,15 @@ export async function sendWhatsAppMessageApi({ contactId, phone, message, templa
 export const DEFAULT_DESIGN_SETTINGS = {
   theme_mode: 'dark',
   primary_color: '#1d5cf0',
-  secondary_color: '#06d6a0',
-  accent_color: '#f72585',
+  secondary_color: '#12a150',
+  accent_color: '#ffe500',
   font_family: 'Outfit, sans-serif',
   border_radius: '12px',
   glassmorphism_intensity: 'high',
   cursor_glow: true,
+  cursor_effect_enabled: true,
+  magnetic_buttons_enabled: true,
+  parallax_enabled: true,
   particle_background: true,
   smooth_scroll: true,
   sound_effects: false,
@@ -826,6 +829,9 @@ export const DEFAULT_DESIGN_SETTINGS = {
   particle_sphere_enabled: true,
   tech_orbit_enabled: true,
   coverflow_enabled: true,
+  hero_style: 'mesh',
+  video_background_url: '',
+  video_poster_url: '',
   quality_override: 'auto'
 };
 

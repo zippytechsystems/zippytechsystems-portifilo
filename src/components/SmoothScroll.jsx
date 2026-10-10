@@ -2,17 +2,21 @@ import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import { useQualityTier } from '../hooks/useQualityTier';
+import { useData } from '../context/DataContext';
 
 /**
  * SmoothScroll provider using Lenis:
  * - Disabled on touch devices ((pointer: coarse)) where native momentum scrolling is optimal.
  * - Disabled in 'reduced' motion tier for accessibility.
+ * - Disabled if smooth_scroll is disabled in Admin Design Settings.
  * - Disabled on /admin routes to prevent interfering with tables and forms.
  * - Handles route changes (scroll to top) and anchor hash links with header offset.
  * - Exposes global window.__lenis for modal scroll-lock integration.
  */
 export default function SmoothScroll({ children }) {
   const { tier } = useQualityTier();
+  const { designSettings } = useData() || {};
+  const isSmoothScrollAllowed = designSettings?.smooth_scroll !== false;
   const location = useLocation();
   const lenisRef = useRef(null);
   const rafIdRef = useRef(null);
@@ -21,8 +25,8 @@ export default function SmoothScroll({ children }) {
   const isReducedMotion = tier === 'reduced';
 
   useEffect(() => {
-    // 1. Never enable on /admin or if reduced motion is preferred
-    if (isAdminRoute || isReducedMotion) {
+    // 1. Never enable on /admin, if disabled by admin, or if reduced motion is preferred
+    if (isAdminRoute || isReducedMotion || !isSmoothScrollAllowed) {
       if (lenisRef.current) {
         lenisRef.current.destroy();
         lenisRef.current = null;
@@ -63,7 +67,7 @@ export default function SmoothScroll({ children }) {
       lenisRef.current = null;
       window.__lenis = null;
     };
-  }, [isAdminRoute, isReducedMotion]);
+  }, [isAdminRoute, isReducedMotion, isSmoothScrollAllowed]);
 
   // Handle route change: scroll to top or target hash
   useEffect(() => {

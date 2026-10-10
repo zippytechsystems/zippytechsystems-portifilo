@@ -445,6 +445,10 @@ CREATE TABLE IF NOT EXISTS `design_settings` (
   `video_background_url` VARCHAR(255) NULL,
   `video_poster_url` VARCHAR(255) NULL,
   `particles_enabled` TINYINT(1) DEFAULT 1,
+  `liquid_mask_enabled` TINYINT(1) DEFAULT 1,
+  `particle_sphere_enabled` TINYINT(1) DEFAULT 1,
+  `tech_orbit_enabled` TINYINT(1) DEFAULT 1,
+  `coverflow_enabled` TINYINT(1) DEFAULT 1,
   `cursor_effect_enabled` TINYINT(1) DEFAULT 1,
   `magnetic_buttons_enabled` TINYINT(1) DEFAULT 1,
   `parallax_enabled` TINYINT(1) DEFAULT 1,
@@ -455,8 +459,8 @@ CREATE TABLE IF NOT EXISTS `design_settings` (
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `design_settings` (`id`, `hero_style`, `particles_enabled`, `cursor_effect_enabled`, `magnetic_buttons_enabled`, `parallax_enabled`, `horizontal_portfolio_enabled`, `lottie_enabled`, `tooltip_enabled`, `quality_override`)
-VALUES (1, 'mesh', 1, 1, 1, 1, 1, 1, 1, 'auto')
+INSERT INTO `design_settings` (`id`, `hero_style`, `particles_enabled`, `liquid_mask_enabled`, `particle_sphere_enabled`, `tech_orbit_enabled`, `coverflow_enabled`, `cursor_effect_enabled`, `magnetic_buttons_enabled`, `parallax_enabled`, `horizontal_portfolio_enabled`, `lottie_enabled`, `tooltip_enabled`, `quality_override`)
+VALUES (1, 'mesh', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'auto')
 ON DUPLICATE KEY UPDATE `hero_style` = VALUES(`hero_style`);
 
 -- -------------------------------------------------------------------------

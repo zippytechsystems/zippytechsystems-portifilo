@@ -57,8 +57,8 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <QualityTierProvider>
-        <DataProvider>
+      <DataProvider>
+        <QualityTierProvider>
           <AdminAuthProvider>
             <SmoothScroll>
               <CursorFollower />
@@ -143,8 +143,8 @@ export default function App() {
           </div>
         </SmoothScroll>
       </AdminAuthProvider>
-    </DataProvider>
-  </QualityTierProvider>
+    </QualityTierProvider>
+  </DataProvider>
 </ThemeProvider>
 );
 
