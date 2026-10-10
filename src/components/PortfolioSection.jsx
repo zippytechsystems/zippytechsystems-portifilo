@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { ExternalLink, MessageCircle, ArrowUpRight } from 'lucide-react';
+import { ExternalLink, MessageCircle, ArrowUpRight, LayoutGrid, SlidersHorizontal, Eye } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import TiltCard from './TiltCard';
+import ProjectCoverflow from './ProjectCoverflow';
+import ProjectModal from './ProjectModal';
 
 export default function PortfolioSection() {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [viewMode, setViewMode] = useState('coverflow'); // 'coverflow' | 'grid'
+  const [selectedProject, setSelectedProject] = useState(null);
   const { projectsData, loading } = useData();
   const allProjects = projectsData && projectsData.length > 0 ? projectsData : content.projects;
-  useScrollReveal([activeFilter]);
-
+  useScrollReveal([activeFilter, viewMode]);
 
   const filterTabs = [
     { id: 'all', label: 'All Projects' },
@@ -28,7 +32,7 @@ export default function PortfolioSection() {
       <div className="container">
         
         {/* Section Heading */}
-        <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 3rem auto' }}>
+        <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 2.5rem auto' }}>
           <span className="badge badge-web" style={{ marginBottom: '1rem' }}>
             PROVEN WORK &amp; CASE STUDIES
           </span>
@@ -41,43 +45,109 @@ export default function PortfolioSection() {
           </p>
         </div>
 
-        {/* Filter Pills */}
+        {/* Filter Pills & View Mode Switcher */}
         <div
           style={{
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.65rem',
-            marginBottom: '3rem'
+            justifyContent: 'space-between',
+            gap: '1rem',
+            marginBottom: '2.5rem',
+            borderBottom: '1px solid var(--border-subtle)',
+            paddingBottom: '1.25rem'
           }}
-          role="tablist"
-          aria-label="Filter projects by domain"
         >
-          {filterTabs.map((tab) => {
-            const isActive = activeFilter === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveFilter(tab.id)}
-                className="btn"
-                role="tab"
-                aria-selected={isActive}
-                style={{
-                  padding: '0.55rem 1.25rem',
-                  fontSize: '0.9rem',
-                  borderRadius: 'var(--radius-full)',
-                  border: isActive ? '1px solid var(--brand-blue)' : '1px solid var(--border-subtle)',
-                  background: isActive ? 'var(--brand-blue)' : 'var(--bg-canvas)',
-                  color: isActive ? '#ffffff' : 'var(--text-main)',
-                  fontWeight: isActive ? 700 : 500,
-                  boxShadow: isActive ? '0 4px 14px var(--domain-web-glow)' : 'none'
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+          {/* Domain Filter Tabs */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: '0.65rem'
+            }}
+            role="tablist"
+            aria-label="Filter projects by domain"
+          >
+            {filterTabs.map((tab) => {
+              const isActive = activeFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveFilter(tab.id)}
+                  className="btn"
+                  role="tab"
+                  aria-selected={isActive}
+                  style={{
+                    padding: '0.45rem 1.15rem',
+                    fontSize: '0.88rem',
+                    borderRadius: 'var(--radius-full)',
+                    border: isActive ? '1px solid var(--brand-blue)' : '1px solid var(--border-subtle)',
+                    background: isActive ? 'var(--brand-blue)' : 'var(--bg-canvas)',
+                    color: isActive ? '#ffffff' : 'var(--text-main)',
+                    fontWeight: isActive ? 700 : 500,
+                    boxShadow: isActive ? '0 4px 14px var(--domain-web-glow)' : 'none'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 3D Showcase vs Grid View Toggle */}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-full)',
+              padding: '3px'
+            }}
+          >
+            <button
+              onClick={() => setViewMode('coverflow')}
+              className="btn btn-sm"
+              style={{
+                borderRadius: 'var(--radius-full)',
+                padding: '0.35rem 0.85rem',
+                fontSize: '0.82rem',
+                background: viewMode === 'coverflow' ? 'var(--brand-blue)' : 'transparent',
+                color: viewMode === 'coverflow' ? '#ffffff' : 'var(--text-body)',
+                border: 'none',
+                fontWeight: viewMode === 'coverflow' ? 700 : 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+              title="3D Perspective Coverflow Showcase"
+            >
+              <SlidersHorizontal size={13} />
+              <span>3D Showcase</span>
+            </button>
+
+            <button
+              onClick={() => setViewMode('grid')}
+              className="btn btn-sm"
+              style={{
+                borderRadius: 'var(--radius-full)',
+                padding: '0.35rem 0.85rem',
+                fontSize: '0.82rem',
+                background: viewMode === 'grid' ? 'var(--brand-blue)' : 'transparent',
+                color: viewMode === 'grid' ? '#ffffff' : 'var(--text-body)',
+                border: 'none',
+                fontWeight: viewMode === 'grid' ? 700 : 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+              title="Standard Grid Layout"
+            >
+              <LayoutGrid size={13} />
+              <span>Grid View</span>
+            </button>
+          </div>
         </div>
 
         {/* Loading Skeleton */}
@@ -146,180 +216,218 @@ export default function PortfolioSection() {
           </div>
         )}
 
-        {/* Projects Grid */}
-        <div
-          style={{
-            display: filteredProjects.length > 0 ? 'grid' : 'none',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '2rem'
-          }}
-        >
-          {filteredProjects.map((project) => {
-            const isWeb = project.domain === 'web';
-            const isApp = project.domain === 'app';
-            const isAI = project.domain === 'ai';
-            const tagClass = isWeb ? 'badge-web' : isApp ? 'badge-app' : 'badge-ai';
+        {/* View Mode 1: 3D Coverflow Showcase */}
+        {!loading && filteredProjects.length > 0 && viewMode === 'coverflow' && (
+          <div style={{ marginBottom: '2rem' }}>
+            <ProjectCoverflow
+              projects={filteredProjects}
+              onSelectProject={setSelectedProject}
+            />
+          </div>
+        )}
 
-            const projectInquiryUrl = buildWhatsAppUrl(
-              `Hi Lingaswamy, I saw the "${project.title}" project on your portfolio. Can you build a similar solution for my business?`
-            );
+        {/* View Mode 2: 3D Tilt Project Cards Grid */}
+        {!loading && filteredProjects.length > 0 && viewMode === 'grid' && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '2rem'
+            }}
+          >
+            {filteredProjects.map((project) => {
+              const isWeb = project.domain === 'web';
+              const isApp = project.domain === 'app';
+              const tagClass = isWeb ? 'badge-web' : isApp ? 'badge-app' : 'badge-ai';
 
-            return (
-              <article
-                key={project.id}
-                className="card frosted-glass reveal-on-scroll"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: '100%'
-                }}
-              >
+              const projectInquiryUrl = buildWhatsAppUrl(
+                `Hi Lingaswamy, I saw the "${project.title}" project on your portfolio. Can you build a similar solution for my business?`
+              );
 
-                {/* Visual Image Preview */}
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '100%',
-                    aspectRatio: '16 / 10',
-                    background: 'var(--bg-surface-elevated)',
-                    overflow: 'hidden',
-                    borderBottom: '1px solid var(--border-subtle)'
-                  }}
-                >
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    loading="lazy"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      display: 'block'
-                    }}
-                  />
-
-                  {/* Domain Tag Overlay */}
-                  <div style={{ position: 'absolute', top: '14px', left: '14px' }}>
-                    <span className={`badge ${tagClass}`}>
-                      {project.domainLabel}
-                    </span>
-                  </div>
-
-                  {/* Impact Metric Pill */}
-                  {project.metrics && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '12px',
-                        right: '12px',
-                        background: 'rgba(7, 12, 30, 0.92)',
-                        color: '#ffe500',
-                        fontSize: '0.78rem',
-                        fontWeight: 700,
-                        padding: '4px 10px',
-                        borderRadius: 'var(--radius-full)',
-                        border: '1px solid rgba(255, 229, 0, 0.3)'
-                      }}
-                    >
-                      ⚡ {project.metrics}
-                    </div>
-                  )}
-                </div>
-
-                {/* Card Body */}
-                <div
-                  style={{
-                    padding: '1.5rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flex: '1 0 auto'
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '0.78rem',
-                      fontWeight: 600,
-                      color: 'var(--text-dim)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.04em',
-                      marginBottom: '0.35rem'
-                    }}
-                  >
-                    {project.clientCategory}
-                  </span>
-
-                  <h3
-                    style={{
-                      fontSize: '1.25rem',
-                      marginBottom: '0.75rem',
-                      fontWeight: 700,
-                      lineHeight: 1.3
-                    }}
-                  >
-                    {project.title}
-                  </h3>
-
-                  <p
-                    style={{
-                      fontSize: '0.92rem',
-                      color: 'var(--text-body)',
-                      lineHeight: 1.5,
-                      marginBottom: '1.25rem',
-                      flex: '1 0 auto'
-                    }}
-                  >
-                    {project.shortDescription}
-                  </p>
-
-                  {/* Technology Tags */}
-                  <div
+              return (
+                <TiltCard key={project.id} maxTilt={6} glare={true} style={{ height: '100%' }}>
+                  <article
+                    className="card frosted-glass reveal-on-scroll"
                     style={{
                       display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '0.4rem',
-                      marginBottom: '1.5rem'
+                      flexDirection: 'column',
+                      height: '100%',
+                      cursor: 'pointer'
                     }}
+                    onClick={() => setSelectedProject(project)}
                   >
-                    {project.technologies.slice(0, 4).map((tech, i) => (
-                      <span
-                        key={i}
+                    {/* Visual Image Preview */}
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        aspectRatio: '16 / 10',
+                        background: 'var(--bg-surface-elevated)',
+                        overflow: 'hidden',
+                        borderBottom: '1px solid var(--border-subtle)'
+                      }}
+                    >
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        loading="lazy"
                         style={{
-                          fontSize: '0.75rem',
-                          padding: '2px 8px',
-                          borderRadius: 'var(--radius-xs)',
-                          background: 'var(--bg-glass-subtle)',
-                          color: 'var(--text-body)',
-                          border: '1px solid var(--border-subtle)',
-                          fontFamily: 'var(--font-mono)'
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block'
+                        }}
+                      />
+
+                      {/* Domain Tag Overlay */}
+                      <div style={{ position: 'absolute', top: '14px', left: '14px' }}>
+                        <span className={`badge ${tagClass}`}>
+                          {project.domainLabel}
+                        </span>
+                      </div>
+
+                      {/* Impact Metric Pill */}
+                      {project.metrics && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            bottom: '12px',
+                            right: '12px',
+                            background: 'rgba(7, 12, 30, 0.92)',
+                            color: '#ffe500',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            padding: '4px 10px',
+                            borderRadius: 'var(--radius-full)',
+                            border: '1px solid rgba(255, 229, 0, 0.3)'
+                          }}
+                        >
+                          ⚡ {project.metrics}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card Body */}
+                    <div
+                      style={{
+                        padding: '1.5rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: '1 0 auto'
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          color: 'var(--text-dim)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
+                          marginBottom: '0.35rem'
                         }}
                       >
-                        {tech}
+                        {project.clientCategory}
                       </span>
-                    ))}
-                  </div>
 
-                  {/* WhatsApp Action Button */}
-                  <a
-                    href={projectInquiryUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-outline"
-                    style={{
-                      width: '100%',
-                      padding: '0.65rem 1rem',
-                      fontSize: '0.9rem',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <MessageCircle size={16} color="#12a150" />
-                    <span>Inquire About Similar Build</span>
-                    <ArrowUpRight size={15} />
-                  </a>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+                      <h3
+                        style={{
+                          fontSize: '1.25rem',
+                          marginBottom: '0.75rem',
+                          fontWeight: 700,
+                          lineHeight: 1.3
+                        }}
+                      >
+                        {project.title}
+                      </h3>
+
+                      <p
+                        style={{
+                          fontSize: '0.92rem',
+                          color: 'var(--text-body)',
+                          lineHeight: 1.5,
+                          marginBottom: '1.25rem',
+                          flex: '1 0 auto'
+                        }}
+                      >
+                        {project.shortDescription}
+                      </p>
+
+                      {/* Technology Tags */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: '0.4rem',
+                          marginBottom: '1.5rem'
+                        }}
+                      >
+                        {project.technologies.slice(0, 4).map((tech, i) => (
+                          <span
+                            key={i}
+                            style={{
+                              fontSize: '0.75rem',
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-xs)',
+                              background: 'var(--bg-glass-subtle)',
+                              color: 'var(--text-body)',
+                              border: '1px solid var(--border-subtle)',
+                              fontFamily: 'var(--font-mono)'
+                            }}
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto' }}>
+                        <button
+                          className="btn btn-outline"
+                          style={{
+                            flex: 1,
+                            padding: '0.65rem 0.75rem',
+                            fontSize: '0.88rem',
+                            justifyContent: 'center'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedProject(project);
+                          }}
+                        >
+                          <Eye size={15} />
+                          <span>View Details</span>
+                        </button>
+
+                        <a
+                          href={projectInquiryUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-cta-yellow"
+                          style={{
+                            padding: '0.65rem 0.95rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          title="Inquire on WhatsApp"
+                        >
+                          <MessageCircle size={16} color="#0b1b4a" />
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                </TiltCard>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Project Lightbox Modal */}
+        <ProjectModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
 
       </div>
     </section>
