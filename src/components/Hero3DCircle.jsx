@@ -287,7 +287,8 @@ export default function Hero3DCircle({
             src={imageSrc}
             alt={title}
             onError={(e) => {
-              if (fallbackSrc && e.target.src !== fallbackSrc) {
+              e.target.onerror = null;
+              if (fallbackSrc) {
                 e.target.src = fallbackSrc;
               }
             }}

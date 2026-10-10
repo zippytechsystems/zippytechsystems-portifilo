@@ -27,6 +27,11 @@ async function createTransparentCircleLogo() {
   await sharp(masked).webp({ quality: 95 }).toFile(path.join(rootImgDir, 'logo.webp'));
   await sharp(masked).resize(512, 512).webp({ quality: 90 }).toFile(path.join(rootImgDir, 'logo@2x.webp'));
 
+  await sharp(masked).toFile(path.join(publicImgDir, 'company-logo-2026.png'));
+  await sharp(masked).webp({ quality: 95 }).toFile(path.join(publicImgDir, 'company-logo-2026.webp'));
+  await sharp(masked).toFile(path.join(rootImgDir, 'company-logo-2026.png'));
+  await sharp(masked).webp({ quality: 95 }).toFile(path.join(rootImgDir, 'company-logo-2026.webp'));
+
   // Also replace any legacy founder-portrait files with the logo as requested by user
   // "total website lo ekadaekada vunnayo passphoto images anni remove chese na company logo pettu"
   await sharp(masked).jpeg({ quality: 95 }).toFile(path.join(publicImgDir, 'founder-portrait.jpg'));

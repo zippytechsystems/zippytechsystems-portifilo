@@ -112,14 +112,14 @@ export default function AboutSection() {
                   }}
                 >
                   <img
-                    src="/images/logo.png"
+                    src="/images/company-logo-2026.png?v=20261011"
                     alt="ZippyTech Systems"
                     width={72}
                     height={72}
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = '/images/logo.webp';
+                      e.target.src = '/images/company-logo-2026.webp?v=20261011';
                     }}
                   />
                 </div>

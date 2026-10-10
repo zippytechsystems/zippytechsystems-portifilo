@@ -159,8 +159,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
           >
             <Hero3DCircle
               type="founder"
-              imageSrc="/images/founder-suit.webp"
-              fallbackSrc="/images/founder-suit.jpg"
+              imageSrc="/images/founder-suit.webp?v=20261011"
+              fallbackSrc="/images/founder-suit.jpg?v=20261011"
               title="Lingaswamy Maddeboina"
               subtitle="Founder & Tech Lead"
               badgeText="Founder Proof"
@@ -239,8 +239,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             >
               <Hero3DCircle
                 type="founder"
-                imageSrc="/images/founder-suit.webp"
-                fallbackSrc="/images/founder-suit.jpg"
+                imageSrc="/images/founder-suit.webp?v=20261011"
+                fallbackSrc="/images/founder-suit.jpg?v=20261011"
                 title="Lingaswamy"
                 subtitle="Founded by ZippyTech"
                 badgeText="Founder Proof"
@@ -250,8 +250,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               />
               <Hero3DCircle
                 type="logo"
-                imageSrc="/images/logo.png"
-                fallbackSrc="/images/logo.webp"
+                imageSrc="/images/company-logo-2026.png?v=20261011"
+                fallbackSrc="/images/company-logo-2026.webp?v=20261011"
                 title="ZippyTech Systems"
                 subtitle="Official Agency"
                 badgeText="Verified Agency"
@@ -320,8 +320,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
           >
             <Hero3DCircle
               type="logo"
-              imageSrc="/images/logo.png"
-              fallbackSrc="/images/logo.webp"
+              imageSrc="/images/company-logo-2026.png?v=20261011"
+              fallbackSrc="/images/company-logo-2026.webp?v=20261011"
               title="ZippyTech Systems"
               subtitle="Official Software Agency"
               badgeText="Verified Agency"
