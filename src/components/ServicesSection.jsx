@@ -436,38 +436,79 @@ export default function ServicesSection() {
                 </div>
               </div>
 
-              {/* BLOCK 2: MORE SERVICES (Shown Second, Smaller & Quieter) */}
+              {/* BLOCK 2: SERVICES DELIVERABLES CHECKLIST (Polished Tick-List) */}
               <div
                 style={{
-                  background: 'var(--bg-surface-elevated)',
-                  borderRadius: 'var(--radius-lg)',
+                  background: 'var(--bg-card)',
+                  borderRadius: 'var(--radius-xl)',
                   border: '1px solid var(--border-subtle)',
-                  padding: '1.75rem 2rem'
+                  padding: 'clamp(1.5rem, 3vw, 2.25rem)',
+                  boxShadow: 'var(--card-shadow)',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  <h4
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '1.25rem',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem',
+                    borderBottom: '1px solid var(--border-subtle)',
+                    paddingBottom: '1rem'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        background: `${accentColor}18`,
+                        color: accentColor,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CheckCircle2 size={16} strokeWidth={2.5} />
+                    </div>
+                    <h4
+                      style={{
+                        fontSize: '1.05rem',
+                        fontWeight: 800,
+                        color: 'var(--text-main)',
+                        margin: 0,
+                        fontFamily: 'var(--font-display)'
+                      }}
+                    >
+                      {service.moreServicesTitle || 'Comprehensive Features & Deliverables'}
+                    </h4>
+                  </div>
+                  <span
                     style={{
-                      fontSize: '0.95rem',
+                      fontSize: '0.78rem',
                       fontWeight: 700,
-                      color: 'var(--text-dim)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      margin: 0
+                      color: accentColor,
+                      background: `${accentColor}12`,
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-full)',
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase'
                     }}
                   >
-                    {service.moreServicesTitle}
-                  </h4>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
-                    Add-ons &amp; Custom Modules Available
+                    Included in Scope &amp; Add-ons
                   </span>
                 </div>
 
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                    gap: '0.75rem 1.5rem'
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: '0.85rem 1.5rem',
+                    marginBottom: '1.5rem'
                   }}
                 >
                   {service.moreServices.map((moreItem, oIdx) => (
@@ -475,25 +516,86 @@ export default function ServicesSection() {
                       key={oIdx}
                       style={{
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.6rem',
-                        padding: '0.35rem 0'
+                        alignItems: 'flex-start',
+                        gap: '0.75rem',
+                        padding: '0.5rem 0.65rem',
+                        borderRadius: '10px',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        border: '1px solid rgba(255, 255, 255, 0.04)'
                       }}
                     >
+                      <div
+                        style={{
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          background: 'rgba(18, 161, 80, 0.15)',
+                          color: '#12a150',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          marginTop: '2px'
+                        }}
+                      >
+                        <Check size={12} strokeWidth={3} />
+                      </div>
                       <span
                         style={{
-                          width: '6px',
-                          height: '6px',
-                          borderRadius: '50%',
-                          background: accentColor,
-                          flexShrink: 0
+                          fontSize: '0.92rem',
+                          color: 'var(--text-body)',
+                          lineHeight: 1.5,
+                          fontWeight: 500
                         }}
-                      />
-                      <span style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.4 }}>
+                      >
                         {moreItem}
                       </span>
                     </div>
                   ))}
+                </div>
+
+                {/* Assurance & WhatsApp Trigger Banner */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '1rem',
+                    padding: '1rem 1.25rem',
+                    background: `${accentColor}0a`,
+                    border: `1px solid ${accentColor}25`,
+                    borderRadius: '14px'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <ShieldCheck size={18} color={accentColor} />
+                    <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                      {isWeb
+                        ? '⚡ Delivery: 48 hours to 7 days | Direct WhatsApp Consultation | Starting from ₹6,500'
+                        : isApp
+                        ? '⚡ Cut Accountant Salary | Offline DB + Cloud Sync | Starting from ₹20,000'
+                        : '⚡ 24/7 Zero Missed Leads | Instant WhatsApp Auto-Reply | Starting from ₹7,500'}
+                    </span>
+                  </div>
+
+                  <a
+                    href={quoteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      fontSize: '0.86rem',
+                      fontWeight: 700,
+                      color: accentColor,
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <span>Request Custom Scope</span>
+                    <ArrowRight size={14} />
+                  </a>
                 </div>
               </div>
 

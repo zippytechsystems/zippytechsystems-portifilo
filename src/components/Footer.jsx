@@ -30,11 +30,28 @@ export default function Footer() {
         background: '#070b1a',
         color: '#f8fafc',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        paddingTop: '4.5rem',
-        paddingBottom: '2.5rem'
+        paddingTop: '5rem',
+        paddingBottom: 'clamp(3.5rem, 6vw, 5rem)',
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
-      <div className="container">
+      {/* Cinematic ambient background glow */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '750px',
+          height: '240px',
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(29, 92, 240, 0.12) 0%, rgba(18, 161, 80, 0.04) 40%, transparent 70%)',
+          pointerEvents: 'none',
+          zIndex: 0
+        }}
+      />
+
+      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
         
         {/* Main Footer Grid */}
         <div
@@ -179,35 +196,34 @@ export default function Footer() {
                 <span>Call: {phoneFormatted}</span>
               </a>
 
-              {settingsData?.email && (
-                <a
-                  href={`mailto:${settingsData.email}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.65rem',
-                    fontSize: '0.92rem',
-                    color: '#ffffff'
-                  }}
-                >
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255, 229, 0, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Mail size={16} color="#ffe500" />
-                  </div>
-                  <span>Email: {settingsData.email}</span>
-                </a>
-              )}
+              {/* Email */}
+              <a
+                href={`mailto:${settingsData?.email || content.founder?.email || 'contact@zippysoftwares.in'}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  fontSize: '0.92rem',
+                  color: '#ffffff'
+                }}
+              >
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255, 229, 0, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Mail size={16} color="#ffe500" />
+                </div>
+                <span>Email: {settingsData?.email || content.founder?.email || 'contact@zippysoftwares.in'}</span>
+              </a>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontSize: '0.88rem', color: '#94a3b8' }}>
                 <MapPin size={16} color="#ffe500" />
                 <span>{settingsData?.location || content.company.location}</span>
               </div>
 
-              {/* Social links (only shown if present in settings) */}
-              {(settingsData?.instagramUrl || settingsData?.youtubeUrl || settingsData?.facebookUrl || settingsData?.linkedinUrl) && (
+              {/* Social links */}
+              {((settingsData?.instagramUrl || content.social?.instagram) || (settingsData?.youtubeUrl || content.social?.youtube) || settingsData?.facebookUrl || settingsData?.linkedinUrl) && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '0.5rem', flexWrap: 'wrap' }}>
-                  {settingsData?.instagramUrl && (
+                  {(settingsData?.instagramUrl || content.social?.instagram) && (
                     <a
-                      href={settingsData.instagramUrl}
+                      href={settingsData?.instagramUrl || content.social?.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -229,9 +245,9 @@ export default function Footer() {
                     </a>
                   )}
 
-                  {settingsData?.youtubeUrl && (
+                  {(settingsData?.youtubeUrl || content.social?.youtube) && (
                     <a
-                      href={settingsData.youtubeUrl}
+                      href={settingsData?.youtubeUrl || content.social?.youtube}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{

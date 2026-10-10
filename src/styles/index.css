@@ -350,4 +350,11 @@ a {
   }
 }
 
+/* Responsive Step Titles */
+@media (min-width: 640px) {
+  .step-title-desktop {
+    display: block !important;
+  }
+}
+
 
