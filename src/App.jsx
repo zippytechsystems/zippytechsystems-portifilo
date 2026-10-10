@@ -11,6 +11,8 @@ import ChatWidget from './components/ChatWidget';
 import ScrollToTop from './components/ScrollToTop';
 import ScrollProgress from './components/ScrollProgress';
 import QuoteModal from './components/QuoteModal';
+import SmoothScroll from './components/SmoothScroll';
+import CursorFollower from './components/CursorFollower';
 
 import HomePage from './pages/HomePage';
 import ServiceDetailPage from './pages/ServiceDetailPage';
@@ -58,10 +60,12 @@ export default function App() {
       <QualityTierProvider>
         <DataProvider>
           <AdminAuthProvider>
-            <div className="app-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-              <ScrollProgress />
-              <ScrollToTop />
-              <Navbar onOpenQuoteModal={() => handleOpenQuoteModal('Web Development')} />
+            <SmoothScroll>
+              <CursorFollower />
+              <div className="app-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                <ScrollProgress />
+                <ScrollToTop />
+                <Navbar onOpenQuoteModal={() => handleOpenQuoteModal('Web Development')} />
 
             <div style={{ flex: '1 0 auto' }}>
               <Routes>
@@ -129,10 +133,11 @@ export default function App() {
               defaultService={quoteDefaultService}
             />
           </div>
-        </AdminAuthProvider>
-      </DataProvider>
-    </QualityTierProvider>
-  </ThemeProvider>
+        </SmoothScroll>
+      </AdminAuthProvider>
+    </DataProvider>
+  </QualityTierProvider>
+</ThemeProvider>
 );
 
 }

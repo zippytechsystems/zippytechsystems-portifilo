@@ -94,25 +94,33 @@ export default function AboutSection() {
           >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                {/* Founder Avatar / Initials */}
+                {/* Founder Avatar with Real Portrait Photo */}
                 <div
                   style={{
-                    width: '68px',
-                    height: '68px',
+                    width: '72px',
+                    height: '72px',
                     borderRadius: '20px',
+                    overflow: 'hidden',
                     background: 'linear-gradient(135deg, #0b1b4a 0%, #1d5cf0 50%, #ffe500 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#ffffff',
-                    fontWeight: 800,
-                    fontSize: '1.75rem',
-                    fontFamily: 'var(--font-display)',
                     boxShadow: '0 8px 24px rgba(29, 92, 240, 0.35)',
-                    border: '2px solid rgba(255, 229, 0, 0.5)'
+                    border: '2px solid rgba(255, 229, 0, 0.5)',
+                    flexShrink: 0
                   }}
                 >
-                  L
+                  <img
+                    src="/images/founder-portrait.webp"
+                    alt={founderName}
+                    width={72}
+                    height={72}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/images/founder-portrait.jpg';
+                    }}
+                  />
                 </div>
 
                 <div>
