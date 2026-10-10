@@ -88,6 +88,15 @@ if (!fs.existsSync(rootHtaccessPath)) {
   fs.copyFileSync(path.join(rootDir, 'public', '.htaccess'), rootHtaccessPath);
 }
 
+// 6b. Sync compiled production bundle to root for Hostinger Git deployment
+console.log('   Syncing production assets to repository root for Git deployment...');
+copyRecursiveSync(path.join(distDir, 'assets'), path.join(rootDir, 'assets'));
+fs.copyFileSync(path.join(distDir, 'index.html'), path.join(rootDir, 'index.html'));
+fs.copyFileSync(path.join(rootDir, 'public', '.htaccess'), path.join(rootDir, '.htaccess'));
+if (fs.existsSync(path.join(distDir, 'projects'))) {
+  copyRecursiveSync(path.join(distDir, 'projects'), path.join(rootDir, 'projects'));
+}
+
 // 7. Write DEPLOY_GUIDE.md inside package
 console.log('5. Generating step-by-step Hostinger Deployment Guide...');
 const deployGuideContent = `# Hostinger Deployment Guide for ZippyTechSystems

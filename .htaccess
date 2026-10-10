@@ -34,6 +34,13 @@ Options -Indexes
   RewriteRule ^api/([^/]+)/?([^/]*)$ api/index.php?endpoint=$1&id=$2 [QSA,L]
 
   # 5. React Router SPA Client-Side Routing
+  # 5a. Explicit SPA Routes for Projects & Portfolio
+  # Physical folder 'projects/' holds SVG assets. Any request to /projects, /projects/, /portfolio, /portfolio/
+  # or slug deep-links that is NOT an existing static file must route directly to index.html to prevent 403 Forbidden.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(projects|portfolio)(/.*)?$ /index.html [L,QSA]
+
+  # 5b. General SPA Client-Side Routing Fallback
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_URI} !^/api/ [NC]
   RewriteCond %{REQUEST_URI} !^/uploads/ [NC]

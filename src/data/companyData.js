@@ -19,7 +19,7 @@ export const companyData = {
     { label: 'Home', path: '/' },
     { label: 'About', path: '/about' },
     { label: 'Services', path: '/#services' },
-    { label: 'Projects', path: '/projects' },
+    { label: 'Projects', path: '/portfolio' },
     { label: 'Why Us', path: '/#why-us' },
     { label: 'Contact', path: '/contact' }
   ],
@@ -106,7 +106,7 @@ export const companyData = {
       title: 'Company',
       links: [
         { label: 'About Us', path: '/about' },
-        { label: 'Selected Projects', path: '/projects' },
+        { label: 'Selected Projects', path: '/portfolio' },
         { label: 'How We Work', path: '/#process' },
         { label: 'Why Work With Us', path: '/#why-us' }
       ]

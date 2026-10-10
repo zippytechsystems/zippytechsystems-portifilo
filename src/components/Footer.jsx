@@ -139,19 +139,20 @@ export default function Footer() {
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {content.footerLinks.quickLinks.map((item, idx) => (
-                <a
+                <Link
                   key={idx}
-                  href={item.path}
+                  to={item.path}
                   style={{
                     fontSize: '0.9rem',
                     color: '#94a3b8',
+                    textDecoration: 'none',
                     transition: 'color var(--transition-fast)'
                   }}
                   onMouseEnter={(e) => (e.target.style.color = '#1d5cf0')}
                   onMouseLeave={(e) => (e.target.style.color = '#94a3b8')}
                 >
                   {item.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "prebuild": "node -e \"import fs from 'fs'; if (fs.existsSync('index.source.html')) fs.copyFileSync('index.source.html', 'index.html');\"",
     "dev": "vite",
     "build": "vite build",
     "optimize-images": "node scripts/optimize-images.mjs",

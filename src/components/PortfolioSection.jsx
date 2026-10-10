@@ -31,14 +31,16 @@ export default function PortfolioSection({ initialSlug }) {
     setSelectedProject(project);
     if (project) {
       const slug = project.slug || project.id;
-      window.history.pushState(null, '', `/portfolio/${slug}`);
+      const base = window.location.pathname.startsWith('/projects') ? '/projects' : '/portfolio';
+      window.history.pushState(null, '', `${base}/${slug}`);
     }
   };
 
   const handleCloseProject = () => {
     setSelectedProject(null);
     if (window.location.pathname.startsWith('/portfolio/') || window.location.pathname.startsWith('/projects/')) {
-      window.history.pushState(null, '', '/projects');
+      const base = window.location.pathname.startsWith('/projects') ? '/projects' : '/portfolio';
+      window.history.pushState(null, '', base);
     }
   };
 

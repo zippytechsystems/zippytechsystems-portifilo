@@ -564,7 +564,7 @@ export const content = {
     { label: 'Web Development', path: '/#web-development' },
     { label: 'App Development', path: '/#app-development' },
     { label: 'AI Agent Services', path: '/#ai-automation' },
-    { label: 'Portfolio', path: '/projects' },
+    { label: 'Portfolio', path: '/portfolio' },
     { label: 'About', path: '/about' },
     { label: 'Contact', path: '/contact' }
   ],
@@ -578,7 +578,7 @@ export const content = {
     ],
     quickLinks: [
       { label: 'Home', path: '/' },
-      { label: 'All Projects', path: '/projects' },
+      { label: 'All Projects', path: '/portfolio' },
       { label: 'About Founder Lingaswamy', path: '/about' },
       { label: 'Contact Us', path: '/contact' }
     ],

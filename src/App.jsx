@@ -123,6 +123,10 @@ export default function App() {
                   element={<ProjectsPage />}
                 />
                 <Route
+                  path="/portfolio"
+                  element={<ProjectsPage />}
+                />
+                <Route
                   path="/portfolio/:slug"
                   element={<ProjectsPage />}
                 />

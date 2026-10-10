@@ -91,10 +91,12 @@ export default function Navbar({ onOpenQuoteModal }) {
   }, [location.pathname]);
 
   const handleNavClick = (path, e) => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     if (path.includes('#')) {
       const [pagePath, hash] = path.split('#');
       if (location.pathname === pagePath || (pagePath === '/' && location.pathname === '')) {
-        e.preventDefault();
         const el = document.getElementById(hash);
         if (el) {
           if (window.__lenis) {
@@ -230,7 +232,7 @@ export default function Navbar({ onOpenQuoteModal }) {
             {content.navLinks.map((link) => {
               const isContact = link.path === '/contact';
               const isAbout = link.path === '/about';
-              const isProjects = link.path === '/projects';
+              const isPortfolio = link.path === '/portfolio' || link.path === '/projects';
               const linkHash = link.path.includes('#') ? `#${link.path.split('#')[1]}` : '';
 
               const isActive =
@@ -238,7 +240,7 @@ export default function Navbar({ onOpenQuoteModal }) {
                 (link.path === '/' && location.pathname === '/' && !location.hash) ||
                 (isContact && location.pathname === '/contact') ||
                 (isAbout && location.pathname === '/about') ||
-                (isProjects && location.pathname === '/projects');
+                (isPortfolio && (location.pathname === '/portfolio' || location.pathname === '/projects'));
 
               return (
                 <a
