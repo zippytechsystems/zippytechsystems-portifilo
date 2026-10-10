@@ -176,13 +176,16 @@ export default function Navbar({ onOpenQuoteModal }) {
                 flexShrink: 0
               }}
             >
-              <OptimizedImage
-                src="/images/logo.png"
-                alt="ZippyTech Softwares Logo"
+              <img
+                src="/images/company-logo-2026.png?v=20261011"
+                alt="ZippyTech Systems Logo"
                 width={40}
                 height={40}
-                priority={true}
-                objectFit="contain"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/images/company-logo-2026.webp?v=20261011';
+                }}
               />
             </div>
 
@@ -428,7 +431,15 @@ export default function Navbar({ onOpenQuoteModal }) {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                 <div style={{ width: '34px', height: '34px', borderRadius: '50%', overflow: 'hidden', border: '1px solid #ffe500' }}>
-                  <img src="/images/logo.png" alt="ZippyTech Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  <img
+                    src="/images/company-logo-2026.png?v=20261011"
+                    alt="ZippyTech Logo"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/images/company-logo-2026.webp?v=20261011';
+                    }}
+                  />
                 </div>
                 <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-main)' }}>
                   ZippyTech<span style={{ color: '#1d5cf0' }}>Systems</span>

@@ -209,9 +209,13 @@ export default function SkillsOrbitCloud() {
         }}
       >
         <img
-          src="/images/logo.webp"
+          src="/images/company-logo-2026.png?v=20261011"
           alt="ZippyTech Softwares Logo"
-          style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'contain' }}
+          style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'contain' }}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = '/images/company-logo-2026.webp?v=20261011';
+          }}
         />
         <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#ffffff', letterSpacing: '0.04em', marginTop: '4px' }}>
           ZIPPYTECH

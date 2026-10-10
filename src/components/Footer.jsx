@@ -66,7 +66,7 @@ export default function Footer() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
               <img
-                src="/images/logo.webp"
+                src="/images/company-logo-2026.png?v=20261011"
                 alt="ZippyTech Softwares"
                 width={40}
                 height={40}
@@ -80,7 +80,7 @@ export default function Footer() {
                 }}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/images/logo.png';
+                  e.target.src = '/images/company-logo-2026.webp?v=20261011';
                 }}
               />
               <div>
