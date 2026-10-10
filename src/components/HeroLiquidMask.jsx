@@ -63,9 +63,9 @@ export default function HeroLiquidMask({
     };
   }, [baseSrc, revealSrc, fallbackBase, fallbackReveal]);
 
-  // Canvas liquid mask interactive loop (Full tier only)
+  // Canvas liquid mask interactive loop (Enabled for all capable devices, gentle fallback on reduced motion)
   useEffect(() => {
-    if (!isFull || isReduced || !imagesLoaded || imagesFailed) return;
+    if (isReduced || !imagesLoaded || imagesFailed) return;
 
     const container = containerRef.current;
     const canvas = canvasRef.current;
@@ -99,7 +99,7 @@ export default function HeroLiquidMask({
       const rect = container.getBoundingClientRect();
       width = Math.max(rect.width, 300);
       height = Math.max(rect.height, 300);
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = isFull ? Math.min(window.devicePixelRatio || 1, 2) : 1;
 
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
@@ -144,6 +144,27 @@ export default function HeroLiquidMask({
       lastInteractionTime = Date.now();
     };
 
+    // Touch handlers for mobile & tablet drag reveal
+    const handleTouchStart = (e) => {
+      if (e.touches && e.touches[0]) {
+        const rect = container.getBoundingClientRect();
+        targetX = e.touches[0].clientX - rect.left;
+        targetY = e.touches[0].clientY - rect.top;
+        hasUserInteracted = true;
+        lastInteractionTime = Date.now();
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (e.touches && e.touches[0]) {
+        const rect = container.getBoundingClientRect();
+        targetX = e.touches[0].clientX - rect.left;
+        targetY = e.touches[0].clientY - rect.top;
+        hasUserInteracted = true;
+        lastInteractionTime = Date.now();
+      }
+    };
+
     const handlePointerLeave = () => {
       // Revert to center when cursor leaves
       targetX = width / 2;
@@ -151,6 +172,8 @@ export default function HeroLiquidMask({
     };
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
     container.addEventListener('pointerleave', handlePointerLeave);
 
     // Main 60fps render loop
@@ -247,6 +270,8 @@ export default function HeroLiquidMask({
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('pointerleave', handlePointerLeave);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
@@ -292,8 +317,8 @@ export default function HeroLiquidMask({
       }}
       aria-hidden="true"
     >
-      {/* Fallback Static Layers for Lite / Reduced Tiers or before canvas loads */}
-      {(!isFull || isReduced || !imagesLoaded || imagesFailed) ? (
+      {/* Fallback Static Layers for Reduced Motion Tier or before canvas loads */}
+      {(isReduced || !imagesLoaded || imagesFailed) ? (
         <div
           style={{
             position: 'absolute',

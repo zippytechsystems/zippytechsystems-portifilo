@@ -13,6 +13,38 @@ export default function ParticleSphere({
   const canvasRef = useRef(null);
   const { isFull, isReduced } = useQualityTier();
 
+  // Mobile & Reduced Motion Fallback: Clean static CSS gradient sphere (Full tier only for canvas)
+  if (!isFull || isReduced) {
+    return (
+      <div
+        className={`particle-sphere-static-fallback ${className}`}
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          pointerEvents: 'none',
+          ...style
+        }}
+        aria-hidden="true"
+      >
+        <div
+          style={{
+            width: `${radius * 1.8}px`,
+            height: `${radius * 1.8}px`,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle at 35% 35%, rgba(0, 229, 255, 0.25) 0%, rgba(29, 92, 240, 0.18) 45%, rgba(122, 47, 208, 0.08) 70%, transparent 85%)',
+            boxShadow: '0 0 50px rgba(29, 92, 240, 0.2)',
+            border: '1px solid rgba(29, 92, 240, 0.25)'
+          }}
+        />
+      </div>
+    );
+  }
+
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
@@ -27,8 +59,7 @@ export default function ParticleSphere({
     let isVisible = true;
     let animationFrameId = null;
 
-    // Adjust count based on device quality tier
-    const count = isFull ? particleCount : Math.min(particleCount, 120);
+    const count = particleCount;
 
     // Generate points on Fibonacci sphere
     const points = [];
