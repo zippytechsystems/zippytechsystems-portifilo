@@ -124,7 +124,7 @@ if ($db !== null) {
 
         while ($proj = $projectStmt->fetch()) {
             $projId = htmlspecialchars($proj['id'], ENT_QUOTES, 'UTF-8');
-            $loc = "{$baseUrl}/projects?id={$projId}";
+            $loc = "{$baseUrl}/projects/{$projId}";
             $latestMod = $proj['updated_at'] ?: $proj['created_at'] ?: $today;
             $modDate = date('Y-m-d', strtotime((string)$latestMod) ?: time());
 

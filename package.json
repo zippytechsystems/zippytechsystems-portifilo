@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "optimize-images": "node scripts/optimize-images.mjs",
+    "sitemap": "node scripts/generate-sitemap.mjs",
+    "verify": "node scripts/smoke-test.mjs",
+    "pack": "vite build && node scripts/smoke-test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
