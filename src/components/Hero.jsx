@@ -249,8 +249,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               />
               <Hero3DCircle
                 type="founder"
-                imageSrc="/images/founder-portrait.webp"
-                fallbackSrc="/images/founder-portrait.jpg"
+                imageSrc="/images/founder-suit.webp"
+                fallbackSrc="/images/founder-suit.jpg"
                 title="Lingaswamy"
                 subtitle="Founded by ZippyTech"
                 badgeText="Founder Proof"
@@ -320,8 +320,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
           >
             <Hero3DCircle
               type="founder"
-              imageSrc="/images/founder-portrait.webp"
-              fallbackSrc="/images/founder-portrait.jpg"
+              imageSrc="/images/founder-suit.webp"
+              fallbackSrc="/images/founder-suit.jpg"
               title="Lingaswamy Maddeboina"
               subtitle="Founded by ZippyTech"
               badgeText="Founder Proof"

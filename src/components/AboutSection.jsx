@@ -112,14 +112,14 @@ export default function AboutSection() {
                   }}
                 >
                   <img
-                    src="/images/founder-portrait.webp"
+                    src="/images/founder-suit.webp"
                     alt={founderName}
                     width={72}
                     height={72}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = '/images/founder-portrait.jpg';
+                      e.target.src = '/images/founder-suit.jpg';
                     }}
                   />
                 </div>
