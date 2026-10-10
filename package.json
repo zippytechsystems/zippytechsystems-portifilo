@@ -10,6 +10,7 @@
     "sitemap": "node scripts/generate-sitemap.mjs",
     "verify": "node scripts/smoke-test.mjs",
     "pack": "vite build && node scripts/smoke-test.mjs",
+    "package:hostinger": "npm run build && node scripts/package-hostinger.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

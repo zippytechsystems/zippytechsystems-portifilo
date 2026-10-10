@@ -10,7 +10,7 @@ const distDir = path.resolve(rootDir, 'dist');
 const apiDir = path.resolve(rootDir, 'api');
 
 console.log('\n======================================================');
-console.log('  ZippyTechSystems — Phase 7 Production Smoke Test');
+console.log('  ZippyTechSystems — Phase 8 Production Smoke Test');
 console.log('======================================================\n');
 
 let passCount = 0;
@@ -152,6 +152,40 @@ apiFiles.forEach((file) => {
 });
 
 assert(fs.existsSync(path.join(rootDir, 'database', 'schema.sql')), 'database/schema.sql exists and up to date');
+
+// 8. Phase 8 Validations: Interactive Estimator, Live FAQ Search & Packager
+console.log('\n8. Validating Phase 8 Interactive Estimator & Hostinger Packager...');
+const costEstimatorPath = path.join(rootDir, 'src', 'components', 'CostEstimator.jsx');
+assert(fs.existsSync(costEstimatorPath), 'CostEstimator.jsx exists');
+if (fs.existsSync(costEstimatorPath)) {
+  const estimatorCode = fs.readFileSync(costEstimatorPath, 'utf8');
+  assert(estimatorCode.includes('6500') && estimatorCode.includes('20000') && estimatorCode.includes('7500'), 'Estimator contains correct core base prices (₹6.5k, ₹20k, ₹7.5k)');
+  assert(estimatorCode.includes('buildWhatsAppUrl'), 'Estimator dispatches calculated quotes directly to WhatsApp');
+  assert(estimatorCode.includes('TiltCard'), 'Estimator utilizes 3D TiltCard micro-interactions');
+}
+
+const packagesSectionPath = path.join(rootDir, 'src', 'components', 'PackagesSection.jsx');
+if (fs.existsSync(packagesSectionPath)) {
+  const packagesCode = fs.readFileSync(packagesSectionPath, 'utf8');
+  assert(packagesCode.includes('CostEstimator'), 'PackagesSection integrates CostEstimator component');
+  assert(packagesCode.includes('viewMode'), 'PackagesSection has viewMode toggle switch between packages and estimator');
+}
+
+const faqSectionPath = path.join(rootDir, 'src', 'components', 'FAQSection.jsx');
+if (fs.existsSync(faqSectionPath)) {
+  const faqCode = fs.readFileSync(faqSectionPath, 'utf8');
+  assert(faqCode.includes('searchQuery') && faqCode.includes('HighlightText'), 'FAQSection has live search query and highlight text helper');
+  assert(faqCode.includes('Search') && faqCode.includes('X'), 'FAQSection has Search and Clear icons');
+}
+
+const packagerScriptPath = path.join(rootDir, 'scripts', 'package-hostinger.mjs');
+assert(fs.existsSync(packagerScriptPath), 'scripts/package-hostinger.mjs exists and ready for automated deployment');
+
+const hostingerZipPath = path.join(rootDir, 'hostinger-package', 'zippysoftwares-hostinger-public_html.zip');
+if (fs.existsSync(hostingerZipPath)) {
+  const zipSize = fs.statSync(hostingerZipPath).size;
+  assert(zipSize > 500 * 1024, `Hostinger zip archive generated (${(zipSize / 1024 / 1024).toFixed(2)} MB > 500 kB)`);
+}
 
 // Summary
 console.log('\n======================================================');

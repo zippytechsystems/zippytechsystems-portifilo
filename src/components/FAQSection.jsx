@@ -1,21 +1,70 @@
-import React, { useState } from 'react';
-import { ChevronDown, HelpCircle, MessageCircle } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { ChevronDown, HelpCircle, MessageCircle, Search, X } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
+
+function HighlightText({ text, query }) {
+  if (!query || !query.trim() || !text) return text;
+  const trimmed = query.trim();
+  const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === trimmed.toLowerCase() ? (
+          <mark
+            key={i}
+            style={{
+              background: 'rgba(255, 229, 0, 0.25)',
+              color: '#ffe500',
+              padding: '1px 4px',
+              borderRadius: '4px',
+              fontWeight: 700
+            }}
+          >
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
 
 export default function FAQSection() {
   const { faqsData, loading } = useData();
   const faqs = faqsData && faqsData.length > 0 ? faqsData : content.faqs || [];
 
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [openFaqId, setOpenFaqId] = useState(faqs[0]?.id || null);
 
   const categories = ['All', 'General', 'Web', 'App', 'AI'];
 
-  const filteredFaqs =
-    activeCategory === 'All'
-      ? faqs
-      : faqs.filter((f) => f.category?.toLowerCase() === activeCategory.toLowerCase());
+  const filteredFaqs = useMemo(() => {
+    let result = faqs;
+    if (activeCategory !== 'All') {
+      result = result.filter((f) => f.category?.toLowerCase() === activeCategory.toLowerCase());
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (f) =>
+          f.question?.toLowerCase().includes(q) ||
+          f.answer?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [faqs, activeCategory, searchQuery]);
+
+  // When search query is entered, auto-open the first matching answer
+  useEffect(() => {
+    if (searchQuery.trim() && filteredFaqs.length > 0) {
+      setOpenFaqId(filteredFaqs[0].id);
+    }
+  }, [searchQuery, filteredFaqs]);
 
   const toggleFaq = (id) => {
     setOpenFaqId(openFaqId === id ? null : id);
@@ -34,7 +83,7 @@ export default function FAQSection() {
     >
       <div className="container">
         {/* Section Heading */}
-        <div style={{ textAlign: 'center', maxWidth: '760px', margin: '0 auto 3.5rem auto' }}>
+        <div style={{ textAlign: 'center', maxWidth: '760px', margin: '0 auto 3rem auto' }}>
           <span className="badge badge-purple" style={{ marginBottom: '1rem' }}>
             GOT QUESTIONS?
           </span>
@@ -44,6 +93,68 @@ export default function FAQSection() {
           <p style={{ fontSize: '1.05rem', color: 'var(--text-body)', lineHeight: 1.6 }}>
             Clear, upfront answers about our starting prices, fast turnaround times, payment milestones, and post-delivery support.
           </p>
+        </div>
+
+        {/* Live Search Input Bar */}
+        <div
+          style={{
+            maxWidth: '620px',
+            margin: '0 auto 2.25rem auto',
+            position: 'relative'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'var(--bg-canvas)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-full)',
+              padding: '0.65rem 1.25rem',
+              boxShadow: 'var(--card-shadow)',
+              transition: 'border-color var(--transition-fast)'
+            }}
+          >
+            <Search size={18} color="#7a2fd0" style={{ marginRight: '0.75rem', flexShrink: 0 }} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search questions (e.g. advance, timeline, hosting, app)..."
+              aria-label="Search frequently asked questions"
+              style={{
+                flex: 1,
+                background: 'none',
+                border: 'none',
+                outline: 'none',
+                color: 'var(--text-main)',
+                fontSize: '0.95rem'
+              }}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-dim)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '2px',
+                  borderRadius: '50%'
+                }}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          {searchQuery.trim() && (
+            <div style={{ textAlign: 'center', marginTop: '0.65rem', fontSize: '0.84rem', color: 'var(--text-dim)' }}>
+              Found {filteredFaqs.length} {filteredFaqs.length === 1 ? 'result' : 'results'} for &ldquo;{searchQuery}&rdquo;
+            </div>
+          )}
         </div>
 
         {/* Category Pills */}
@@ -102,19 +213,34 @@ export default function FAQSection() {
         {!loading && filteredFaqs.length === 0 && (
           <div className="card" style={{ padding: '3rem', textAlign: 'center', maxWidth: '550px', margin: '0 auto' }}>
             <HelpCircle size={36} color="#7a2fd0" style={{ margin: '0 auto 1rem auto' }} />
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Questions in This Category</h3>
-            <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem', fontSize: '0.92rem' }}>
-              Have a custom question not covered here? Ask founder Lingaswamy directly on WhatsApp.
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+              {searchQuery.trim() ? `No questions matching "${searchQuery}"` : 'No Questions in This Category'}
+            </h3>
+            <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem', fontSize: '0.92rem', lineHeight: 1.5 }}>
+              {searchQuery.trim()
+                ? 'Have a specific requirement or technical question? Founder Lingaswamy answers directly on WhatsApp.'
+                : 'Have a custom question not covered here? Ask founder Lingaswamy directly on WhatsApp.'}
             </p>
-            <a
-              href={buildWhatsAppUrl("Hi Lingaswamy, I have a question about ZippyTechSystems services.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-cta-yellow"
-            >
-              <MessageCircle size={16} />
-              <span>Ask on WhatsApp</span>
-            </a>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {searchQuery.trim() && (
+                <button onClick={() => setSearchQuery('')} className="btn btn-outline">
+                  Clear Search
+                </button>
+              )}
+              <a
+                href={buildWhatsAppUrl(
+                  searchQuery.trim()
+                    ? `Hi Lingaswamy, I searched for "${searchQuery}" on your FAQ but had a question about...`
+                    : 'Hi Lingaswamy, I have a question about ZippyTechSystems services.'
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-cta-yellow"
+              >
+                <MessageCircle size={16} />
+                <span>Ask on WhatsApp</span>
+              </a>
+            </div>
           </div>
         )}
 
@@ -163,7 +289,9 @@ export default function FAQSection() {
                       fontSize: '1.02rem'
                     }}
                   >
-                    <span>{faq.question}</span>
+                    <span>
+                      <HighlightText text={faq.question} query={searchQuery} />
+                    </span>
                     <div
                       style={{
                         transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -187,7 +315,7 @@ export default function FAQSection() {
                         paddingTop: '1.1rem'
                       }}
                     >
-                      {faq.answer}
+                      <HighlightText text={faq.answer} query={searchQuery} />
                     </div>
                   )}
                 </div>
