@@ -121,9 +121,41 @@ ${formData.email.trim() ? `✉️ *Email:* ${formData.email.trim()}\n` : ''}🛠
           {/* Left Column: Direct Call & Quick Connect */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div className="card" style={{ padding: '2rem' }}>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '1rem' }}>
-                Direct Founder Contact
-              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
+                <div
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    background: '#070e24',
+                    border: '2px solid rgba(255, 229, 0, 0.65)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 16px rgba(29, 92, 240, 0.35)',
+                    flexShrink: 0
+                  }}
+                >
+                  <img
+                    src="/images/logo.png"
+                    alt="ZippyTech Systems Logo"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/images/logo.webp';
+                    }}
+                  />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0 }}>
+                    Direct Founder Contact
+                  </h3>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
+                    ZippyTech Systems Official Line
+                  </span>
+                </div>
+              </div>
               <p style={{ color: 'var(--text-body)', fontSize: '0.95rem', marginBottom: '1.75rem', lineHeight: 1.6 }}>
                 Speak directly with <strong style={{ color: 'var(--text-main)' }}>{founderName}</strong>, Founder &amp; Chief Architect.
                 We respond within minutes on WhatsApp during business hours.

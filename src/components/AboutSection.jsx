@@ -95,31 +95,31 @@ export default function AboutSection() {
           >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                {/* Founder Avatar with Real Portrait Photo */}
+                {/* Official Agency Logo Emblem */}
                 <div
                   style={{
                     width: '72px',
                     height: '72px',
-                    borderRadius: '20px',
+                    borderRadius: '50%',
                     overflow: 'hidden',
-                    background: 'linear-gradient(135deg, #0b1b4a 0%, #1d5cf0 50%, #ffe500 100%)',
+                    background: '#070e24',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     boxShadow: '0 8px 24px rgba(29, 92, 240, 0.35)',
-                    border: '2px solid rgba(255, 229, 0, 0.5)',
+                    border: '2px solid rgba(255, 229, 0, 0.7)',
                     flexShrink: 0
                   }}
                 >
                   <img
-                    src="/images/founder-suit.webp"
-                    alt={founderName}
+                    src="/images/logo.png"
+                    alt="ZippyTech Systems"
                     width={72}
                     height={72}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = '/images/founder-suit.jpg';
+                      e.target.src = '/images/logo.webp';
                     }}
                   />
                 </div>

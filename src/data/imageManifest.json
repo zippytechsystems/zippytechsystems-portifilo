@@ -1,12 +1,12 @@
 {
   "images/founder-portrait.jpg": {
-    "original": "/images/founder-portrait.jpg",
-    "webp1x": "/images/founder-portrait.webp",
-    "webp2x": "/images/founder-portrait@2x.webp",
-    "width": 1254,
-    "height": 1254,
-    "blurPlaceholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAQABADASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAwEF/8QAJBAAAgIBAwMFAQAAAAAAAAAAAQIDBREABBIUQVETISNSobH/xAAUAQEAAAAAAAAAAAAAAAAAAAAC/8QAFxEBAQEBAAAAAAAAAAAAAAAAEQAhQf/aAAwDAQACEQMRAD8AyrS2nuLCRWMvSKSEjRuIwO5/urW2slNvI+DSjbMwDRSHOV+2Ox0lvXzU8zr0qvtyxKTcCcgnOCexGfzRVFXNcbpPhIgBHqSsvtjwD50uETW//9k=",
-    "format": "jpeg"
+    "original": "/images/logo.png",
+    "webp1x": "/images/logo.webp",
+    "webp2x": "/images/logo@2x.webp",
+    "width": 1024,
+    "height": 1024,
+    "blurPlaceholder": "data:image/jpeg;base64,/9j/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAQABADASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAwIH/8QAIhAAAgICAgEFAQAAAAAAAAAAAQIDEQQhAAUSFCIxQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAgP/xAAXEQEBAQEAAAAAAAAAAAAAAAABEQAC/9oADAMBAAIRAxEAPwDPOvx1nnCyRyOlb8Gqv6TR1y+xxocdqjSWOzaCU+4r+nWt8TE7FIMUR+lx2YfLlLY7+zfCycpJkNoC9V5Eb5RRJhE6u//Z",
+    "format": "png"
   },
   "images/hero-base.jpg": {
     "original": "/images/hero-base.jpg",
@@ -30,10 +30,10 @@
     "original": "/images/logo.png",
     "webp1x": "/images/logo.webp",
     "webp2x": "/images/logo@2x.webp",
-    "width": 875,
-    "height": 1092,
-    "blurPlaceholder": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAQAA0DASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABAED/8QAHxAAAwACAgIDAAAAAAAAAAAAAQIDBBEAIQUxElFx/8QAFQEBAQAAAAAAAAAAAAAAAAAAAwT/xAAaEQEAAwADAAAAAAAAAAAAAAABAAIRA0FR/9oADAMBAAIRAxEAPwC1jTIyCq5JiAWPs98T4tqAUWlC5Gu9+/fC4kqvRss0Xt2UK42Nb+uaYs3xK1T5NQEKQdfvHbavjJq8eFTs2f/Z",
-    "format": "jpeg"
+    "width": 1024,
+    "height": 1024,
+    "blurPlaceholder": "data:image/jpeg;base64,/9j/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAQABADASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAwIH/8QAIhAAAgICAgEFAQAAAAAAAAAAAQIDEQQhAAUSFCIxQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAgP/xAAXEQEBAQEAAAAAAAAAAAAAAAABEQAC/9oADAMBAAIRAxEAPwDPOvx1nnCyRyOlb8Gqv6TR1y+xxocdqjSWOzaCU+4r+nWt8TE7FIMUR+lx2YfLlLY7+zfCycpJkNoC9V5Eb5RRJhE6u//Z",
+    "format": "png"
   },
   "images/tech-illustration.png": {
     "original": "/images/tech-illustration.png",
