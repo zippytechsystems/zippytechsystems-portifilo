@@ -21,44 +21,49 @@ import TiltCard from './TiltCard';
 const CORE_DOMAINS = [
   {
     id: 'web',
-    title: 'Business Website',
-    subtitle: 'High-converting portfolio, clinic, restaurant or showcase landing',
+    title: 'Web Development Services',
+    subtitle: 'Business websites, showcase catalogs, e-commerce stores & custom domains',
     basePrice: 6500,
     timeline: '48h to 7 days',
     icon: Globe,
     accent: '#1d5cf0',
-    inclusions: ['Mobile responsive design', 'WhatsApp chat integration', 'Free SSL & Cloud setup']
+    inclusions: [
+      'Business Websites / Landing Page',
+      'Services / Products Showcase Website',
+      'E-commerce Store & Online Ordering',
+      'Custom Domain, Cloud Hosting & Free SSL'
+    ]
   },
   {
     id: 'app',
-    title: 'Shop & Business App',
-    subtitle: 'Accountant app, billing, inventory & staff management',
+    title: 'App Development Services',
+    subtitle: 'Custom shop management, billing, staff attendance & accountant apps',
     basePrice: 20000,
     timeline: '2 to 3 weeks',
     icon: Smartphone,
     accent: '#12a150',
-    inclusions: ['Cut full-time accountant salary', 'Offline DB with cloud sync', 'Android & tablet ready']
+    popular: true,
+    inclusions: [
+      'Accountant App (Save Full-Time Accountant Salary!)',
+      'Business Management & POS Billing App',
+      'Stock Inventory, Barcode Scanner & Udhar Khata',
+      'Staff Management & GPS Selfie Attendance'
+    ]
   },
   {
     id: 'ai',
-    title: 'AI WhatsApp Automation',
-    subtitle: '24/7 automated inquiry responses, catalog sharing & lead capture',
+    title: 'AI Agent Development Services',
+    subtitle: '24×7 smart customer support AI chatbots & WhatsApp lead automation',
     basePrice: 7500,
     timeline: '24 to 48 hours',
     icon: Cpu,
     accent: '#7a2fd0',
-    inclusions: ['Zero missed leads after hours', 'Auto catalog & price dispatch', 'Sync leads to Google Sheets']
-  },
-  {
-    id: 'bundle',
-    title: 'Full-Stack Business Suite',
-    subtitle: 'Complete end-to-end digital transformation: Web + App + AI Automation',
-    basePrice: 31000,
-    timeline: '3 to 4 weeks',
-    icon: Sparkles,
-    accent: '#ffe500',
-    popular: true,
-    inclusions: ['All 3 domains integrated', 'Unified customer database', 'Save ₹3,000 on bundle']
+    inclusions: [
+      'Smart Support 24×7 AI Chatbot on Website',
+      'WhatsApp Automation & Instant Replies',
+      'Lead Management Automation & Phone Capture',
+      'Follow-up Reminders & Customer Support'
+    ]
   }
 ];
 
@@ -67,56 +72,56 @@ const ADDONS = [
     id: 'ecommerce',
     title: 'E-Commerce Store & Online Ordering',
     price: 8000,
-    domains: ['web', 'bundle'],
+    domains: ['web'],
     desc: 'Product catalog, shopping cart, customer checkout, order alerts'
   },
   {
     id: 'payments',
     title: 'UPI & Razorpay Payment Gateway',
     price: 2500,
-    domains: ['web', 'app', 'bundle'],
+    domains: ['web', 'app'],
     desc: 'Instant QR code, PhonePe, Google Pay & Card bank settlement'
   },
   {
     id: 'gst_billing',
     title: 'Automated GST Billing & PDF Invoices',
     price: 3500,
-    domains: ['app', 'ai', 'bundle'],
+    domains: ['app', 'ai'],
     desc: 'Auto invoice generation, HSN codes, and WhatsApp PDF dispatch'
   },
   {
     id: 'inventory',
     title: 'Barcode Scanner & Stock Alerts',
     price: 4000,
-    domains: ['app', 'bundle'],
+    domains: ['app'],
     desc: 'Camera barcode lookup, low-stock notifications, supplier records'
   },
   {
     id: 'attendance',
     title: 'Staff Selfie Attendance & Salary Slips',
     price: 3000,
-    domains: ['app', 'bundle'],
+    domains: ['app'],
     desc: 'GPS location verification, shift timings, auto monthly payslips'
   },
   {
     id: 'voice_agent',
     title: 'AI Voice Call Answering Agent',
     price: 5000,
-    domains: ['ai', 'bundle'],
+    domains: ['ai'],
     desc: 'Answers inbound customer calls with natural voice & logs enquiries'
   },
   {
     id: 'seo_maps',
     title: 'Google Business Profile & Local SEO',
     price: 1500,
-    domains: ['web', 'bundle'],
+    domains: ['web'],
     desc: 'Google Maps verification, local keyword ranking, review showcase'
   },
   {
     id: 'cloud_backup',
     title: 'Automated Daily Cloud Backups & Care',
     price: 1500,
-    domains: ['web', 'app', 'ai', 'bundle'],
+    domains: ['web', 'app', 'ai'],
     desc: 'Tamper-proof off-site backup, SSL maintenance & 1-year priority care'
   }
 ];

@@ -12,10 +12,10 @@ export default function PackagesSection() {
   const [activeDomain, setActiveDomain] = useState('all');
 
   const domainTabs = [
-    { id: 'all', label: 'All Packages' },
-    { id: 'web', label: 'Web Packages (₹7k+)' },
-    { id: 'app', label: 'App Packages (₹10k+)' },
-    { id: 'ai', label: 'AI Packages (₹6k+)' }
+    { id: 'all', label: 'All 3 Services Packages' },
+    { id: 'web', label: 'Web Development (From ₹6,500)' },
+    { id: 'app', label: 'App Development (From ₹20,000)' },
+    { id: 'ai', label: 'AI Agent Development (From ₹7,500)' }
   ];
 
   const filteredPackages =
@@ -224,10 +224,10 @@ export default function PackagesSection() {
               const isApp = pkg.domain === 'app';
               const domainColor = isWeb ? '#1d5cf0' : isApp ? '#12a150' : '#7a2fd0';
               const domainLabel = isWeb
-                ? 'Web Development'
+                ? 'Web Development Services'
                 : isApp
-                ? 'App Development'
-                : 'AI Automation';
+                ? 'App Development Services'
+                : 'AI Agent Development Services';
 
               const quoteMsg = `Hi Lingaswamy, I am interested in the ${pkg.name} (${pkg.price}) for my business. Please share next steps!`;
 

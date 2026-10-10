@@ -97,153 +97,155 @@ export const content = {
       id: 'web-development',
       slug: 'web-development',
       domain: 'web',
-      domainLabel: 'Web Development',
+      domainLabel: 'Web Development Services',
       badgeColor: '#1d5cf0',
       gradient: 'linear-gradient(135deg, #1d5cf0 0%, #3b82f6 100%)',
-      introLine: 'A website that helps your business grow.',
+      introLine: 'Business Websites, Product Showcases & High-Converting Landing Pages.',
       startingPrice: '₹6,500',
       startingPriceNum: 6500,
       priceNote: 'Starting price in INR',
       conceptCopy:
-        'A good website brings your business online, builds trust, shows your services and products to customers 24 hours a day, and helps you get more enquiries and grow your business.',
-      mainServicesTitle: 'Our Main Services',
+        'A high-performance website brings your business online, builds instant customer trust, showcases your products and services 24 hours a day, and turns visitors into high-paying enquiries.',
+      mainServicesTitle: 'Our Core Web Offerings',
       mainServices: [
         {
-          title: 'Business Websites & Landing Pages',
-          desc: 'High-converting, professional web pages that establish immediate credibility and capture customer enquiries.'
+          title: 'Business Websites / Landing Page',
+          desc: 'High-converting, mobile-responsive web pages that establish immediate credibility and capture direct customer enquiries.'
         },
         {
-          title: 'Services / Products Showcase Websites',
-          desc: 'Beautiful, visual catalog websites displaying your complete offerings, pricing, and client testimonials.'
+          title: 'Services / Products Showcase Website',
+          desc: 'Visual, high-resolution product and service catalogs with instant WhatsApp inquiry triggers and customer reviews.'
         },
         {
-          title: 'E-Commerce Business Websites',
-          desc: 'Full online shopping stores with fast mobile checkout, UPI / Razorpay payment gateways, and order tracking.'
+          title: 'E-commerce Business Website',
+          desc: 'Full online store with seamless mobile shopping, shopping cart, UPI & card payments (Razorpay/PhonePe), and order alerts.'
         },
         {
           title: 'Custom Domain & Hosting Setup',
-          desc: 'Complete end-to-end setup of your custom .com / .in domain, high-speed cloud hosting, and free SSL certificate.'
+          desc: 'Complete end-to-end setup of your custom .com / .in domain, high-speed secure cloud hosting, and lifetime SSL certificate.'
         }
       ],
-      moreServicesTitle: 'More Web Services We Provide',
+      moreServicesTitle: 'More Web Development Capabilities',
       moreServices: [
-        'Portfolio, restaurant, clinic, school and real estate websites',
-        'Booking and appointment scheduling websites',
-        'Website redesign and modernization',
-        'Search Engine Optimization (SEO) & Google Business Profile setup',
-        'Payment gateway integration (Razorpay, PhonePe, UPI)',
-        'Ongoing website maintenance, security updates and yearly support'
+        'Portfolio, clinic, showroom, restaurant, school and real estate websites',
+        'Direct WhatsApp chat integration & click-to-call buttons',
+        'Search Engine Optimization (SEO) & Google Business Profile verification',
+        'Website redesign, modernization and mobile optimization',
+        'Payment gateway integration (PhonePe, Google Pay, Paytm, UPI)',
+        'Ongoing website maintenance, regular backups and technical support'
       ],
       whatsappMessage:
-        "Hi Lingaswamy, I'm interested in Web Development services starting from ₹6,500. I need a website for my business. Please share details.",
+        "Hi Lingaswamy, I am interested in Web Development Services starting from ₹6,500. I need a website for my business. Please share details.",
       icon: 'Globe'
     },
     {
       id: 'app-development',
       slug: 'app-development',
       domain: 'app',
-      domainLabel: 'App Development',
+      domainLabel: 'App Development Services',
       badgeColor: '#12a150',
       gradient: 'linear-gradient(135deg, #12a150 0%, #10b981 100%)',
-      introLine: 'Ready-made business apps for shops, small or big.',
+      introLine: 'Custom Business Management & Accountant Apps for Small & Big Enterprises.',
       startingPrice: '₹20,000',
       startingPriceNum: 20000,
       priceNote: 'Starting price in INR',
       conceptCopy:
-        'We build accountant apps and business management apps for small and big shops. The app handles billing, accounts, stock and staff records automatically, so the shop owner can save the salary of a full-time accountant and still keep accurate accounts.',
+        'We build custom accountant apps and business management software that automate billing, inventory, ledgers, and staff records. Save the monthly salary of a full-time accountant while keeping 100% accurate accounts on your phone.',
       accountantCallout: {
-        title: 'Save Accountant Salary',
+        title: 'Save Full-Time Accountant Salary',
         tagline: 'Run your shop accounts on autopilot without paying high monthly accountant retainers.',
         benefits: [
-          'Less manual work: Automated billing, GST invoices, and daily ledger entries.',
+          'Less manual work: Automated billing, GST invoices, and daily customer udhar ledger entries.',
           'Fewer calculation mistakes: Tamper-proof calculations for stock, discounts, and customer credit.',
-          'Accounts available on your phone anytime: Check daily sales, cash in hand, and pending udhar 24/7.'
+          'Accounts on your phone 24/7: Check daily sales, cash in hand, and pending collections from anywhere.'
         ]
       },
-      mainServicesTitle: 'Our Main Services',
+      mainServicesTitle: 'Our Core App Offerings',
       mainServices: [
         {
           title: 'Accountant App',
-          desc: 'Automates daily khata, ledger entries, customer credit balance, GST invoicing, and financial reports.'
+          desc: 'Automates daily billing, customer credit (udhar khata), automated GST invoices, and instant financial reports on mobile.'
         },
         {
           title: 'Business Management App',
-          desc: 'Centralized mobile management app tracking inventory, purchases, supplier payments, and shop operations.'
+          desc: 'Centralized mobile management app tracking inventory, purchases, supplier payments, and overall shop operations.'
         },
         {
-          title: 'E-Commerce Business App',
-          desc: 'Dedicated Android & iOS shopping app for your shop with instant push notifications and fast checkout.'
+          title: 'E-commerce Business App',
+          desc: 'Dedicated Android app for your business with instant push notifications, order tracking, and mobile checkout.'
         },
         {
           title: 'Staff Management App',
-          desc: 'Digital staff attendance, overtime tracker, salary slip calculator, and daily staff shift roster.'
+          desc: 'Digital staff selfie attendance with GPS verification, overtime tracker, shift timings, and monthly salary slips.'
+        },
+        {
+          title: 'Custom App Development',
+          desc: 'Tailor-made Android and tablet applications built precisely for your unique business workflows and store requirements.'
         }
       ],
-      moreServicesTitle: 'More App Services We Provide',
+      moreServicesTitle: 'More App Development Capabilities',
       moreServices: [
-        'Billing / POS and barcode inventory apps',
-        'GST invoice & thermal receipt printing app',
-        'CRM and customer loyalty management app',
-        'Delivery partner and appointment booking apps',
-        'School / college administration apps',
-        'Google Play Store and Apple App Store publishing',
+        'Billing / POS with camera and handheld barcode scanner lookup',
+        'GST & non-GST thermal receipt and invoice printing',
+        'Multi-user access control (Owner, Cashier, Inventory Staff)',
+        'Offline-first architecture with automatic background cloud sync',
+        'Google Play Store publishing and deployment support',
         'Continuous app maintenance, feature upgrades and bug fixes'
       ],
       whatsappMessage:
-        "Hi Lingaswamy, I'm interested in App Development services starting from ₹20,000 for my shop/business. I would like to discuss my requirements.",
+        "Hi Lingaswamy, I am interested in App Development Services starting from ₹20,000 for my business/shop. I would like to discuss my requirements.",
       icon: 'Smartphone'
     },
     {
       id: 'ai-automation',
       slug: 'ai-automation',
       domain: 'ai',
-      domainLabel: 'AI Automation',
+      domainLabel: 'AI Agent Development Services',
       badgeColor: '#7a2fd0',
       gradient: 'linear-gradient(135deg, #7a2fd0 0%, #9333ea 100%)',
-      introLine: 'Never miss a customer enquiry again.',
+      introLine: 'Smart 24×7 Customer Support AI Chatbots & WhatsApp Automation.',
       startingPrice: '₹7,500',
       startingPriceNum: 7500,
       priceNote: 'Starting price in INR',
       conceptCopy:
-        'Enquiries are answered instantly on WhatsApp, phone and website even when the owner is busy or the shop is closed, so no lead is lost and more enquiries turn into customers.',
-      mainServicesTitle: 'Our Main Services',
+        'Never lose a customer lead after hours. Our intelligent AI agents answer customer enquiries 24×7 on WhatsApp and your website, share catalogs, qualify budgets, and book meetings automatically.',
+      mainServicesTitle: 'Our Core AI Agent Offerings',
       mainServices: [
         {
+          title: 'Smart Support 24×7 AI Chatbot',
+          desc: 'Intelligent AI chatbot trained on your business products and pricing, answering customer enquiries 24 hours a day.'
+        },
+        {
           title: 'WhatsApp Automation',
-          desc: 'Automatic replies to customers on WhatsApp, greeting new visitors, sharing catalogs, and qualifying leads.'
-        },
-        {
-          title: 'AI Voice Agent',
-          desc: 'Answers business enquiry calls intelligently, provides details, and schedules callbacks.'
-        },
-        {
-          title: 'AI Chatbot for Your Website',
-          desc: 'Handles customer enquiries 24x7 directly on your website and captures contact numbers.'
+          desc: 'Instant replies on WhatsApp, automatic greeting of new leads, catalog & price list sharing, and contact capture.'
         },
         {
           title: 'Lead Management Automation',
-          desc: 'Syncs incoming customer enquiries instantly to Google Sheets, CRM, and sales team phones.'
+          desc: 'Captures and qualifies incoming leads, syncing phone numbers and requirements instantly to Google Sheets and CRM.'
         },
         {
-          title: 'Follow-Up Reminders',
-          desc: 'Automated follow-up messages on WhatsApp for pending quotations and customer decisions.'
+          title: 'Follow-up Reminders',
+          desc: 'Automated follow-up messages sent to prospective customers for pending quotes and decision closures.'
         },
         {
           title: 'Customer Support Automation',
-          desc: 'Resolves frequent customer queries (timings, pricing, location, order status) without manual effort.'
+          desc: 'Resolves frequent customer queries (pricing, timings, location, order status) with zero human intervention.'
+        },
+        {
+          title: 'AI Voice Agent',
+          desc: 'Answers incoming business telephone enquiry calls intelligently, logs customer needs, and schedules callbacks.'
         }
       ],
-      moreServicesTitle: 'More AI & Automation Services We Provide',
+      moreServicesTitle: 'More AI & Automation Capabilities',
       moreServices: [
-        'Auto invoices and payment reminder workflows',
-        'Email and social media inquiry automation',
-        'Data entry and document processing automation',
-        'AI content and marketing copy tools',
-        'Google Sheets, Zoho, Excel and CRM integrations',
-        'Custom AI agents tailored for your unique business operations'
+        'Automated GST invoice generation & WhatsApp payment reminder workflows',
+        'Social media & website inquiry qualification automation',
+        'Google Sheets, Excel, Zoho, and WhatsApp Business API integrations',
+        'Custom AI prompts and knowledge base tuning for your business',
+        'Weekly analytics on customer queries, popular products, and lead conversions'
       ],
       whatsappMessage:
-        "Hi Lingaswamy, I'm interested in AI Automation starting from ₹7,500. I want to automate my customer enquiries and WhatsApp replies.",
+        "Hi Lingaswamy, I am interested in AI Agent Development Services starting from ₹7,500. I want to automate my customer enquiries and WhatsApp replies.",
       icon: 'Cpu'
     }
   ],
@@ -461,96 +463,96 @@ export const content = {
     {
       id: 'pkg-web-starter',
       domain: 'web',
-      name: 'Starter Web Presence',
+      name: 'Business Websites / Landing Page',
       price: '₹6,500',
-      tagline: 'Best for local shops, professionals, and new businesses',
+      tagline: 'High-converting business website with custom domain & hosting',
       deliverables: [
-        'Single-page fast responsive landing site',
-        'Direct WhatsApp chat button & Call CTA',
-        'Mobile, tablet & desktop optimized',
-        'Google Maps & Google Business profile link',
-        'Free SSL certificate & fast cloud hosting setup',
-        '7 days turnaround time'
+        'Business Websites / Landing Page',
+        'Services / Products Showcase Website',
+        'E-commerce Business Website & UPI Payments',
+        'Custom Domain, Cloud Hosting & Free SSL',
+        'Direct WhatsApp Chat & Click-to-Call CTAs',
+        '48 Hours to 7 Days Fast Delivery'
       ],
       popular: false
     },
     {
       id: 'pkg-web-business',
       domain: 'web',
-      name: 'Business Growth Showcase',
+      name: 'E-Commerce & Product Showcase',
       price: '₹14,500',
-      tagline: 'For established businesses wanting full catalog showcases',
+      tagline: 'Full online shopping store, product catalog, UPI checkout & SEO',
       deliverables: [
-        'Up to 5 pages (Home, About, Services, Gallery, Contact)',
-        'Full service/product visual showcase catalog',
-        'Customer enquiry form with database & WhatsApp sync',
-        'On-page SEO optimization & metadata',
-        'Google Search Console indexing',
-        '30 days free support & maintenance'
+        'Full Product & Services Showcase Catalog',
+        'Shopping Cart & UPI Payment Gateway (PhonePe/GPay)',
+        'Custom Domain, Cloud Hosting & Free SSL',
+        'Google Business Profile & Local SEO Setup',
+        'Customer Enquiry Form with WhatsApp Sync',
+        '30 Days Free Support & Maintenance'
       ],
       popular: true
     },
     {
       id: 'pkg-app-billing',
       domain: 'app',
-      name: 'Shop Billing & Udhar App',
+      name: 'Accountant App & Shop Billing',
       price: '₹20,000',
-      tagline: 'Save accountant salary with automated shop records',
+      tagline: 'Save full-time accountant salary with automated shop records',
       deliverables: [
-        'Fast barcode scanning & POS billing',
-        'GST & non-GST thermal receipt printing',
-        'Customer credit ledger (Udhar tracking & WhatsApp reminders)',
-        'Daily cash in hand & profit report on mobile',
-        'Tamper-proof calculations & offline support',
-        'Free staff training session'
+        'Accountant App (Save Full-Time Accountant Salary!)',
+        'Automated Billing, Khata & GST Invoicing',
+        'Thermal Receipt Printing & Udhar Reminders',
+        'Daily Cash in Hand & Mobile Sales Reports',
+        'Offline DB Support with Automatic Cloud Sync',
+        'Free Shop Staff Training & Setup'
       ],
       popular: true
     },
     {
       id: 'pkg-app-enterprise',
       domain: 'app',
-      name: 'Complete Business Management App',
-      price: '₹22,000',
-      tagline: 'Multi-store, staff attendance, and inventory management',
+      name: 'Business Management & Staff App',
+      price: '₹28,000',
+      tagline: 'Multi-store, staff attendance, stock barcodes & custom app features',
       deliverables: [
-        'Multi-user roles (Owner, Manager, Cashier)',
-        'Live warehouse stock alerts & supplier order records',
-        'Staff attendance & payroll calculation',
-        'Cloud backup & multi-device sync',
-        'Android APK + Web dashboard included',
-        '3 months priority bugfix guarantee'
+        'Business Management App for Shop & Warehouse',
+        'Barcode Scanner & Low Stock Notifications',
+        'Staff Management & GPS Selfie Attendance',
+        'Automated Monthly Salary Slips Calculator',
+        'Android App, Tablet Ready & Web Admin',
+        'Custom App Development & Dedicated Care'
       ],
       popular: false
     },
     {
       id: 'pkg-ai-whatsapp',
       domain: 'ai',
-      name: 'WhatsApp 24/7 Auto-Responder',
+      name: 'Smart Support 24×7 AI Chatbot',
       price: '₹7,500',
-      tagline: 'Never lose a customer lead after working hours',
+      tagline: 'Never lose a customer lead on WhatsApp or website',
       deliverables: [
-        'Official or QR WhatsApp automation setup',
-        'Instant replies with price cards & catalog PDF',
-        'Lead qualification & phone number capture',
-        'Instant alert on owner mobile for hot leads',
-        'Custom business greeting & FAQ answering',
-        'Quick 48-hour deployment'
+        'Smart Support 24×7 AI Chatbot for Website',
+        'WhatsApp Automation with Instant Auto-Replies',
+        'Lead Management Automation & Phone Capture',
+        'Auto Catalog & Price List PDF Dispatch',
+        'Follow-up Reminders for Pending Enquiries',
+        '24 to 48 Hours Quick Deployment'
       ],
       popular: true
     },
     {
       id: 'pkg-ai-agent',
       domain: 'ai',
-      name: 'AI Voice & Lead Pipeline Suite',
+      name: 'AI Agent & Voice Calling Suite',
       price: '₹16,000',
-      tagline: 'Full intelligent customer qualification & automated CRM',
+      tagline: 'AI phone voice agent & automated CRM lead qualification',
       deliverables: [
-        'AI Voice Agent for telephone enquiry triage',
-        'Website AI chatbot widget trained on your business',
-        'Sync leads automatically to Google Sheets & CRM',
-        'Automated follow-up WhatsApp reminders for pending quotes',
-        'Weekly analytics of customer questions and conversions',
-        'Dedicated onboarding & testing'
+        'AI Voice Agent Answering Inbound Phone Calls',
+        'Customer Support Automation for 24/7 Operations',
+        'Instant Lead Sync to Google Sheets & CRM',
+        'Automated WhatsApp Invoices & Reminders',
+        'Weekly Conversion & Enquiry Analytics',
+        'Dedicated AI Knowledge Base Tuning'
       ],
       popular: false
     }
@@ -559,9 +561,9 @@ export const content = {
   // Navigation Links
   navLinks: [
     { label: 'Home', path: '/' },
-    { label: 'Web', path: '/#web-development' },
-    { label: 'Apps', path: '/#app-development' },
-    { label: 'AI Automation', path: '/#ai-automation' },
+    { label: 'Web Development', path: '/#web-development' },
+    { label: 'App Development', path: '/#app-development' },
+    { label: 'AI Agent Services', path: '/#ai-automation' },
     { label: 'Portfolio', path: '/projects' },
     { label: 'About', path: '/about' },
     { label: 'Contact', path: '/contact' }
@@ -570,9 +572,9 @@ export const content = {
   // Footer Navigation
   footerLinks: {
     services: [
-      { label: 'Web Development (from ₹6,500)', path: '/#web-development' },
-      { label: 'App Development (from ₹20,000)', path: '/#app-development' },
-      { label: 'AI Automation (from ₹7,500)', path: '/#ai-automation' }
+      { label: 'Web Development Services (from ₹6,500)', path: '/#web-development' },
+      { label: 'App Development Services (from ₹20,000)', path: '/#app-development' },
+      { label: 'AI Agent Development Services (from ₹7,500)', path: '/#ai-automation' }
     ],
     quickLinks: [
       { label: 'Home', path: '/' },
