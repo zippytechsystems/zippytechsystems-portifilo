@@ -822,6 +822,10 @@ export const DEFAULT_DESIGN_SETTINGS = {
   sound_effects: false,
   lottie_enabled: true,
   tooltip_enabled: true,
+  liquid_mask_enabled: true,
+  particle_sphere_enabled: true,
+  tech_orbit_enabled: true,
+  coverflow_enabled: true,
   quality_override: 'auto'
 };
 

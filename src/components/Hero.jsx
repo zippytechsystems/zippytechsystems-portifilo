@@ -9,7 +9,7 @@ import HeroLiquidMask from './HeroLiquidMask';
 import ParticleSphere from './ParticleSphere';
 
 export default function Hero({ onOpenQuoteModal, onExploreServices }) {
-  const { settingsData } = useData();
+  const { settingsData, designSettings } = useData();
   const secondaryTagline = settingsData?.secondaryTagline || content.company.secondaryTagline;
   const rawWa = settingsData?.whatsappNumber || content.founder.whatsappNumber || '6302690251';
   const cleanWa = String(rawWa).replace(/[^0-9]/g, '');
@@ -32,25 +32,27 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
       aria-labelledby="hero-heading"
     >
       {/* 1. Dual-Layer Liquid Cursor-Mask Canvas (Background Layer) */}
-      <HeroLiquidMask />
+      {designSettings?.liquid_mask_enabled !== false && <HeroLiquidMask />}
 
       {/* 2. Interactive 3D Particle Constellation Sphere Accent */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '2%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 'min(520px, 92vw)',
-          height: 'min(520px, 92vw)',
-          pointerEvents: 'none',
-          opacity: 0.6,
-          zIndex: 0
-        }}
-        aria-hidden="true"
-      >
-        <ParticleSphere radius={175} particleCount={340} interactive={true} />
-      </div>
+      {designSettings?.particle_sphere_enabled !== false && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '2%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'min(520px, 92vw)',
+            height: 'min(520px, 92vw)',
+            pointerEvents: 'none',
+            opacity: 0.6,
+            zIndex: 0
+          }}
+          aria-hidden="true"
+        >
+          <ParticleSphere radius={175} particleCount={340} interactive={true} />
+        </div>
+      )}
 
       {/* 3. Background Ambient Mesh — Soft glow enhancer */}
       <div

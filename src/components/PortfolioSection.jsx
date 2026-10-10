@@ -11,9 +11,11 @@ export default function PortfolioSection() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [viewMode, setViewMode] = useState('coverflow'); // 'coverflow' | 'grid'
   const [selectedProject, setSelectedProject] = useState(null);
-  const { projectsData, loading } = useData();
+  const { projectsData, loading, designSettings } = useData();
+  const isCoverflowAllowed = designSettings?.coverflow_enabled !== false;
+  const currentViewMode = isCoverflowAllowed ? viewMode : 'grid';
   const allProjects = projectsData && projectsData.length > 0 ? projectsData : content.projects;
-  useScrollReveal([activeFilter, viewMode]);
+  useScrollReveal([activeFilter, currentViewMode]);
 
   const filterTabs = [
     { id: 'all', label: 'All Projects' },
@@ -95,59 +97,61 @@ export default function PortfolioSection() {
             })}
           </div>
 
-          {/* 3D Showcase vs Grid View Toggle */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-full)',
-              padding: '3px'
-            }}
-          >
-            <button
-              onClick={() => setViewMode('coverflow')}
-              className="btn btn-sm"
+          {/* 3D Showcase vs Grid View Toggle (Only shown when coverflow is enabled in admin) */}
+          {isCoverflowAllowed && (
+            <div
               style={{
-                borderRadius: 'var(--radius-full)',
-                padding: '0.35rem 0.85rem',
-                fontSize: '0.82rem',
-                background: viewMode === 'coverflow' ? 'var(--brand-blue)' : 'transparent',
-                color: viewMode === 'coverflow' ? '#ffffff' : 'var(--text-body)',
-                border: 'none',
-                fontWeight: viewMode === 'coverflow' ? 700 : 500,
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.4rem'
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-full)',
+                padding: '3px'
               }}
-              title="3D Perspective Coverflow Showcase"
             >
-              <SlidersHorizontal size={13} />
-              <span>3D Showcase</span>
-            </button>
+              <button
+                onClick={() => setViewMode('coverflow')}
+                className="btn btn-sm"
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  padding: '0.35rem 0.85rem',
+                  fontSize: '0.82rem',
+                  background: currentViewMode === 'coverflow' ? 'var(--brand-blue)' : 'transparent',
+                  color: currentViewMode === 'coverflow' ? '#ffffff' : 'var(--text-body)',
+                  border: 'none',
+                  fontWeight: currentViewMode === 'coverflow' ? 700 : 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+                title="3D Perspective Coverflow Showcase"
+              >
+                <SlidersHorizontal size={13} />
+                <span>3D Showcase</span>
+              </button>
 
-            <button
-              onClick={() => setViewMode('grid')}
-              className="btn btn-sm"
-              style={{
-                borderRadius: 'var(--radius-full)',
-                padding: '0.35rem 0.85rem',
-                fontSize: '0.82rem',
-                background: viewMode === 'grid' ? 'var(--brand-blue)' : 'transparent',
-                color: viewMode === 'grid' ? '#ffffff' : 'var(--text-body)',
-                border: 'none',
-                fontWeight: viewMode === 'grid' ? 700 : 500,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem'
-              }}
-              title="Standard Grid Layout"
-            >
-              <LayoutGrid size={13} />
-              <span>Grid View</span>
-            </button>
-          </div>
+              <button
+                onClick={() => setViewMode('grid')}
+                className="btn btn-sm"
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  padding: '0.35rem 0.85rem',
+                  fontSize: '0.82rem',
+                  background: currentViewMode === 'grid' ? 'var(--brand-blue)' : 'transparent',
+                  color: currentViewMode === 'grid' ? '#ffffff' : 'var(--text-body)',
+                  border: 'none',
+                  fontWeight: currentViewMode === 'grid' ? 700 : 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+                title="Standard Grid Layout"
+              >
+                <LayoutGrid size={13} />
+                <span>Grid View</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Loading Skeleton */}
@@ -217,7 +221,7 @@ export default function PortfolioSection() {
         )}
 
         {/* View Mode 1: 3D Coverflow Showcase */}
-        {!loading && filteredProjects.length > 0 && viewMode === 'coverflow' && (
+        {!loading && filteredProjects.length > 0 && currentViewMode === 'coverflow' && (
           <div style={{ marginBottom: '2rem' }}>
             <ProjectCoverflow
               projects={filteredProjects}
@@ -227,7 +231,7 @@ export default function PortfolioSection() {
         )}
 
         {/* View Mode 2: 3D Tilt Project Cards Grid */}
-        {!loading && filteredProjects.length > 0 && viewMode === 'grid' && (
+        {!loading && filteredProjects.length > 0 && currentViewMode === 'grid' && (
           <div
             style={{
               display: 'grid',

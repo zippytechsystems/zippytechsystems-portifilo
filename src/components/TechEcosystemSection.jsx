@@ -1,8 +1,12 @@
 import React from 'react';
+import { useData } from '../context/DataContext';
 import SkillsOrbitCloud from './SkillsOrbitCloud';
 import TechMarquee from './TechMarquee';
 
 export default function TechEcosystemSection() {
+  const { designSettings } = useData() || {};
+  const showOrbit = designSettings?.tech_orbit_enabled !== false;
+
   return (
     <section
       id="tech-stack"
@@ -29,10 +33,12 @@ export default function TechEcosystemSection() {
           </p>
         </div>
 
-        {/* 3D Orbiting Cloud */}
-        <div style={{ marginBottom: '3rem' }}>
-          <SkillsOrbitCloud />
-        </div>
+        {/* 3D Orbiting Cloud (toggled by admin design settings) */}
+        {showOrbit && (
+          <div style={{ marginBottom: '3rem' }}>
+            <SkillsOrbitCloud />
+          </div>
+        )}
 
         {/* Dual Infinite Looping Marquee */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

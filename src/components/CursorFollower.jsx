@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQualityTier } from '../hooks/useQualityTier';
+import { useData } from '../context/DataContext';
 
 /**
  * CursorFollower component:
@@ -14,6 +15,7 @@ import { useQualityTier } from '../hooks/useQualityTier';
 export default function CursorFollower() {
   const { tier } = useQualityTier();
   const location = useLocation();
+  const { designSettings } = useData() || {};
   const [isEnabled, setIsEnabled] = useState(false);
   const [isHoveringInteractive, setIsHoveringInteractive] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -27,13 +29,14 @@ export default function CursorFollower() {
 
   const isAdmin = location.pathname.startsWith('/admin');
   const isReduced = tier === 'reduced';
+  const isCursorAllowed = designSettings?.cursor_effect_enabled !== false;
 
   useEffect(() => {
-    // 1. Guard against touch devices, reduced motion, or admin portal
+    // 1. Guard against touch devices, reduced motion, admin portal, or disabled by admin
     const hasFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
     const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
 
-    if (!hasFinePointer || isTouch || isReduced || isAdmin) {
+    if (!hasFinePointer || isTouch || isReduced || isAdmin || !isCursorAllowed) {
       setIsEnabled(false);
       return;
     }
@@ -86,7 +89,7 @@ export default function CursorFollower() {
       document.removeEventListener('mouseleave', handleMouseLeave);
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, [isAdmin, isReduced]);
+  }, [isAdmin, isReduced, isCursorAllowed]);
 
   if (!isEnabled) return null;
 

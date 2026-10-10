@@ -213,11 +213,13 @@ export default function DesignTab({ showToast }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
           {[
+            { key: 'liquid_mask_enabled', label: 'Hero Liquid Mask Reveal', desc: 'Dual-layer interactive cursor reveal canvas in Hero' },
+            { key: 'particle_sphere_enabled', label: '3D Particle Constellation', desc: 'Interactive 3D particle sphere in Hero background' },
+            { key: 'tech_orbit_enabled', label: '3D Orbiting Tech Cloud', desc: 'Concentric orbiting skills ring and dual marquee' },
+            { key: 'coverflow_enabled', label: '3D Coverflow Showcase', desc: 'Interactive 3D perspective carousel for projects' },
             { key: 'magnetic_buttons_enabled', label: 'Magnetic CTA Buttons', desc: 'Pulls primary buttons subtly toward mouse on desktop fine pointer' },
-            { key: 'particles_enabled', label: 'Ambient Particle Drift', desc: 'Floating micro-particles in hero and domain preview sections' },
             { key: 'cursor_effect_enabled', label: 'Cursor Follower Glow', desc: 'Subtle glowing trail following pointer on capable desktop hardware' },
             { key: 'parallax_enabled', label: 'Parallax Layer Depth', desc: 'Smooth multi-plane scroll depth on section backgrounds' },
-            { key: 'horizontal_portfolio_enabled', label: 'Horizontal Portfolio Reel', desc: 'Enhanced side-scrolling project reel on wide desktop screens' },
             { key: 'lottie_enabled', label: 'Lottie Vector Icons', desc: 'Smooth animated SVG icons for domain headers and packages' },
             { key: 'tooltip_enabled', label: 'Rich Floating Tooltips', desc: 'Interactive info hints on price tags and technology badges' }
           ].map((toggle) => {
