@@ -7,7 +7,7 @@ import TiltCard from './TiltCard';
 import ProjectCoverflow from './ProjectCoverflow';
 import ProjectModal from './ProjectModal';
 
-export default function PortfolioSection() {
+export default function PortfolioSection({ initialSlug }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [viewMode, setViewMode] = useState('coverflow'); // 'coverflow' | 'grid'
   const [selectedProject, setSelectedProject] = useState(null);
@@ -16,6 +16,31 @@ export default function PortfolioSection() {
   const currentViewMode = isCoverflowAllowed ? viewMode : 'grid';
   const allProjects = projectsData && projectsData.length > 0 ? projectsData : content.projects;
   useScrollReveal([activeFilter, currentViewMode]);
+
+  // Deep-link auto-selection on mount or slug change
+  useEffect(() => {
+    if (initialSlug && allProjects && allProjects.length > 0) {
+      const match = allProjects.find((p) => p.slug === initialSlug || p.id === initialSlug);
+      if (match) {
+        setSelectedProject(match);
+      }
+    }
+  }, [initialSlug, allProjects]);
+
+  const handleSelectProject = (project) => {
+    setSelectedProject(project);
+    if (project) {
+      const slug = project.slug || project.id;
+      window.history.pushState(null, '', `/portfolio/${slug}`);
+    }
+  };
+
+  const handleCloseProject = () => {
+    setSelectedProject(null);
+    if (window.location.pathname.startsWith('/portfolio/') || window.location.pathname.startsWith('/projects/')) {
+      window.history.pushState(null, '', '/projects');
+    }
+  };
 
   const filterTabs = [
     { id: 'all', label: 'All Projects' },
@@ -225,7 +250,7 @@ export default function PortfolioSection() {
           <div style={{ marginBottom: '2rem' }}>
             <ProjectCoverflow
               projects={filteredProjects}
-              onSelectProject={setSelectedProject}
+              onSelectProject={handleSelectProject}
             />
           </div>
         )}
@@ -258,7 +283,7 @@ export default function PortfolioSection() {
                       height: '100%',
                       cursor: 'pointer'
                     }}
-                    onClick={() => setSelectedProject(project)}
+                    onClick={() => handleSelectProject(project)}
                   >
                     {/* Visual Image Preview */}
                     <div
@@ -395,7 +420,7 @@ export default function PortfolioSection() {
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedProject(project);
+                            handleSelectProject(project);
                           }}
                         >
                           <Eye size={15} />
@@ -430,7 +455,9 @@ export default function PortfolioSection() {
         {/* Project Lightbox Modal */}
         <ProjectModal
           project={selectedProject}
-          onClose={() => setSelectedProject(null)}
+          projects={filteredProjects}
+          onSelectProject={handleSelectProject}
+          onClose={handleCloseProject}
         />
 
       </div>

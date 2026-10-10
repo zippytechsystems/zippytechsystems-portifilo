@@ -1,10 +1,60 @@
-import React, { useEffect } from 'react';
-import { X, Check, Cpu, Layers, Sparkles, ArrowRight } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { X, Check, Cpu, Layers, Sparkles, ArrowRight, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Share2, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { buildWhatsAppUrl } from '../data/content';
 
-export default function ProjectModal({ project, onClose, onStartSimilarProject }) {
+/**
+ * ProjectModal Lightbox Viewer:
+ * - Deep-link ready (/portfolio/:slug).
+ * - Interactive Image Zoom (1x vs 1.6x).
+ * - Keyboard navigation (Escape to close, Left/Right arrows to cycle projects).
+ * - Touch swipe left/right to browse adjacent case studies.
+ * - Shareable deep-link copy with toast confirmation.
+ * - Direct WhatsApp inquiry pre-filled to founder Lingaswamy (6302690251).
+ */
+export default function ProjectModal({
+  project,
+  projects = [],
+  onClose,
+  onSelectProject,
+  onStartSimilarProject
+}) {
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const touchStartX = useRef(null);
+  const modalContentRef = useRef(null);
+
+  // Find index of current project for Prev / Next cycling
+  const currentIndex = projects && projects.length > 0 && project
+    ? projects.findIndex((p) => (p.id === project.id || p.slug === project.slug))
+    : -1;
+
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex >= 0 && currentIndex < projects.length - 1;
+
+  const handlePrev = () => {
+    if (hasPrev && onSelectProject) {
+      setIsZoomed(false);
+      onSelectProject(projects[currentIndex - 1]);
+    }
+  };
+
+  const handleNext = () => {
+    if (hasNext && onSelectProject) {
+      setIsZoomed(false);
+      onSelectProject(projects[currentIndex + 1]);
+    }
+  };
+
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      } else if (e.key === 'ArrowRight') {
+        handleNext();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
@@ -13,7 +63,47 @@ export default function ProjectModal({ project, onClose, onStartSimilarProject }
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'auto';
     };
-  }, [onClose]);
+  }, [currentIndex, projects, onClose]);
+
+  // Touch swipe detection
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchEndX - touchStartX.current;
+    touchStartX.current = null;
+
+    if (diffX > 60) {
+      handlePrev(); // Swipe right -> Previous
+    } else if (diffX < -60) {
+      handleNext(); // Swipe left -> Next
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (!project) return;
+    const slug = project.slug || project.id;
+    const shareUrl = `${window.location.origin}/portfolio/${slug}`;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        const input = document.createElement('input');
+        input.value = shareUrl;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+      }
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2400);
+    } catch {
+      setCopiedLink(false);
+    }
+  };
 
   if (!project) return null;
 
@@ -26,75 +116,174 @@ export default function ProjectModal({ project, onClose, onStartSimilarProject }
   const demoMetrics = project.demoMetrics || (project.metrics ? [{ label: 'Impact Metric', value: project.metrics }] : null);
   const architecture = project.architecture || `Modern responsive ${type} architecture tailored for high uptime, clean UI, and direct business impact.`;
 
+  const whatsappInquiryUrl = buildWhatsAppUrl(
+    `Hi Lingaswamy, I saw the "${project.title}" case study on your portfolio. Can you build a similar solution for my business?`
+  );
+
   return (
     <div
       role="dialog"
       aria-modal="true"
+      aria-labelledby="modal-project-title"
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 'var(--z-modal)',
-        backgroundColor: 'rgba(5, 8, 15, 0.82)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        zIndex: 'var(--z-modal, 100)',
+        backgroundColor: 'rgba(5, 8, 15, 0.86)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1.5rem',
+        padding: '1.25rem',
         animation: 'fadeInUp 0.25s ease-out'
       }}
       onClick={onClose}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
+      {/* Floating Side Prev Button (Desktop) */}
+      {hasPrev && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handlePrev();
+          }}
+          className="btn-icon-only hide-on-mobile"
+          style={{
+            position: 'absolute',
+            left: '1.5rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'rgba(12, 18, 31, 0.85)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            color: '#ffffff',
+            borderRadius: '50%',
+            width: '46px',
+            height: '46px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 10,
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)'
+          }}
+          title="Previous Project (Left Arrow)"
+          aria-label="Previous Project"
+        >
+          <ChevronLeft size={22} />
+        </button>
+      )}
+
+      {/* Floating Side Next Button (Desktop) */}
+      {hasNext && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleNext();
+          }}
+          className="btn-icon-only hide-on-mobile"
+          style={{
+            position: 'absolute',
+            right: '1.5rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'rgba(12, 18, 31, 0.85)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            color: '#ffffff',
+            borderRadius: '50%',
+            width: '46px',
+            height: '46px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 10,
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)'
+          }}
+          title="Next Project (Right Arrow)"
+          aria-label="Next Project"
+        >
+          <ChevronRight size={22} />
+        </button>
+      )}
+
+      {/* Main Lightbox Modal Window */}
       <div
+        ref={modalContentRef}
         className="glass-card"
         style={{
           width: '100%',
-          maxWidth: '780px',
-          maxHeight: '90vh',
+          maxWidth: '820px',
+          maxHeight: '92vh',
           overflowY: 'auto',
           backgroundColor: '#0c121f',
-          borderColor: 'rgba(255, 255, 255, 0.15)',
+          borderColor: 'rgba(255, 255, 255, 0.16)',
           borderRadius: 'var(--radius-xl)',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 242, 254, 0.12)',
-          padding: '0'
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.85), 0 0 45px rgba(29, 92, 240, 0.15)',
+          padding: '0',
+          position: 'relative'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Top Header Banner */}
+        {/* Top Control Bar */}
         <div
           style={{
-            padding: '2rem',
-            background: `radial-gradient(circle at top right, ${accentColor}20 0%, rgba(12, 18, 31, 0.98) 70%)`,
+            padding: '1.5rem 2rem 1.25rem 2rem',
+            background: `radial-gradient(circle at top right, ${accentColor}25 0%, rgba(12, 18, 31, 0.98) 70%)`,
             borderBottom: '1px solid var(--border-glass)',
             position: 'relative'
           }}
         >
-          <button
-            onClick={onClose}
-            aria-label="Close modal"
-            className="btn-icon-only"
-            style={{
-              position: 'absolute',
-              top: '1.5rem',
-              right: '1.5rem',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid var(--border-glass)',
-              borderRadius: 'var(--radius-full)',
-              color: 'var(--text-main)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '36px',
-              height: '36px'
-            }}
-          >
-            <X size={20} />
-          </button>
+          {/* Action buttons (Share, Zoom, Close) */}
+          <div style={{ position: 'absolute', top: '1.25rem', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {/* Share Deep-Link button */}
+            <button
+              onClick={handleCopyLink}
+              className="btn btn-sm btn-outline"
+              style={{
+                borderRadius: 'var(--radius-full)',
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.78rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                background: copiedLink ? '#12a15025' : 'rgba(255, 255, 255, 0.05)',
+                borderColor: copiedLink ? '#12a150' : 'var(--border-glass)',
+                color: copiedLink ? '#12a150' : 'var(--text-main)'
+              }}
+              title="Copy shareable link to this project"
+            >
+              {copiedLink ? <CheckCircle2 size={13} color="#12a150" /> : <Share2 size={13} />}
+              <span>{copiedLink ? 'Link Copied!' : 'Share'}</span>
+            </button>
 
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              aria-label="Close modal"
+              className="btn-icon-only"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid var(--border-glass)',
+                borderRadius: 'var(--radius-full)',
+                color: 'var(--text-main)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px'
+              }}
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Badges & Category */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
             <span
               className="badge"
@@ -111,16 +300,85 @@ export default function ProjectModal({ project, onClose, onStartSimilarProject }
             <span style={{ fontSize: '0.82rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
               {category}
             </span>
+            {currentIndex >= 0 && (
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', opacity: 0.8 }}>
+                ({currentIndex + 1} of {projects.length})
+              </span>
+            )}
           </div>
 
-          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', color: '#ffffff', marginBottom: '0.5rem' }}>
+          <h2 id="modal-project-title" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', color: '#ffffff', marginBottom: '0.5rem' }}>
             {project.title}
           </h2>
 
-          <p style={{ fontSize: '1rem', color: 'var(--text-body)', lineHeight: 1.6, maxWidth: '640px' }}>
+          <p style={{ fontSize: '0.96rem', color: 'var(--text-body)', lineHeight: 1.55, maxWidth: '640px', margin: 0 }}>
             {fullDescription}
           </p>
         </div>
+
+        {/* Visual Graphic & Zoom Lightbox Strip */}
+        {project.image && (
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              background: '#070b14',
+              borderBottom: '1px solid var(--border-glass)',
+              overflow: 'hidden',
+              cursor: isZoomed ? 'zoom-out' : 'zoom-in'
+            }}
+            onClick={() => setIsZoomed(!isZoomed)}
+            title="Click to Zoom / Toggle Lightbox Preview"
+          >
+            <div
+              style={{
+                width: '100%',
+                maxHeight: isZoomed ? '540px' : '320px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 350ms cubic-bezier(0.25, 1, 0.5, 1)',
+                padding: isZoomed ? '0.5rem' : '1.5rem',
+                transform: isZoomed ? 'scale(1.15)' : 'scale(1)'
+              }}
+            >
+              <img
+                src={project.image}
+                alt={`${project.title} diagram preview`}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: isZoomed ? '520px' : '290px',
+                  objectFit: 'contain',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: '0 12px 35px rgba(0, 0, 0, 0.6)'
+                }}
+              />
+            </div>
+
+            {/* Zoom Toggle Pill */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '12px',
+                right: '16px',
+                background: 'rgba(12, 18, 31, 0.85)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.74rem',
+                color: 'var(--text-dim)',
+                pointerEvents: 'none'
+              }}
+            >
+              {isZoomed ? <ZoomOut size={13} color="#ffe500" /> : <ZoomIn size={13} />}
+              <span>{isZoomed ? 'Zoom Out (1.6x Active)' : 'Click to Inspect Zoom'}</span>
+            </div>
+          </div>
+        )}
 
         {/* Modal Body */}
         <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -198,7 +456,7 @@ export default function ProjectModal({ project, onClose, onStartSimilarProject }
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <Layers size={16} color="var(--brand-blue)" />
                 <span style={{ fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-dim)' }}>
-                  Architecture & Data Flow
+                  Architecture &amp; Data Flow
                 </span>
               </div>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.6, margin: 0 }}>
@@ -239,7 +497,7 @@ export default function ProjectModal({ project, onClose, onStartSimilarProject }
         {/* Modal Footer CTA */}
         <div
           style={{
-            padding: '1.5rem 2rem',
+            padding: '1.25rem 2rem',
             borderTop: '1px solid var(--border-glass)',
             background: 'rgba(7, 10, 17, 0.95)',
             display: 'flex',
@@ -249,31 +507,53 @@ export default function ProjectModal({ project, onClose, onStartSimilarProject }
             gap: '1rem'
           }}
         >
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
-            Interested in a similar system for your business?
-          </span>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {/* Mobile Prev / Next Pager */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              onClick={handlePrev}
+              disabled={!hasPrev}
+              className="btn btn-sm btn-outline"
+              style={{
+                opacity: hasPrev ? 1 : 0.4,
+                cursor: hasPrev ? 'pointer' : 'not-allowed',
+                padding: '0.35rem 0.65rem'
+              }}
+              title="Previous project"
+            >
+              <ChevronLeft size={15} />
+              <span>Prev</span>
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={!hasNext}
+              className="btn btn-sm btn-outline"
+              style={{
+                opacity: hasNext ? 1 : 0.4,
+                cursor: hasNext ? 'pointer' : 'not-allowed',
+                padding: '0.35rem 0.65rem'
+              }}
+              title="Next project"
+            >
+              <span>Next</span>
+              <ChevronRight size={15} />
+            </button>
+          </div>
+
+          {/* Action CTAs */}
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <button onClick={onClose} className="btn btn-outline" style={{ padding: '0.6rem 1.1rem' }}>
               Close
             </button>
-            <button
-              onClick={() => {
-                onClose();
-                if (onStartSimilarProject) {
-                  onStartSimilarProject(project);
-                } else {
-                  const inquiryUrl = `https://wa.me/916302690251?text=${encodeURIComponent(
-                    `Hi Lingaswamy, I am interested in building a solution similar to "${project.title}". Please share quotation & timeline.`
-                  )}`;
-                  window.open(inquiryUrl, '_blank', 'noopener,noreferrer');
-                }
-              }}
+            <a
+              href={whatsappInquiryUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn btn-cta-yellow"
-              style={{ padding: '0.6rem 1.25rem' }}
+              style={{ padding: '0.6rem 1.25rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              <span>Discuss Similar Project</span>
-              <ArrowRight size={15} />
-            </button>
+              <MessageCircle size={16} color="#0b1b4a" />
+              <span>Discuss on WhatsApp</span>
+            </a>
           </div>
         </div>
       </div>

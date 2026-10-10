@@ -86,6 +86,14 @@ export default function App() {
                   element={<ProjectsPage />}
                 />
                 <Route
+                  path="/projects/:slug"
+                  element={<ProjectsPage />}
+                />
+                <Route
+                  path="/portfolio/:slug"
+                  element={<ProjectsPage />}
+                />
+                <Route
                   path="/contact"
                   element={<ContactPage />}
                 />

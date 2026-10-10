@@ -4,11 +4,23 @@ import { buildWhatsAppUrl } from '../data/content';
 import { useQualityTier } from '../context/QualityTierContext';
 import TiltCard from './TiltCard';
 
+/**
+ * ProjectCoverflow Component:
+ * - 3D Perspective Coverflow Carousel on Desktop with mouse drag & touch swipe.
+ * - Native 60fps Scroll-Snap Carousel on Mobile.
+ * - Visual project preview graphic with tags and metrics.
+ * - Interactive slide selection & direct WhatsApp inquiry button.
+ */
 export default function ProjectCoverflow({ projects = [], onSelectProject }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { isFull, isReduced } = useQualityTier();
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef(null);
+
+  // Desktop Drag Scrubbing State
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragDiffRef = useRef(0);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -40,6 +52,29 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev < projects.length - 1 ? prev + 1 : 0));
+  };
+
+  // Mouse Drag Handlers for Desktop 3D Scrubbing
+  const onMouseDown = (e) => {
+    isDraggingRef.current = true;
+    dragStartXRef.current = e.clientX;
+    dragDiffRef.current = 0;
+  };
+
+  const onMouseMove = (e) => {
+    if (!isDraggingRef.current) return;
+    dragDiffRef.current = e.clientX - dragStartXRef.current;
+  };
+
+  const onMouseUp = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    if (dragDiffRef.current < -45) {
+      handleNext();
+    } else if (dragDiffRef.current > 45) {
+      handlePrev();
+    }
+    dragDiffRef.current = 0;
   };
 
   // Mobile Native Scroll-Snap Layout
@@ -85,24 +120,49 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
-                    padding: '1.5rem',
+                    padding: '1.25rem',
                     cursor: 'pointer'
                   }}
                   onClick={() => onSelectProject && onSelectProject(project)}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                    <span className={`badge ${tagClass}`}>{project.type || 'Custom Solution'}</span>
+                  {/* Visual Preview Image */}
+                  {project.image && (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '140px',
+                        background: 'rgba(5, 8, 16, 0.7)',
+                        borderRadius: 'var(--radius-md)',
+                        overflow: 'hidden',
+                        marginBottom: '0.85rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid rgba(255, 255, 255, 0.08)'
+                      }}
+                    >
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '0.5rem' }}
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                    <span className={`badge ${tagClass}`}>{project.type || project.domainLabel || 'Custom Solution'}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 600 }}>{project.domain?.toUpperCase()}</span>
                   </div>
 
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem' }}>{project.title}</h3>
-                  <p style={{ fontSize: '0.88rem', color: 'var(--text-body)', lineHeight: 1.5, flex: '1 0 auto', marginBottom: '1rem' }}>
-                    {project.shortDesc || project.description}
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '0.45rem' }}>{project.title}</h3>
+                  <p style={{ fontSize: '0.86rem', color: 'var(--text-body)', lineHeight: 1.5, flex: '1 0 auto', marginBottom: '1rem' }}>
+                    {project.shortDescription || project.shortDesc || project.description}
                   </p>
 
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
                     {(project.technologies || project.tech || []).slice(0, 3).map((t, i) => (
-                      <span key={i} style={{ fontSize: '0.72rem', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', background: 'var(--bg-glass)', border: '1px solid var(--border-glass)' }}>
+                      <span key={i} style={{ fontSize: '0.72rem', padding: '0.2rem 0.55rem', borderRadius: 'var(--radius-sm)', background: 'var(--bg-glass)', border: '1px solid var(--border-glass)' }}>
                         {t}
                       </span>
                     ))}
@@ -117,7 +177,7 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
                         onSelectProject && onSelectProject(project);
                       }}
                     >
-                      <span>Details</span>
+                      <span>Case Study</span>
                       <ArrowUpRight size={15} />
                     </button>
                     <a
@@ -127,6 +187,7 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
                       className="btn btn-cta-yellow"
                       style={{ padding: '0.55rem 0.85rem', fontSize: '0.85rem' }}
                       onClick={(e) => e.stopPropagation()}
+                      title="Enquire on WhatsApp"
                     >
                       <MessageCircle size={15} color="#0b1b4a" />
                     </a>
@@ -169,18 +230,23 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
   return (
     <div
       className="coverflow-3d-container"
+      onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseUp}
       style={{
         position: 'relative',
         width: '100%',
         perspective: '1200px',
-        padding: '2.5rem 0',
-        overflow: 'hidden'
+        padding: '2rem 0',
+        overflow: 'hidden',
+        cursor: 'grab'
       }}
     >
       <div
         style={{
           position: 'relative',
-          height: '460px',
+          height: '510px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
@@ -199,7 +265,7 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
           // Only render immediate neighbors to conserve DOM nodes & GPU
           if (absOffset > 2) return null;
 
-          const translateX = offset * 260; // Spread distance
+          const translateX = offset * 280; // Spread distance
           const translateZ = -absOffset * 150; // Depth back
           const rotateY = offset > 0 ? -28 : offset < 0 ? 28 : 0;
           const scale = offset === 0 ? 1.05 : 0.88;
@@ -218,7 +284,7 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
               }}
               style={{
                 position: 'absolute',
-                width: '360px',
+                width: '370px',
                 transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                 opacity,
                 zIndex,
@@ -231,37 +297,62 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
                 <div
                   className="card frosted-glass"
                   style={{
-                    height: '420px',
+                    height: '470px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    padding: '1.75rem',
+                    padding: '1.5rem',
                     borderRadius: 'var(--radius-xl)',
-                    border: offset === 0 ? '1.5px solid rgba(29, 92, 240, 0.45)' : '1px solid var(--border-glass)',
-                    boxShadow: offset === 0 ? '0 18px 45px rgba(0, 0, 0, 0.35), 0 0 25px rgba(29, 92, 240, 0.15)' : 'none'
+                    border: offset === 0 ? '1.5px solid rgba(29, 92, 240, 0.55)' : '1px solid var(--border-glass)',
+                    boxShadow: offset === 0 ? '0 18px 45px rgba(0, 0, 0, 0.4), 0 0 30px rgba(29, 92, 240, 0.2)' : 'none'
                   }}
                 >
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                      <span className={`badge ${tagClass}`}>{project.type || 'Custom Solution'}</span>
+                    {/* Visual Preview Graphic */}
+                    {project.image && (
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '145px',
+                          background: 'rgba(5, 8, 16, 0.75)',
+                          borderRadius: 'var(--radius-md)',
+                          overflow: 'hidden',
+                          marginBottom: '1rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '1px solid rgba(255, 255, 255, 0.08)'
+                        }}
+                      >
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '0.5rem' }}
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                      <span className={`badge ${tagClass}`}>{project.type || project.domainLabel || 'Custom Solution'}</span>
                       <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)', fontWeight: 600 }}>{project.domain?.toUpperCase()}</span>
                     </div>
 
-                    <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '0.75rem', color: 'var(--text-main)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
                       {project.title}
                     </h3>
 
-                    <p style={{ fontSize: '0.92rem', color: 'var(--text-body)', lineHeight: 1.55, marginBottom: '1.25rem' }}>
-                      {project.shortDesc || project.description}
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-body)', lineHeight: 1.5, marginBottom: '0.85rem' }}>
+                      {project.shortDescription || project.shortDesc || project.description}
                     </p>
 
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      {(project.technologies || project.tech || []).slice(0, 4).map((t, i) => (
+                    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                      {(project.technologies || project.tech || []).slice(0, 3).map((t, i) => (
                         <span
                           key={i}
                           style={{
-                            fontSize: '0.74rem',
-                            padding: '0.22rem 0.65rem',
+                            fontSize: '0.72rem',
+                            padding: '0.2rem 0.55rem',
                             borderRadius: 'var(--radius-sm)',
                             background: 'var(--bg-glass)',
                             border: '1px solid var(--border-glass)',
@@ -274,17 +365,17 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
                     <button
                       className="btn btn-outline"
-                      style={{ flex: 1, padding: '0.65rem', fontSize: '0.88rem' }}
+                      style={{ flex: 1, padding: '0.6rem', fontSize: '0.85rem' }}
                       onClick={(e) => {
                         e.stopPropagation();
                         onSelectProject && onSelectProject(project);
                       }}
                     >
                       <span>View Case Study</span>
-                      <ArrowUpRight size={16} />
+                      <ArrowUpRight size={15} />
                     </button>
 
                     <a
@@ -292,7 +383,7 @@ export default function ProjectCoverflow({ projects = [], onSelectProject }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-cta-yellow"
-                      style={{ padding: '0.65rem 0.95rem' }}
+                      style={{ padding: '0.6rem 0.95rem' }}
                       onClick={(e) => e.stopPropagation()}
                       title="Enquire on WhatsApp"
                     >

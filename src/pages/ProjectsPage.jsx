@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import PortfolioSection from '../components/PortfolioSection';
 import ContactSection from '../components/ContactSection';
 import { content, buildWhatsAppUrl } from '../data/content';
-import { MessageCircle, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { useData } from '../context/DataContext';
 
 export default function ProjectsPage() {
-  const whatsappUrl = buildWhatsAppUrl(
-    'Hi Lingaswamy, I am browsing your portfolio and would like to consult on my upcoming project.'
-  );
+  const { slug } = useParams();
+  const { projectsData } = useData() || {};
+  const allProjects = projectsData && projectsData.length > 0 ? projectsData : content.projects;
+  const currentProject = slug ? allProjects.find((p) => p.slug === slug || p.id === slug) : null;
+
+  useEffect(() => {
+    if (currentProject) {
+      document.title = `${currentProject.title} | Case Study - ZippyTechSystems`;
+    } else {
+      document.title = 'Projects & Portfolio Showcase | ZippyTechSystems';
+    }
+  }, [currentProject]);
 
   return (
     <main style={{ paddingTop: 'calc(var(--navbar-height) + 2rem)' }}>
@@ -44,8 +54,8 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Portfolio Grid with Web / App / AI filter */}
-      <PortfolioSection />
+      {/* Portfolio Grid with Web / App / AI filter and deep-link initial slug */}
+      <PortfolioSection initialSlug={slug} />
 
       {/* Direct Contact Form */}
       <ContactSection />

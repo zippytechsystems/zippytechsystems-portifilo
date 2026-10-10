@@ -30,7 +30,7 @@ export default function TiltCard({
     return (
       <div
         className={`tilt-card-fallback ${className}`}
-        style={style}
+        style={{ ...style, cursor: onClick ? 'pointer' : undefined }}
         onClick={onClick}
         {...props}
       >
