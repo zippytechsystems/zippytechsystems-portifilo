@@ -117,15 +117,14 @@ assert_test("Valid HMAC signature accepted", hash_equals($validSig, 'sha256=' . 
 assert_test("Invalid HMAC signature rejected", !hash_equals($validSig, $invalidSig));
 
 // -----------------------------------------------------------------------------
-// Test 5: Archive Folder Verification
+// Test 5: Pure Hostinger MySQL & Deployment Architecture (Zero Supabase/Vercel/Netlify)
 // -----------------------------------------------------------------------------
-$archiveDir = __DIR__ . '/../archive';
-assert_test("Archive folder exists", is_dir($archiveDir));
-assert_test("Supabase folder moved to archive", is_dir($archiveDir . '/supabase'));
-assert_test("supabase_schema.sql moved to archive", file_exists($archiveDir . '/supabase_schema.sql'));
-assert_test("import_from_supabase.php moved to archive", file_exists($archiveDir . '/import_from_supabase.php'));
-assert_test("No supabase folder in project root", !is_dir(__DIR__ . '/../supabase'));
-assert_test("No supabase_schema.sql in project root", !file_exists(__DIR__ . '/../supabase_schema.sql'));
+assert_test("Zero Supabase directory in project", !is_dir(__DIR__ . '/../supabase') && !is_dir(__DIR__ . '/../archive/supabase'));
+assert_test("Zero Supabase schema file in project", !file_exists(__DIR__ . '/../supabase_schema.sql') && !file_exists(__DIR__ . '/../archive/supabase_schema.sql'));
+assert_test("Zero Supabase client in src/lib", !file_exists(__DIR__ . '/../src/lib/supabase.js'));
+assert_test("Zero Vercel/Netlify deployment configs", !file_exists(__DIR__ . '/../vercel.json') && !file_exists(__DIR__ . '/../netlify.toml'));
+assert_test("Hostinger MySQL schema exists at database/schema.sql", file_exists(__DIR__ . '/../database/schema.sql'));
+assert_test("Hostinger Deployment Guide exists at DEPLOY.md", file_exists(__DIR__ . '/../DEPLOY.md'));
 
 // -----------------------------------------------------------------------------
 // Test 6: GitHub Workflow Check
@@ -135,6 +134,14 @@ $workflowContent = @file_get_contents($workflowFile) ?: '';
 assert_test("Workflow has check_ftp step", strpos($workflowContent, 'check_ftp') !== false);
 assert_test("Workflow uses steps.check_ftp.outputs.has_ftp", strpos($workflowContent, "steps.check_ftp.outputs.has_ftp == 'true'") !== false);
 assert_test("Workflow has no Supabase secret fallbacks", strpos($workflowContent, 'supabase.co') === false);
+
+// -----------------------------------------------------------------------------
+// Test 7: Admin Panel Privacy Shield (No Public Admin Email Exposure)
+// -----------------------------------------------------------------------------
+$adminPageContent = @file_get_contents(__DIR__ . '/../src/pages/AdminPage.jsx') ?: '';
+assert_test("AdminPage does not pre-fill email in state", strpos($adminPageContent, "useState('lingaswamymaddeboina@gmail.com')") === false);
+assert_test("AdminPage does not expose email placeholder", strpos($adminPageContent, 'placeholder="lingaswamymaddeboina@gmail.com"') === false);
+assert_test("AdminPage uses username input label", strpos($adminPageContent, 'Admin Username') !== false);
 
 echo "\n==========================================\n";
 echo "Results: $passCount / $totalCount tests passed successfully.\n";

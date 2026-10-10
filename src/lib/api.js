@@ -28,7 +28,7 @@ export function cleanPhone(phone) {
   return String(phone).replace(/[^0-9]/g, '');
 }
 
-export const isSupabaseConfigured = false;
+
 export const isBackendConfigured = true;
 
 // ---------------------------------------------------------------------------
@@ -671,7 +671,7 @@ export async function updateChatbotSettingsApi(settings) {
 
 export async function getChatSessionsApi() {
   try {
-    const data = await apiFetch('/index.php?endpoint=chatbot_messages');
+    const data = await apiFetch('/index.php?endpoint=chat_sessions');
     if (Array.isArray(data)) return data;
     return [];
   } catch (err) {
@@ -681,7 +681,7 @@ export async function getChatSessionsApi() {
 
 export async function getChatMessagesApi(sessionId) {
   try {
-    const data = await apiFetch(`/index.php?endpoint=chatbot_messages&session_id=${encodeURIComponent(sessionId)}`);
+    const data = await apiFetch(`/index.php?endpoint=chat_messages&session_id=${encodeURIComponent(sessionId)}`);
     if (Array.isArray(data)) return data;
     return [];
   } catch (err) {
@@ -691,7 +691,7 @@ export async function getChatMessagesApi(sessionId) {
 
 export async function deleteChatSessionApi(sessionId) {
   try {
-    const res = await apiFetch(`/index.php?endpoint=chatbot_messages&session_id=${encodeURIComponent(sessionId)}`, {
+    const res = await apiFetch(`/index.php?endpoint=chat_sessions&id=${encodeURIComponent(sessionId)}`, {
       method: 'DELETE'
     });
     return { success: true, ...res };

@@ -180,38 +180,45 @@ if (empty($replyText) && !empty($openaiKey)) {
 if (empty($replyText)) {
     $lower = strtolower($userText);
     if (strpos($lower, 'price') !== false || strpos($lower, 'cost') !== false || strpos($lower, 'quote') !== false) {
-        $replyText = "Hello! At ZippyTechSystems, our website development starts from ₹9,999, custom web applications from ₹24,999, and mobile apps from ₹49,999. Would you like a personalized quote? You can connect directly with our founder Lingaswamy on WhatsApp at +91 {$whatsapp}!";
+        $replyText = "Hello! At ZippyTechSystems, our starting prices are: Web Development Services from ₹6,500, App Development Services from ₹20,000, and AI Agent Development Services from ₹7,500. Would you like a personalized quote? You can connect directly with our founder Lingaswamy on WhatsApp at +91 {$whatsapp}!";
     } elseif (strpos($lower, 'service') !== false || strpos($lower, 'offer') !== false || strpos($lower, 'work') !== false) {
-        $replyText = "ZippyTechSystems specializes in full-stack web development, custom software, mobile apps (iOS & Android), UI/UX design, cloud solutions, and AI automation. What kind of project are you planning?";
+        $replyText = "ZippyTechSystems specializes in 3 core domains: 1) Web Development Services (from ₹6,500), 2) App Development Services (custom billing, inventory & accountant apps from ₹20,000), and 3) AI Agent Development Services (WhatsApp 24/7 bots & voice triage from ₹7,500). What kind of project are you planning?";
     } elseif (strpos($lower, 'contact') !== false || strpos($lower, 'call') !== false || strpos($lower, 'phone') !== false || strpos($lower, 'whatsapp') !== false) {
         $replyText = "You can reach us directly anytime!\n📞 Call/WhatsApp: +91 {$whatsapp}\n📧 Email: {$supportEmail}\nOur founder Lingaswamy is available to discuss your requirements.";
     } elseif (strpos($lower, 'hello') !== false || strpos($lower, 'hi') !== false || strpos($lower, 'hey') !== false) {
-        $replyText = "Hello! Welcome to ZippyTechSystems. I am your AI assistant. How can I help you elevate your business with modern web, mobile, or cloud solutions today?";
+        $replyText = "Hello! Welcome to ZippyTechSystems. I am your AI assistant. How can I help you elevate your business with modern Web Development, App Development, or AI Agent Automation today?";
     } else {
         $replyText = "Thank you for reaching out! ZippyTechSystems delivers top-tier software solutions tailored to your business goals. For instant pricing and project consultations, feel free to chat with our founder Lingaswamy on WhatsApp (+91 {$whatsapp}) or drop your requirements here!";
     }
 }
 
 // -----------------------------------------------------------------------------
-// Persist Message in MySQL (Chatbot Sessions & Messages)
+// Persist Message in MySQL (Chat Sessions & Messages)
 // -----------------------------------------------------------------------------
 if ($db !== null) {
     try {
         // Upsert session
         $sessStmt = $db->prepare('
-            INSERT INTO `chatbot_sessions` (`id`, `channel`, `message_count`, `last_message_at`)
-            VALUES (:id, :channel, 2, NOW())
-            ON DUPLICATE KEY UPDATE `message_count` = `message_count` + 2, `last_message_at` = NOW()
+            INSERT INTO `chat_sessions` (`id`, `session_id`, `channel`, `page_url`, `last_message_at`)
+            VALUES (:id, :sid, :channel, :url, NOW())
+            ON DUPLICATE KEY UPDATE `channel` = VALUES(`channel`), `page_url` = VALUES(`page_url`), `last_message_at` = NOW()
         ');
-        $sessStmt->execute([':id' => $sessionId, ':channel' => $channel]);
+        $sessStmt->execute([
+            ':id'      => $sessionId,
+            ':sid'     => $sessionId,
+            ':channel' => $channel,
+            ':url'     => $pageUrl,
+        ]);
 
         // Insert user message
         $mStmt = $db->prepare('
-            INSERT INTO `chatbot_messages` (`session_id`, `role`, `content`, `channel`, `page_url`, `created_at`)
-            VALUES (:sid, "user", :content, :channel, :url, NOW())
+            INSERT INTO `chat_messages` (`id`, `session_id`, `role`, `content`, `channel`, `page_url`, `created_at`)
+            VALUES (:id, :sid, :role, :content, :channel, :url, NOW())
         ');
         $mStmt->execute([
+            ':id'      => 'cmsg_' . bin2hex(random_bytes(8)),
             ':sid'     => $sessionId,
+            ':role'    => 'user',
             ':content' => $userText,
             ':channel' => $channel,
             ':url'     => $pageUrl,
@@ -219,7 +226,9 @@ if ($db !== null) {
 
         // Insert assistant reply
         $mStmt->execute([
+            ':id'      => 'cmsg_' . bin2hex(random_bytes(8)),
             ':sid'     => $sessionId,
+            ':role'    => 'assistant',
             ':content' => $replyText,
             ':channel' => $channel,
             ':url'     => $pageUrl,

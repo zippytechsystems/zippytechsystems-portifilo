@@ -119,17 +119,25 @@ const deployGuideContent = `# Hostinger Deployment Guide for ZippyTechSystems
    - **DB Password**: \`<your-password>\`
    - **DB Host**: \`localhost\`
 3. Open \`public_html/api/config.example.php\`.
-4. Copy or rename it to \`public_html/api/config.php\`:
+4. Copy or rename \`public_html/api/config.example.php\` to \`public_html/api/config.php\`:
    \`\`\`php
    <?php
-   define('DB_HOST', 'localhost');
-   define('DB_USER', 'u123456789_admin');
-   define('DB_PASS', 'your_password_here');
-   define('DB_NAME', 'u123456789_zippy');
-   define('GEMINI_API_KEY', 'your_gemini_api_key_here'); // Optional for AI Chat
-   define('ADMIN_PASSWORD_HASH', password_hash('YourStrongPassword', PASSWORD_DEFAULT));
+   return [
+       'db' => [
+           'host'     => 'localhost',
+           'port'     => 3306,
+           'dbname'   => 'u914601002_zippytech', // your Hostinger database name
+           'username' => 'u914601002_zippyuser', // your Hostinger database user
+           'password' => 'YOUR_STRONG_DATABASE_PASSWORD',
+           'charset'  => 'utf8mb4',
+       ],
+       // ... other settings as in config.example.php
+   ];
    \`\`\`
-5. Open \`https://zippysoftwares.in/api/index.php\` to test DB connection. The bootstrap script will automatically create necessary tables on first launch if configured.
+5. In Hostinger hPanel > Databases > phpMyAdmin, import \`database/schema.sql\`.
+6. Log in to the Admin Panel at \`https://zippysoftwares.in/admin\` using:
+   - **Username**: \`lingaswamymaddeboina\`
+   - **Password**: \`linga@123\`
 
 ---
 

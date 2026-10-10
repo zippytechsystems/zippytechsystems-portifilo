@@ -3,14 +3,14 @@
 > **Official Step-by-Step Implementation Guide**  
 > **Company**: ZippyTechSystems Pvt. Ltd.  
 > **Business WhatsApp Number**: `+91 63026 90251` (Configured dynamically via database / secrets)  
-> **Supabase Webhook URL**: `https://cdrwrbmabcyhxngvyrxh.supabase.co/functions/v1/whatsapp-webhook`
+> **Hostinger Webhook URL**: `https://zippysoftwares.in/api/whatsapp/webhook.php`
 
 ---
 
 ## 🔒 Security Notice
 > [!IMPORTANT]
-> **Never paste any API token, app secret, or credentials into chat windows or code repositories.**  
-> All secrets are configured strictly through your local terminal using the Supabase CLI (`supabase secrets set`).
+> **Never paste any API token, app secret, or credentials into public chat windows or code repositories.**  
+> All secrets are configured strictly on your Hostinger server in `api/config.php` or environment variables.
 
 ---
 
@@ -20,8 +20,8 @@
 3. [Step 3: Test with Meta's Free Test Number](#step-3-test-first-with-metas-free-test-number)
 4. [Step 4: Connect Real Number (+91 63026 90251) via Coexistence](#step-4-connect-the-real-number-6302690251-via-coexistence)
 5. [Step 5: Generate Permanent System User Token](#step-5-create-a-permanent-system-user-access-token)
-6. [Step 6: Configure Webhook & Subscriptions](#step-6-configure-the-supabase-webhook-in-meta)
-7. [Step 7: Set Supabase Secrets & Deploy Functions](#step-7-set-supabase-secrets--deploy-edge-functions)
+6. [Step 6: Configure Webhook & Subscriptions](#step-6-configure-the-hostinger-webhook-in-meta)
+7. [Step 7: Configure Hostinger api/config.php](#step-7-configure-hostinger-apiconfigphp)
 8. [Step 8: Message Templates (English, Telugu, Hindi)](#step-8-create-and-submit-message-templates)
 9. [Step 9: Payment Method & Spend Limits](#step-9-add-a-payment-method--set-spend-limit)
 10. [Step 10: WhatsApp Business Rules in Plain Language](#step-10-whatsapp-business-rules--policies-in-plain-language)
@@ -161,16 +161,16 @@ Temporary tokens expire after 24 hours. A **System User Access Token** never exp
 
 ---
 
-## Step 6: Configure the Supabase Webhook in Meta
+## Step 6: Configure the Hostinger Webhook in Meta
 
 1. In Meta Developer App, click **WhatsApp** in the left sidebar > click **Configuration**.
 2. Locate the **Webhook** section > click **Edit**:
    - **Callback URL**:  
-     `https://cdrwrbmabcyhxngvyrxh.supabase.co/functions/v1/whatsapp-webhook`
+     `https://zippysoftwares.in/api/whatsapp/webhook.php`
    - **Verify Token**:  
      Create a random secret string (e.g. `zippy_wa_verify_2026_secure_key`).  
-     *(You will set this same string as `WA_VERIFY_TOKEN` in Supabase).*
-   - Click **Verify and Save**. Meta sends a `GET` challenge request to your Supabase function. When verified, a green checkmark appears!
+     *(You will set this same string as `verify_token` in `api/config.php`).*
+   - Click **Verify and Save**. Meta sends a `GET` challenge request to your Hostinger PHP webhook. When verified, a green checkmark appears!
 3. Subscribe to Webhook Fields:
    - Under **Webhook fields**, click **Manage**.
    - Find **`messages`** > click **Subscribe**.
@@ -179,65 +179,34 @@ Temporary tokens expire after 24 hours. A **System User Access Token** never exp
 
 ---
 
-## Step 7: Set Supabase Secrets & Deploy Edge Functions
+## Step 7: Configure Hostinger api/config.php
 
-Run the following commands from your project root in PowerShell or Terminal.
+On your Hostinger server inside `public_html/api/config.php`, add your Meta WhatsApp credentials:
 
-### 1. Set Environment Secrets
+```php
+'whatsapp' => [
+    'phone_number_id' => 'your_phone_number_id_from_step_3_or_4',
+    'access_token'    => 'your_permanent_system_user_token_from_step_5',
+    'verify_token'    => 'your_verify_token_chosen_in_step_6',
+    'app_secret'      => 'your_app_secret_here',
+    'admin_to'        => '91XXXXXXXXXX', // Optional personal mobile for admin alerts
+],
+'gemini' => [
+    'api_key' => 'YOUR_GEMINI_API_KEY', // For AI Chat assistance
+],
+'mail' => [
+    'enabled'      => true,
+    'admin_email'  => 'lingaswamymaddeboina@gmail.com',
+],
+```
+
+The webhook (`api/whatsapp/webhook.php`) and outbound sender (`api/whatsapp/send.php`) automatically read this configuration and connect directly to your Hostinger MySQL database.
+### Automated Background Tasks on Hostinger (Optional)
+If you wish to run scheduled automated checks (e.g., follow-up queue or daily summaries), set up a Cron Job in Hostinger hPanel (**Advanced** > **Cron Jobs**):
 ```bash
-# Set Meta WhatsApp credentials
-supabase secrets set WA_PHONE_NUMBER_ID="your_phone_number_id_from_step_3_or_4"
-supabase secrets set WA_ACCESS_TOKEN="your_permanent_system_user_token_from_step_5"
-supabase secrets set WA_VERIFY_TOKEN="your_verify_token_chosen_in_step_6"
-
-# Meta App Secret (Found in Meta Developers > App Settings > Basic > App Secret)
-supabase secrets set WA_APP_SECRET="your_app_secret_here"
-
-# OPTIONAL Personal Number for Admin WhatsApp Alerts
-# IMPORTANT: WA_ADMIN_TO must NOT be 6302690251 (bot cannot message itself).
-# Provide your separate personal mobile number with country code (e.g., 919876543210).
-# If omitted or left empty, admin WhatsApp alerts are skipped silently and email is used.
-supabase secrets set WA_ADMIN_TO="91XXXXXXXXXX"
-
-# AI Model API Key (Anthropic Claude for live DB-grounded customer assistance)
-supabase secrets set ANTHROPIC_API_KEY="your_claude_api_key"
-
-# Email Notifications (Primary Admin Alert via Resend)
-supabase secrets set EMAIL_API_KEY="re_your_resend_key"
-supabase secrets set ADMIN_NOTIFY_EMAIL="lingaswamymaddeboina@gmail.com"
+/usr/bin/php /home/u914601002/domains/zippysoftwares.in/public_html/api/index.php?endpoint=daily_summary
 ```
-
-### 2. Deploy Edge Functions
-Deploy all 4 Edge Functions to Supabase:
-```bash
-# Webhook receiver (Meta verification, incoming messages, app echoes)
-supabase functions deploy whatsapp-webhook --no-verify-jwt
-
-# Sender function (Manual replies & template sender with 24h window enforcement)
-supabase functions deploy whatsapp-send
-
-# Queue worker (Processes pending automation queue items respecting quiet hours)
-supabase functions deploy whatsapp-automation-runner
-
-# Lead & enquiry notifications dispatcher
-supabase functions deploy notify-enquiry
-```
-
-### 3. Set Up Automation Cron Schedule
-In Supabase Dashboard > **Database** > **Extensions**, ensure `pg_cron` and `pg_net` are enabled.  
-Then in **SQL Editor**, schedule the automation runner to execute every 5 minutes:
-```sql
-SELECT cron.schedule(
-  'process-whatsapp-queue-every-5-min',
-  '*/5 * * * *',
-  $$
-  SELECT net.http_post(
-    url := 'https://cdrwrbmabcyhxngvyrxh.supabase.co/functions/v1/whatsapp-automation-runner',
-    headers := '{"Content-Type": "application/json"}'::jsonb
-  );
-  $$
-);
-```
+Runs once daily or every 5 minutes as needed.
 
 ---
 

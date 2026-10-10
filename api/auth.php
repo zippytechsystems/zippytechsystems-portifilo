@@ -98,22 +98,20 @@ if ($method === 'POST' && ($action === 'login' || empty($action))) {
         $isValid = password_verify($password, $user['password_hash']);
     }
 
-    // Fallback verification for default admin during fresh install / db config phase
-    if (!$isValid) {
+    // Fallback verification for default admin during fresh install / db unconfigured phase only
+    if (!$isValid && ($db === null || !$user)) {
         $defaultUser = 'lingaswamymaddeboina';
         $defaultEmail = 'lingaswamymaddeboina@gmail.com';
         $defaultPass = 'linga@123';
 
         if (($identifier === $defaultUser || $identifier === $defaultEmail || $identifier === 'lingaswamy') && $password === $defaultPass) {
             $isValid = true;
-            if (!$user) {
-                $user = [
-                    'id' => 1,
-                    'username' => $defaultUser,
-                    'email' => $defaultEmail,
-                    'role' => 'Administrator',
-                ];
-            }
+            $user = [
+                'id' => 1,
+                'username' => $defaultUser,
+                'email' => $defaultEmail,
+                'role' => 'Administrator',
+            ];
         }
     }
 

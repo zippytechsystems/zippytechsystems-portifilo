@@ -24,8 +24,8 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci
 
-      - name: 🔨 Build Vite production assets
-        run: npm run build
+      - name: 🔨 Package Hostinger production assets & backend
+        run: npm run package:hostinger
 
       - name: 🔍 Check Hostinger FTP credentials
         id: check_ftp
@@ -38,7 +38,7 @@ jobs:
             echo "FTP_SERVER secret not set. Deployment step will be skipped."
           fi
 
-      - name: 🚀 Deploy dist folder to Hostinger public_html
+      - name: 🚀 Deploy public_html folder to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         if: steps.check_ftp.outputs.has_ftp == 'true'
         with:
@@ -46,5 +46,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ./public_html/
-          local-dir: ./dist/
+          local-dir: ./hostinger-package/public_html/
           dangerous-clean-slate: false

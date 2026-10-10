@@ -107,7 +107,7 @@ VALUES (
   'https://www.instagram.com/zippytechsystems',
   'https://www.youtube.com/@zippytechsystems',
   'Lingaswamy Maddeboina',
-  'contact@zippysoftwares.in',
+  'info@zippysoftwares.in',
   'Thank you for contacting ZippyTechSystems. We received your enquiry and will contact you within 24 hours.',
   'ZippyTechSystems ను సంప్రదించినందుకు ధన్యవాదాలు. మీ విచారణ మాకు అందింది, మేము 24 గంటల్లో మిమ్మల్ని సంప్రదిస్తాము.',
   'ZippyTechSystems से संपर्क करने के लिए धन्यवाद। हमें आपकी पूछताछ मिल गई है और हम 24 घंटे के भीतर आपसे संपर्क करेंगे।'
@@ -325,6 +325,7 @@ CREATE TABLE IF NOT EXISTS `enquiries` (
   `notes` TEXT NULL,
   `whatsapp_opt_in` TINYINT(1) DEFAULT 0,
   `follow_up_at` DATETIME NULL,
+  `ip_address` VARCHAR(45) NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX `idx_enquiries_status` (`status`, `created_at`),
   INDEX `idx_enquiries_created` (`created_at`)
@@ -373,6 +374,7 @@ ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
 CREATE TABLE IF NOT EXISTS `chat_sessions` (
   `id` VARCHAR(36) PRIMARY KEY,
   `session_id` VARCHAR(100) NOT NULL UNIQUE,
+  `channel` VARCHAR(20) DEFAULT 'text',
   `started_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_message_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `page_url` VARCHAR(255) DEFAULT '',
@@ -388,6 +390,8 @@ CREATE TABLE IF NOT EXISTS `chat_messages` (
   `session_id` VARCHAR(100) NOT NULL,
   `role` ENUM('user', 'assistant') NOT NULL,
   `content` MEDIUMTEXT NOT NULL,
+  `channel` VARCHAR(20) DEFAULT 'text',
+  `page_url` VARCHAR(255) DEFAULT '',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX `idx_chat_msg_session` (`session_id`, `created_at`),
   CONSTRAINT `fk_chat_msg_session` FOREIGN KEY (`session_id`) REFERENCES `chat_sessions` (`session_id`) ON DELETE CASCADE

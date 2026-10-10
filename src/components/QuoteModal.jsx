@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, CheckCircle2, MessageCircle } from 'lucide-react';
 import { content, buildEnquiryWhatsAppUrl } from '../data/content';
+import { useData } from '../context/DataContext';
 
 export default function QuoteModal({ isOpen, onClose, defaultService = 'Web Development' }) {
+  const { saveEnquiry } = useData() || {};
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -41,9 +43,24 @@ export default function QuoteModal({ isOpen, onClose, defaultService = 'Web Deve
       return;
     }
 
+    const cleanDigits = formData.phone.replace(/[^0-9]/g, '');
+    if (saveEnquiry) {
+      try {
+        saveEnquiry({
+          name: formData.name.trim(),
+          phone: cleanDigits || formData.phone.trim(),
+          service: formData.service,
+          message: formData.details ? formData.details.trim() : 'Quote request from website modal',
+          source: 'quote'
+        });
+      } catch (err) {
+        console.warn('Quote saveEnquiry error:', err);
+      }
+    }
+
     const whatsappUrl = buildEnquiryWhatsAppUrl({
-      name: formData.name,
-      phone: formData.phone,
+      name: formData.name.trim(),
+      phone: cleanDigits || formData.phone.trim(),
       service: formData.service,
       message: formData.details
     });

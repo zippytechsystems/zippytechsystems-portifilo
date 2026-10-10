@@ -53,7 +53,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Login form state
-  const [loginEmail, setLoginEmail] = useState('lingaswamymaddeboina@gmail.com');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [resetMessage, setResetMessage] = useState('');
@@ -88,7 +88,7 @@ export default function AdminPage() {
 
   const handleForgotPassword = async () => {
     if (!loginEmail.trim()) {
-      setLoginError('Please enter your admin email above first.');
+      setLoginError('Please enter your admin username above first.');
       return;
     }
     setLoginError('');
@@ -96,7 +96,7 @@ export default function AdminPage() {
     const res = await resetPassword(loginEmail.trim());
     setResetLoading(false);
     if (res.success) {
-      setResetMessage(`Password reset link sent to ${loginEmail}. Please check your inbox.`);
+      setResetMessage('Password reset instructions sent. Please check your admin inbox.');
     } else {
       setLoginError(res.error || 'Failed to send reset link.');
     }
@@ -111,7 +111,7 @@ export default function AdminPage() {
     setLoginError('');
     const res = await login(loginEmail, loginPassword);
     if (!res.success) {
-      setLoginError(res.error || 'Invalid credentials. Only admin email is authorized.');
+      setLoginError(res.error || 'Invalid credentials. Please verify your admin username and password.');
     } else {
       showToast('Welcome, Lingaswamy! Logged in to Admin Suite.');
     }
@@ -188,17 +188,18 @@ export default function AdminPage() {
 
           <form onSubmit={handleLoginSubmit}>
             <div className="form-group" style={{ textAlign: 'left', marginBottom: '1rem' }}>
-              <label className="form-label" htmlFor="admin-email">
-                Admin Email / Username
+              <label className="form-label" htmlFor="admin-username">
+                Admin Username
               </label>
               <input
-                id="admin-email"
+                id="admin-username"
                 type="text"
                 required
                 className="form-input"
-                placeholder="lingaswamymaddeboina@gmail.com"
+                placeholder="Enter admin username"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
+                autoComplete="username"
               />
             </div>
 

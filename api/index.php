@@ -67,9 +67,12 @@ $tables = [
     'before_after'      => ['table' => 'before_after',     'pk' => 'id', 'order' => 'sort_order ASC'],
     'design_settings'   => ['table' => 'design_settings',  'pk' => 'id', 'single_row' => true],
     'chatbot_settings'  => ['table' => 'chatbot_settings', 'pk' => 'id', 'single_row' => true],
-    'chatbot_messages'  => ['table' => 'chatbot_messages', 'pk' => 'id', 'order' => 'created_at ASC'],
+    'chat_sessions'     => ['table' => 'chat_sessions',    'pk' => 'id', 'order' => 'last_message_at DESC'],
+    'chat_messages'     => ['table' => 'chat_messages',    'pk' => 'id', 'order' => 'created_at ASC'],
+    'chatbot_messages'  => ['table' => 'chat_messages',    'pk' => 'id', 'order' => 'created_at ASC'],
     'whatsapp_templates'=> ['table' => 'whatsapp_templates','pk' => 'id', 'order' => 'created_at DESC'],
-    'whatsapp_logs'     => ['table' => 'whatsapp_logs',    'pk' => 'id', 'order' => 'created_at DESC'],
+    'whatsapp_logs'     => ['table' => 'whatsapp_messages', 'pk' => 'id', 'order' => 'created_at DESC'],
+    'whatsapp_contacts' => ['table' => 'whatsapp_contacts', 'pk' => 'id', 'order' => 'updated_at DESC'],
 ];
 
 if (!isset($tables[$endpoint])) {
@@ -118,7 +121,7 @@ function format_row_output(array $row, string $endpoint, array $jsonFields): arr
 // -----------------------------------------------------------------------------
 if ($method === 'GET') {
     // Check permission for private endpoints
-    $adminOnlyGet = ['enquiries', 'chatbot_messages', 'whatsapp_logs', 'whatsapp_templates'];
+    $adminOnlyGet = ['enquiries', 'chatbot_messages', 'chat_messages', 'chat_sessions', 'whatsapp_logs', 'whatsapp_templates', 'whatsapp_contacts'];
     if (in_array($endpoint, $adminOnlyGet, true)) {
         require_admin();
     }
@@ -166,7 +169,7 @@ if ($method === 'GET') {
             $where[] = "`status` = :status";
             $params[':status'] = $_GET['status'];
         }
-        if (!empty($_GET['session_id']) && $endpoint === 'chatbot_messages') {
+        if (!empty($_GET['session_id']) && ($endpoint === 'chatbot_messages' || $endpoint === 'chat_messages')) {
             $where[] = "`session_id` = :session_id";
             $params[':session_id'] = $_GET['session_id'];
         }
@@ -221,29 +224,43 @@ if ($method === 'POST') {
             error_response('Please provide your name and either phone or email.', 400);
         }
 
+        $enquiryId = 'enq_' . bin2hex(random_bytes(8)) . '_' . time();
+        $source    = in_array($input['source'] ?? '', ['contact', 'quote', 'project', 'callback', 'chatbot', 'whatsapp', 'whatsapp-callback'], true)
+            ? $input['source']
+            : 'contact';
+        $optIn     = (!empty($input['whatsapp_opt_in']) || !empty($input['whatsappOptIn'])) ? 1 : 0;
+        $selected  = !empty($input['selected_services']) ? json_encode($input['selected_services']) : (!empty($input['selectedServices']) ? json_encode($input['selectedServices']) : null);
+        $budget    = !empty($input['budget_range']) ? (string)$input['budget_range'] : (!empty($input['budget']) ? (string)$input['budget'] : null);
+        $timeline  = !empty($input['timeline']) ? (string)$input['timeline'] : null;
+
         if ($db === null) {
-            // Still return success to prevent frontend crash
-            json_response(['success' => true, 'id' => time(), 'message' => 'Enquiry received.']);
+            // Still return success to prevent frontend crash in offline mode
+            json_response(['success' => true, 'id' => $enquiryId, 'message' => 'Enquiry received.']);
         }
 
         try {
             $stmt = $db->prepare('
-                INSERT INTO `enquiries` (`name`, `email`, `phone`, `service`, `message`, `status`, `ip_address`, `created_at`)
-                VALUES (:name, :email, :phone, :service, :message, "new", :ip, NOW())
+                INSERT INTO `enquiries` (`id`, `name`, `email`, `phone`, `service`, `message`, `status`, `source`, `whatsapp_opt_in`, `selected_services`, `budget_range`, `timeline`, `ip_address`, `created_at`)
+                VALUES (:id, :name, :email, :phone, :service, :message, "New", :source, :opt_in, :selected, :budget, :timeline, :ip, NOW())
             ');
             $stmt->execute([
-                ':name'    => $name,
-                ':email'   => $email,
-                ':phone'   => $phone,
-                ':service' => $service,
-                ':message' => $message,
-                ':ip'      => substr($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', 0, 45),
+                ':id'       => $enquiryId,
+                ':name'     => $name,
+                ':email'    => $email ?: null,
+                ':phone'    => $phone,
+                ':service'  => $service,
+                ':message'  => $message ?: null,
+                ':source'   => $source,
+                ':opt_in'   => $optIn,
+                ':selected' => $selected,
+                ':budget'   => $budget,
+                ':timeline' => $timeline,
+                ':ip'       => substr($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', 0, 45),
             ]);
-            $insertedId = (int)$db->lastInsertId();
 
             json_response([
                 'success' => true,
-                'id'      => $insertedId,
+                'id'      => $enquiryId,
                 'message' => 'Thank you! Your inquiry has been submitted. Our team will contact you shortly.',
             ]);
         } catch (PDOException $e) {

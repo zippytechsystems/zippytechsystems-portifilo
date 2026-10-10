@@ -50,7 +50,7 @@ export default function ContactSection() {
       return;
     }
 
-    // 1. Save to Supabase (or local fallback)
+    // 1. Save to Hostinger MySQL API (or local fallback)
     try {
       await saveEnquiry({
         name: formData.name.trim(),
