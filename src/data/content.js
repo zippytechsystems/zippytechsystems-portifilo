@@ -560,13 +560,13 @@ export const content = {
 
   // Navigation Links
   navLinks: [
-    { label: 'Home', path: '/' },
-    { label: 'Web Development', path: '/#web-development' },
-    { label: 'App Development', path: '/#app-development' },
-    { label: 'AI Agent Services', path: '/#ai-automation' },
-    { label: 'Portfolio', path: '/portfolio' },
-    { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' }
+    { label: 'Home', shortLabel: 'Home', path: '/' },
+    { label: 'Web Development', shortLabel: 'Web Dev', path: '/#web-development' },
+    { label: 'App Development', shortLabel: 'Apps', path: '/#app-development' },
+    { label: 'AI Agent Services', shortLabel: 'AI Agents', path: '/#ai-automation' },
+    { label: 'Portfolio', shortLabel: 'Portfolio', path: '/portfolio' },
+    { label: 'About', shortLabel: 'About', path: '/about' },
+    { label: 'Contact', shortLabel: 'Contact', path: '/contact' }
   ],
 
   // Footer Navigation

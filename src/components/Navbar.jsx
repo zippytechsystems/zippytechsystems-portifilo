@@ -173,42 +173,43 @@ export default function Navbar({ onOpenQuoteModal }) {
             gap: '0.75rem'
           }}
         >
-          {/* Brand Logo / Wordmark */}
+          {/* Brand Logo / Wordmark (Locked on Left: Unshrinkable, Full Visibility) */}
           <Link
             to="/"
             className="nav-brand-link"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.65rem',
+              gap: '0.75rem',
               textDecoration: 'none',
-              minWidth: 0,
-              flexShrink: 1
+              flexShrink: 0,
+              minWidth: 'max-content',
+              zIndex: 10
             }}
             aria-label="ZippyTechSystems Home"
           >
-            {/* Real Logo or Glowing Brand Icon */}
+            {/* Real Logo Box */}
             <div
               className="nav-brand-logo-box"
               style={{
-                width: '38px',
-                height: '38px',
+                width: '42px',
+                height: '42px',
                 borderRadius: '50%',
                 overflow: 'hidden',
                 background: '#070e24',
-                border: '1.5px solid rgba(255, 229, 0, 0.5)',
+                border: '1.5px solid rgba(255, 229, 0, 0.6)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 12px rgba(29, 92, 240, 0.35)',
+                boxShadow: '0 2px 14px rgba(29, 92, 240, 0.4)',
                 flexShrink: 0
               }}
             >
               <img
                 src="/images/company-logo-2026.png?v=20261011"
                 alt="ZippyTech Systems Logo"
-                width={38}
-                height={38}
+                width={42}
+                height={42}
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 onError={(e) => {
                   e.target.onerror = null;
@@ -217,13 +218,13 @@ export default function Navbar({ onOpenQuoteModal }) {
               />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 'max-content' }}>
               <span
                 className="nav-brand-title"
                 style={{
                   fontFamily: 'var(--font-display)',
                   fontWeight: 800,
-                  fontSize: '1.15rem',
+                  fontSize: '1.2rem',
                   letterSpacing: '-0.02em',
                   color: '#ffffff',
                   lineHeight: 1.15,
@@ -248,108 +249,111 @@ export default function Navbar({ onOpenQuoteModal }) {
             </div>
           </Link>
 
-          {/* Desktop Navigation Links with Frosted Glass Pill Container */}
-          <nav
-            style={{
-              display: 'none',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.35rem 0.6rem',
-              borderRadius: '9999px',
-              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid var(--border-glass)',
-              backdropFilter: 'blur(12px)'
-            }}
-            className="desktop-nav"
-            role="navigation"
-            aria-label="Main Navigation"
-          >
-            {content.navLinks.map((link) => {
-              const isContact = link.path === '/contact';
-              const isAbout = link.path === '/about';
-              const isPortfolio = link.path === '/portfolio' || link.path === '/projects';
-              const linkHash = link.path.includes('#') ? `#${link.path.split('#')[1]}` : '';
-
-              const isActive =
-                (linkHash && activeHash === linkHash) ||
-                (link.path === '/' && location.pathname === '/' && !location.hash) ||
-                (isContact && location.pathname === '/contact') ||
-                (isAbout && location.pathname === '/about') ||
-                (isPortfolio && (location.pathname === '/portfolio' || location.pathname === '/projects'));
-
-              return (
-                <a
-                  key={link.label}
-                  href={link.path}
-                  onClick={(e) => handleNavClick(link.path, e)}
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontWeight: isActive ? 700 : 500,
-                    fontSize: '0.88rem',
-                    color: isActive ? '#1d5cf0' : 'var(--text-main)',
-                    backgroundColor: isActive ? 'rgba(29, 92, 240, 0.12)' : 'transparent',
-                    padding: '0.45rem 0.85rem',
-                    borderRadius: '9999px',
-                    transition: 'all 0.2s ease',
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  {link.label}
-                </a>
-              );
-            })}
-
-            {/* Subtle Admin Link (muted grey, non-distracting) */}
-            <Link
-              to="/admin"
-              style={{
-                fontSize: '12px',
-                color: 'var(--text-dim)',
-                textDecoration: 'none',
-                fontWeight: 500,
-                padding: '0.45rem 0.65rem',
-                borderRadius: '9999px',
-                transition: 'color 0.2s ease',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#1d5cf0')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-dim)')}
-              title="Admin Portal"
-            >
-              <Shield size={12} />
-              <span>Admin</span>
-            </Link>
-          </nav>
-
-          {/* Right Action Cluster */}
+          {/* Right Header Cluster: Desktop Nav Options + Action Buttons Shifted Cleanly to the Right Side */}
           <div
-            className="nav-right-actions"
+            className="nav-right-cluster"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.65rem',
-              flexShrink: 0,
-              marginLeft: 'auto'
+              gap: '0.55rem',
+              marginLeft: 'auto',
+              flexShrink: 0
             }}
           >
-            {/* Quick Call Link (Desktop/Tablet) */}
+            {/* Desktop Navigation Links (Compact size, positioned on the right) */}
+            <nav
+              style={{
+                display: 'none',
+                alignItems: 'center',
+                gap: '0.2rem',
+                padding: '0.22rem 0.4rem',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(12px)'
+              }}
+              className="desktop-nav"
+              role="navigation"
+              aria-label="Main Navigation"
+            >
+              {content.navLinks.map((link) => {
+                const isContact = link.path === '/contact';
+                const isAbout = link.path === '/about';
+                const isPortfolio = link.path === '/portfolio' || link.path === '/projects';
+                const linkHash = link.path.includes('#') ? `#${link.path.split('#')[1]}` : '';
+
+                const isActive =
+                  (linkHash && activeHash === linkHash) ||
+                  (link.path === '/' && location.pathname === '/' && !location.hash) ||
+                  (isContact && location.pathname === '/contact') ||
+                  (isAbout && location.pathname === '/about') ||
+                  (isPortfolio && (location.pathname === '/portfolio' || location.pathname === '/projects'));
+
+                return (
+                  <a
+                    key={link.label}
+                    href={link.path}
+                    onClick={(e) => handleNavClick(link.path, e)}
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontWeight: isActive ? 700 : 500,
+                      fontSize: '0.80rem',
+                      color: isActive ? '#1d5cf0' : 'var(--text-main)',
+                      backgroundColor: isActive ? 'rgba(29, 92, 240, 0.12)' : 'transparent',
+                      padding: '0.32rem 0.58rem',
+                      borderRadius: '9999px',
+                      transition: 'all 0.2s ease',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {link.shortLabel || link.label}
+                  </a>
+                );
+              })}
+
+              {/* Subtle Admin Link */}
+              <Link
+                to="/admin"
+                style={{
+                  fontSize: '0.72rem',
+                  color: 'var(--text-dim)',
+                  textDecoration: 'none',
+                  fontWeight: 500,
+                  padding: '0.32rem 0.48rem',
+                  borderRadius: '9999px',
+                  transition: 'color 0.2s ease',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#1d5cf0')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-dim)')}
+                title="Admin Portal"
+              >
+                <Shield size={11} />
+                <span>Admin</span>
+              </Link>
+            </nav>
+
+            {/* Quick Call Link (Only on wide screens >= 1250px) */}
             <a
               href={`tel:+91${cleanPhone}`}
               className="btn btn-outline"
               style={{
                 display: 'none',
-                padding: '0.45rem 0.85rem',
-                fontSize: '0.82rem',
-                borderRadius: '9999px'
+                padding: '0.35rem 0.7rem',
+                fontSize: '0.78rem',
+                borderRadius: '9999px',
+                whiteSpace: 'nowrap'
               }}
               id="nav-call-btn"
               title="Call Lingaswamy Maddeboina"
             >
-              <Phone size={13} color="#12a150" />
+              <Phone size={12} color="#12a150" />
               <span>{activePhoneFormatted}</span>
             </a>
 
@@ -357,23 +361,24 @@ export default function Navbar({ onOpenQuoteModal }) {
             <button
               onClick={toggleTheme}
               style={{
-                padding: '0.45rem',
+                padding: '0.38rem',
                 borderRadius: '50%',
                 color: '#ffffff',
                 background: 'rgba(255, 255, 255, 0.08)',
                 border: '1px solid rgba(255, 255, 255, 0.16)',
                 lineHeight: 1,
-                minWidth: '38px',
-                minHeight: '38px',
+                minWidth: '36px',
+                minHeight: '36px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                flexShrink: 0
               }}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              {theme === 'dark' ? <Sun size={17} color="#ffe500" /> : <Moon size={17} color="#38bdf8" />}
+              {theme === 'dark' ? <Sun size={16} color="#ffe500" /> : <Moon size={16} color="#38bdf8" />}
             </button>
 
             {/* WhatsApp Direct CTA Button with Magnetic Pull */}
@@ -385,15 +390,17 @@ export default function Navbar({ onOpenQuoteModal }) {
                 className="btn btn-cta-yellow"
                 style={{
                   display: 'none',
-                  padding: '0.55rem 1.15rem',
-                  fontSize: '0.86rem',
+                  padding: '0.42rem 0.95rem',
+                  fontSize: '0.82rem',
                   borderRadius: '9999px',
-                  fontWeight: 700
+                  fontWeight: 700,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
                 }}
                 id="nav-whatsapp-cta"
               >
-                <MessageCircle size={15} color="#0b1b4a" />
-                <span>Get Quote on WhatsApp</span>
+                <MessageCircle size={14} color="#0b1b4a" />
+                <span>Get Quote</span>
               </a>
             </MagneticButton>
 
@@ -413,7 +420,8 @@ export default function Navbar({ onOpenQuoteModal }) {
                 border: '1.5px solid rgba(255, 229, 0, 0.65)',
                 color: '#ffe500',
                 cursor: 'pointer',
-                boxShadow: '0 2px 10px rgba(255, 229, 0, 0.25)'
+                boxShadow: '0 2px 10px rgba(255, 229, 0, 0.25)',
+                flexShrink: 0
               }}
               id="mobile-menu-trigger"
               aria-label="Open navigation menu"
@@ -603,20 +611,28 @@ export default function Navbar({ onOpenQuoteModal }) {
       <style>{`
         @media (min-width: 900px) {
           .desktop-nav {
-            display: flex !important;
-          }
-          #nav-whatsapp-cta {
             display: inline-flex !important;
           }
-          #nav-call-btn {
+          #nav-whatsapp-cta {
             display: inline-flex !important;
           }
           #mobile-menu-trigger {
             display: none !important;
           }
         }
+        @media (min-width: 1250px) {
+          #nav-call-btn {
+            display: inline-flex !important;
+          }
+        }
         @media (max-width: 899px) {
           .desktop-nav {
+            display: none !important;
+          }
+          #nav-whatsapp-cta {
+            display: none !important;
+          }
+          #nav-call-btn {
             display: none !important;
           }
           #mobile-menu-trigger {
