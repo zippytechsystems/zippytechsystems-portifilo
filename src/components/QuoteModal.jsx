@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, CheckCircle2, MessageCircle } from 'lucide-react';
+import { X, Send, CheckCircle2, MessageCircle, ArrowLeft } from 'lucide-react';
 import { content, buildEnquiryWhatsAppUrl } from '../data/content';
 import { useData } from '../context/DataContext';
 
@@ -18,11 +18,36 @@ export default function QuoteModal({ isOpen, onClose, defaultService = 'Web Deve
     setFormData((prev) => ({ ...prev, service: defaultService }));
   }, [defaultService]);
 
+  // Screen Back Motion & History Popstate integration
+  useEffect(() => {
+    if (!isOpen) return;
+    window.history.pushState({ zippyQuoteModal: true }, '');
+
+    const handlePopState = () => {
+      setSubmitted(false);
+      onClose();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isOpen, onClose]);
+
+  const handleBack = () => {
+    setSubmitted(false);
+    if (window.history.state && window.history.state.zippyQuoteModal) {
+      window.history.back();
+    } else {
+      onClose();
+    }
+  };
+
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleBack();
     };
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
@@ -114,22 +139,50 @@ export default function QuoteModal({ isOpen, onClose, defaultService = 'Web Deve
           border: '1px solid var(--border-glass-hover)'
         }}
       >
-        <button
-          onClick={handleClose}
-          style={{
-            position: 'absolute',
-            top: '1.25rem',
-            right: '1.25rem',
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--text-dim)',
-            cursor: 'pointer',
-            padding: '4px'
-          }}
-          aria-label="Close quote modal"
-        >
-          <X size={20} />
-        </button>
+        {/* Modal Header Bar with Back Button */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+          <button
+            type="button"
+            onClick={handleBack}
+            className="btn btn-sm btn-outline"
+            style={{
+              padding: '0.38rem 0.9rem',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              borderRadius: 'var(--radius-full)',
+              background: 'rgba(255, 255, 255, 0.12)',
+              borderColor: 'rgba(255, 255, 255, 0.28)',
+              color: '#ffffff',
+              cursor: 'pointer'
+            }}
+            aria-label="Back to website"
+          >
+            <ArrowLeft size={15} />
+            <span>← Back</span>
+          </button>
+
+          <button
+            onClick={handleBack}
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid var(--border-glass)',
+              borderRadius: '50%',
+              color: 'var(--text-dim)',
+              cursor: 'pointer',
+              width: '34px',
+              height: '34px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            aria-label="Close quote modal"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
         <span className="badge badge-yellow" style={{ marginBottom: '0.75rem' }}>
           FAST ESTIMATE
@@ -163,8 +216,14 @@ export default function QuoteModal({ isOpen, onClose, defaultService = 'Web Deve
             <p style={{ color: 'var(--text-body)', fontSize: '0.92rem', marginBottom: '1.5rem' }}>
               Your requirements have been prefilled in WhatsApp. Lingaswamy will respond shortly.
             </p>
-            <button onClick={handleClose} className="btn btn-outline" style={{ width: '100%' }}>
-              Close Window
+            <button
+              type="button"
+              onClick={handleBack}
+              className="btn btn-outline"
+              style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: '#ffffff' }}
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Website</span>
             </button>
           </div>
         ) : (
@@ -222,14 +281,34 @@ export default function QuoteModal({ isOpen, onClose, defaultService = 'Web Deve
               />
             </div>
 
-            <button
-              type="submit"
-              className="btn btn-cta-yellow"
-              style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', marginTop: '0.5rem' }}
-            >
-              <MessageCircle size={18} />
-              <span>Send via WhatsApp</span>
-            </button>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={handleBack}
+                className="btn btn-outline"
+                style={{
+                  flex: '0 0 auto',
+                  padding: '0.85rem 1.15rem',
+                  fontSize: '0.92rem',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  color: '#ffffff'
+                }}
+              >
+                <ArrowLeft size={16} />
+                <span>Back</span>
+              </button>
+              <button
+                type="submit"
+                className="btn btn-cta-yellow"
+                style={{ flex: '1 1 auto', padding: '0.85rem', fontSize: '1rem' }}
+              >
+                <MessageCircle size={18} />
+                <span>Send via WhatsApp</span>
+              </button>
+            </div>
           </form>
         )}
       </div>

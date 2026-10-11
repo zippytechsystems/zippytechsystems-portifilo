@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { X, Check, Cpu, Layers, Sparkles, ArrowRight, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Share2, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { X, Check, Cpu, Layers, Sparkles, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Share2, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { buildWhatsAppUrl } from '../data/content';
 
 /**
@@ -45,13 +45,36 @@ export default function ProjectModal({
     }
   };
 
+  // Screen Back Motion & History Popstate integration
+  useEffect(() => {
+    if (!project) return;
+    window.history.pushState({ zippyProjectModal: true }, '');
+
+    const handlePopState = () => {
+      onClose();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [project, onClose]);
+
+  const handleBack = () => {
+    if (window.history.state && window.history.state.zippyProjectModal) {
+      window.history.back();
+    } else {
+      onClose();
+    }
+  };
+
   // Keyboard navigation & body scroll lock (ONLY while project is selected)
   useEffect(() => {
     if (!project) return;
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleBack();
       } else if (e.key === 'ArrowLeft') {
         handlePrev();
       } else if (e.key === 'ArrowRight') {
@@ -240,6 +263,61 @@ export default function ProjectModal({
             position: 'relative'
           }}
         >
+          {/* Top Bar Navigation: Prominent Back button + Category Badge */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem', paddingRight: '120px', flexWrap: 'wrap', gap: '0.65rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleBack}
+                className="btn btn-sm btn-outline zippy-modal-back-btn"
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  padding: '0.42rem 0.95rem',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  background: 'rgba(255, 255, 255, 0.14)',
+                  borderColor: 'rgba(255, 255, 255, 0.35)',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+                }}
+                aria-label="Back to projects"
+                title="Back to projects list"
+              >
+                <ArrowLeft size={16} />
+                <span>← Back to Projects</span>
+              </button>
+
+              <span
+                className="badge"
+                style={{
+                  background: `${accentColor}18`,
+                  color: accentColor,
+                  border: `1px solid ${accentColor}35`,
+                  fontSize: '0.75rem',
+                  fontWeight: '700'
+                }}
+              >
+                {categoryLabel}
+              </span>
+
+              {category && category !== categoryLabel && (
+                <span style={{ fontSize: '0.82rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
+                  {category}
+                </span>
+              )}
+
+              {currentIndex >= 0 && (
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', opacity: 0.8 }}>
+                  ({currentIndex + 1} of {projects.length})
+                </span>
+              )}
+            </div>
+          </div>
+
           {/* Action buttons (Share, Zoom, Close) */}
           <div style={{ position: 'absolute', top: '1.25rem', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             {/* Share Deep-Link button */}
@@ -265,8 +343,8 @@ export default function ProjectModal({
 
             {/* Close button */}
             <button
-              onClick={onClose}
-              aria-label="Close modal"
+              onClick={handleBack}
+              aria-label="Close modal and return to projects"
               className="btn-icon-only"
               style={{
                 background: 'rgba(255, 255, 255, 0.08)',
@@ -283,30 +361,6 @@ export default function ProjectModal({
             >
               <X size={18} />
             </button>
-          </div>
-
-          {/* Badges & Category */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-            <span
-              className="badge"
-              style={{
-                background: `${accentColor}18`,
-                color: accentColor,
-                border: `1px solid ${accentColor}35`,
-                fontSize: '0.75rem',
-                fontWeight: '700'
-              }}
-            >
-              {type}
-            </span>
-            <span style={{ fontSize: '0.82rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
-              {category}
-            </span>
-            {currentIndex >= 0 && (
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', opacity: 0.8 }}>
-                ({currentIndex + 1} of {projects.length})
-              </span>
-            )}
           </div>
 
           <h2 id="modal-project-title" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', color: '#ffffff', marginBottom: '0.5rem' }}>
@@ -543,8 +597,22 @@ export default function ProjectModal({
 
           {/* Action CTAs */}
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <button onClick={onClose} className="btn btn-outline" style={{ padding: '0.6rem 1.1rem' }}>
-              Close
+            <button
+              type="button"
+              onClick={handleBack}
+              className="btn btn-outline"
+              style={{
+                padding: '0.6rem 1.15rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontWeight: 600,
+                color: '#ffffff'
+              }}
+              title="Return to projects showcase"
+            >
+              <ArrowLeft size={15} />
+              <span>Back to Projects</span>
             </button>
             <a
               href={whatsappInquiryUrl}

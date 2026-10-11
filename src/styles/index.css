@@ -473,10 +473,6 @@ a {
     margin-bottom: 2rem !important;
   }
 
-  .hero-logo-circle-tablet-only {
-    display: block !important;
-  }
-
   .hero-trust-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 1rem !important;
@@ -534,12 +530,15 @@ a {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 0 !important;
-    margin-bottom: 1rem !important;
+    gap: 0.75rem !important;
+    margin-bottom: 1.25rem !important;
+    flex-wrap: nowrap !important;
   }
-  /* On mobile phones, hide the secondary logo circle so CTAs are immediately above the fold */
-  .hero-logo-circle-tablet-only {
-    display: none !important;
+  .hero-mobile-circle-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
   }
   .hero-action-buttons-group {
     display: flex !important;

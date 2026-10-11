@@ -233,41 +233,46 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               </strong>
             </p>
 
-            {/* MOBILE & TABLET: 3D Rotating Circles Showcase (Founder on mobile, Founder + Logo on tablet) */}
+            {/* MOBILE & TABLET: Dual 3D Rotating Circles Showcase (Founder on Left, Company Logo on Right) */}
             <div
               className="hero-wing-mobile-dual"
               style={{
                 display: 'none',
                 justifyContent: 'center',
                 alignItems: 'center',
-                gap: '0.75rem',
-                marginBottom: '1.5rem',
-                flexWrap: 'wrap',
+                gap: '0.65rem',
+                marginBottom: '1.35rem',
+                flexWrap: 'nowrap',
                 maxWidth: '100%',
-                overflow: 'hidden'
+                overflow: 'visible'
               }}
             >
-              <Hero3DCircle
-                type="founder"
-                imageSrc="/images/founder-suit.webp?v=20261011"
-                fallbackSrc="/images/founder-suit.jpg?v=20261011"
-                title="Lingaswamy"
-                subtitle="Founded by ZippyTech"
-                badgeText="Founder Proof"
-                phone={phone}
-                accentColor="gold"
-                size={110}
-              />
-              <div className="hero-logo-circle-tablet-only">
+              {/* Left Circle: Founder Lingaswamy */}
+              <div className="hero-mobile-circle-wrapper">
+                <Hero3DCircle
+                  type="founder"
+                  imageSrc="/images/founder-suit.webp?v=20261011"
+                  fallbackSrc="/images/founder-suit.jpg?v=20261011"
+                  title="Lingaswamy"
+                  subtitle="Founder"
+                  badgeText="Founder Proof"
+                  phone={phone}
+                  accentColor="gold"
+                  size={95}
+                />
+              </div>
+
+              {/* Right Circle: Official ZippyTech Systems Logo */}
+              <div className="hero-mobile-circle-wrapper">
                 <Hero3DCircle
                   type="logo"
                   imageSrc="/images/company-logo-2026.png?v=20261011"
                   fallbackSrc="/images/company-logo-2026.webp?v=20261011"
-                  title="ZippyTech Systems"
+                  title="ZippyTech"
                   subtitle="Official Agency"
                   badgeText="Verified Agency"
                   accentColor="blue"
-                  size={110}
+                  size={95}
                 />
               </div>
             </div>

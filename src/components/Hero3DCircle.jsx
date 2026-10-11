@@ -324,14 +324,14 @@ export default function Hero3DCircle({
       {/* Floating Verification Glass Badge Below 3D Circle */}
       <div
         style={{
-          marginTop: '0.65rem',
+          marginTop: size <= 110 ? '0.45rem' : '0.65rem',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
-          maxWidth: `${size + 30}px`,
-          padding: '0.45rem 0.85rem',
-          borderRadius: '14px',
+          maxWidth: size <= 110 ? `${size + 15}px` : `${size + 30}px`,
+          padding: size <= 110 ? '0.28rem 0.5rem' : '0.45rem 0.85rem',
+          borderRadius: size <= 110 ? '10px' : '14px',
           background: 'rgba(7, 14, 38, 0.82)',
           border: '1px solid rgba(255, 255, 255, 0.14)',
           backdropFilter: 'blur(16px)',
@@ -345,22 +345,22 @@ export default function Hero3DCircle({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '0.3rem',
-            padding: '0.15rem 0.55rem',
+            gap: '0.25rem',
+            padding: size <= 110 ? '0.1rem 0.4rem' : '0.15rem 0.55rem',
             borderRadius: '9999px',
             background: isGold ? 'rgba(255, 229, 0, 0.15)' : 'rgba(0, 229, 255, 0.15)',
             border: isGold ? '1px solid rgba(255, 229, 0, 0.35)' : '1px solid rgba(0, 229, 255, 0.35)',
-            marginBottom: '0.25rem'
+            marginBottom: '0.2rem'
           }}
         >
           {isGold ? (
-            <Award size={11} color="#ffe500" />
+            <Award size={size <= 110 ? 9 : 11} color="#ffe500" />
           ) : (
-            <ShieldCheck size={11} color="#00e5ff" />
+            <ShieldCheck size={size <= 110 ? 9 : 11} color="#00e5ff" />
           )}
           <span
             style={{
-              fontSize: '0.68rem',
+              fontSize: size <= 110 ? '0.6rem' : '0.68rem',
               fontWeight: 700,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
@@ -374,11 +374,11 @@ export default function Hero3DCircle({
         {/* Primary Title (Crisp White Text) */}
         <span
           style={{
-            fontSize: '0.92rem',
+            fontSize: size <= 110 ? '0.78rem' : '0.92rem',
             fontWeight: 800,
             fontFamily: 'var(--font-display)',
             color: '#ffffff',
-            lineHeight: 1.2,
+            lineHeight: 1.15,
             letterSpacing: '-0.01em',
             textShadow: '0 2px 8px rgba(0, 0, 0, 0.6)'
           }}
@@ -389,10 +389,10 @@ export default function Hero3DCircle({
         {/* Secondary Subtitle / Proof Line */}
         <span
           style={{
-            fontSize: '0.72rem',
+            fontSize: size <= 110 ? '0.62rem' : '0.72rem',
             color: '#cbd5e1',
-            lineHeight: 1.3,
-            marginTop: '0.15rem',
+            lineHeight: 1.25,
+            marginTop: '0.1rem',
             fontWeight: 500
           }}
         >
@@ -400,7 +400,7 @@ export default function Hero3DCircle({
         </span>
 
         {/* Optional Direct Contact Line */}
-        {phone && (
+        {phone && size > 110 && (
           <div
             style={{
               marginTop: '0.35rem',

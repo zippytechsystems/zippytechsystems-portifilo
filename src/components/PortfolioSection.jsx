@@ -27,12 +27,31 @@ export default function PortfolioSection({ initialSlug }) {
     }
   }, [initialSlug, allProjects]);
 
+  // Handle Screen Back Motion & popstate for project modal
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      const isProjectUrl = path.startsWith('/portfolio/') || path.startsWith('/projects/');
+      if (!isProjectUrl) {
+        setSelectedProject(null);
+      } else {
+        const parts = path.split('/');
+        const currentSlug = parts[parts.length - 1];
+        const match = allProjects.find((p) => p.slug === currentSlug || p.id === currentSlug);
+        setSelectedProject(match || null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [allProjects]);
+
   const handleSelectProject = (project) => {
     setSelectedProject(project);
     if (project) {
       const slug = project.slug || project.id;
       const base = window.location.pathname.startsWith('/projects') ? '/projects' : '/portfolio';
-      window.history.pushState(null, '', `${base}/${slug}`);
+      window.history.pushState({ zippyProjectOpen: true, slug }, '', `${base}/${slug}`);
     }
   };
 

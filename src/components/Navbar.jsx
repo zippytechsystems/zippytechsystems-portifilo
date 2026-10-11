@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Sun, Moon, Phone, MessageCircle, ChevronRight, Shield } from 'lucide-react';
+import { Menu, X, Sun, Moon, Phone, MessageCircle, ChevronRight, Shield, ArrowLeft } from 'lucide-react';
 import { content, buildWhatsAppUrl } from '../data/content';
 import { useTheme } from '../context/ThemeContext';
 import { useData } from '../context/DataContext';
@@ -47,6 +47,29 @@ export default function Navbar({ onOpenQuoteModal }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [location.pathname]);
 
+  // Screen Back Motion & History Popstate integration for Mobile Menu Drawer
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      window.history.pushState({ zippyMobileMenu: true }, '');
+
+      const handlePopState = () => {
+        setMobileMenuOpen(false);
+      };
+
+      window.addEventListener('popstate', handlePopState);
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, [mobileMenuOpen]);
+
+  const handleCloseMobileMenu = () => {
+    setMobileMenuOpen(false);
+    if (window.history.state && window.history.state.zippyMobileMenu) {
+      window.history.back();
+    }
+  };
+
   // Lock body scroll and handle Escape key for Mobile Drawer
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -54,7 +77,7 @@ export default function Navbar({ onOpenQuoteModal }) {
 
       const handleKeyDown = (e) => {
         if (e.key === 'Escape') {
-          setMobileMenuOpen(false);
+          handleCloseMobileMenu();
         }
         // Basic focus trap inside mobile drawer
         if (e.key === 'Tab' && drawerRef.current) {
@@ -418,7 +441,7 @@ export default function Navbar({ onOpenQuoteModal }) {
           pointerEvents: mobileMenuOpen ? 'auto' : 'none',
           transition: 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
-        onClick={() => setMobileMenuOpen(false)}
+        onClick={handleCloseMobileMenu}
       >
         <div
           ref={drawerRef}
@@ -445,7 +468,7 @@ export default function Navbar({ onOpenQuoteModal }) {
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Drawer Header */}
+          {/* Drawer Header with Back Button */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
@@ -465,14 +488,38 @@ export default function Navbar({ onOpenQuoteModal }) {
                 </span>
               </div>
 
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="btn btn-outline"
-                style={{ minWidth: '44px', minHeight: '44px', borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                aria-label="Close navigation menu"
-              >
-                <X size={20} />
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <button
+                  type="button"
+                  onClick={handleCloseMobileMenu}
+                  className="btn btn-sm btn-outline"
+                  style={{
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '9999px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                    color: '#ffffff',
+                    cursor: 'pointer'
+                  }}
+                  aria-label="Back to website"
+                >
+                  <ArrowLeft size={14} />
+                  <span>Back</span>
+                </button>
+
+                <button
+                  onClick={handleCloseMobileMenu}
+                  className="btn btn-outline"
+                  style={{ minWidth: '40px', minHeight: '40px', borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  aria-label="Close navigation menu"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Navigation Links with 44px minimum tap targets */}

@@ -13,7 +13,8 @@ import {
   VolumeX,
   Square,
   Sliders,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { getOrCreateSessionId, resetChatSession, sendChatMessage } from '../lib/chatApi';
@@ -328,13 +329,38 @@ export default function ChatWidget() {
     setIsListening(false);
   };
 
-  // Close / Switch cleanup
+  // Close / Switch cleanup with browser history integration
   const handleClose = () => {
     stopSpeechPlayback();
     stopListening();
     setIsSpeakingBot(false);
     setIsOpen(false);
+    setIsVoiceMode(false);
+    if (window.history.state && window.history.state.zippyModal === 'chat') {
+      window.history.back();
+    }
   };
+
+  // Browser History & Screen Back Motion Integration:
+  // When chat/voice window opens, push state so hardware back button or swipe back gesture closes the assistant cleanly
+  useEffect(() => {
+    if (isOpen) {
+      window.history.pushState({ zippyModal: 'chat' }, '');
+
+      const handlePopState = () => {
+        stopSpeechPlayback();
+        stopListening();
+        setIsSpeakingBot(false);
+        setIsOpen(false);
+        setIsVoiceMode(false);
+      };
+
+      window.addEventListener('popstate', handlePopState);
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, [isOpen]);
 
   // Send voice message
   const handleSendVoiceMessage = async (transcriptText) => {
@@ -588,25 +614,63 @@ export default function ChatWidget() {
         >
           {/* Header */}
           <div className="zippy-chat-header">
-            <div className="zippy-chat-header-info">
-              <div className="zippy-chat-avatar" aria-hidden="true">
-                {isVoiceMode ? <Mic size={20} /> : <Bot size={20} />}
-              </div>
-              <div>
-                <h2 id="zippy-chat-title" className="zippy-chat-title">
-                  {isVoiceMode ? 'AI Voice Assistant' : 'ZippyTechSystems AI'}
-                </h2>
-                <div className="zippy-chat-status">
-                  <span className="zippy-status-dot" aria-hidden="true" />
-                  <span>
-                    {isVoiceMode
-                      ? isSpeakingBot
-                        ? 'Speaking (Female Voice)...'
-                        : isListening
-                        ? 'Listening to you...'
-                        : 'Voice Mode Active'
-                      : 'Live Enquiry Bot'}
-                  </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+              {/* Prominent Back Button (All Devices) */}
+              <button
+                type="button"
+                className="zippy-chat-back-btn"
+                onClick={() => {
+                  if (isVoiceMode) {
+                    stopSpeechPlayback();
+                    stopListening();
+                    setIsSpeakingBot(false);
+                    setIsVoiceMode(false);
+                  } else {
+                    handleClose();
+                  }
+                }}
+                title={isVoiceMode ? 'Back to Text Chat' : 'Back to Website'}
+                aria-label={isVoiceMode ? 'Back to Text Chat' : 'Back to Website'}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: 'rgba(255, 255, 255, 0.16)',
+                  border: '1px solid rgba(255, 255, 255, 0.35)',
+                  color: '#ffffff',
+                  borderRadius: '9999px',
+                  padding: '5px 12px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.25)'
+                }}
+              >
+                <ArrowLeft size={16} />
+                <span>Back</span>
+              </button>
+
+              <div className="zippy-chat-header-info" style={{ minWidth: 0 }}>
+                <div className="zippy-chat-avatar" aria-hidden="true">
+                  {isVoiceMode ? <Mic size={20} /> : <Bot size={20} />}
+                </div>
+                <div style={{ overflow: 'hidden' }}>
+                  <h2 id="zippy-chat-title" className="zippy-chat-title" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                    {isVoiceMode ? 'AI Voice Assistant' : 'ZippyTechSystems AI'}
+                  </h2>
+                  <div className="zippy-chat-status">
+                    <span className="zippy-status-dot" aria-hidden="true" />
+                    <span style={{ fontSize: '0.74rem' }}>
+                      {isVoiceMode
+                        ? isSpeakingBot
+                          ? 'Speaking (Voice)...'
+                          : isListening
+                          ? 'Listening to you...'
+                          : 'Voice Mode Active'
+                        : 'Live Enquiry Bot'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -658,7 +722,7 @@ export default function ChatWidget() {
               <button
                 className="zippy-chat-header-btn"
                 onClick={handleClose}
-                title="Close assistant"
+                title="Close assistant and return to website"
                 aria-label="Close assistant"
               >
                 <X size={18} />
@@ -671,6 +735,70 @@ export default function ChatWidget() {
           {/* ===================================================================== */}
           {isVoiceMode && (
             <div className="zippy-voice-dashboard">
+              {/* Prominent Voice Mode Back / Exit Bar */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '7px 12px',
+                  background: 'rgba(29, 92, 240, 0.22)',
+                  border: '1px solid rgba(29, 92, 240, 0.45)',
+                  borderRadius: '10px',
+                  marginBottom: '10px',
+                  gap: '8px'
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopSpeechPlayback();
+                    stopListening();
+                    setIsSpeakingBot(false);
+                    setIsVoiceMode(false);
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '5px 11px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    background: 'rgba(255, 255, 255, 0.12)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: '6px',
+                    color: '#ffffff',
+                    cursor: 'pointer'
+                  }}
+                  title="Switch to typing text"
+                >
+                  <ArrowLeft size={14} />
+                  <span>← Back to Typing</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '5px 11px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    background: 'rgba(239, 68, 68, 0.18)',
+                    border: '1px solid rgba(239, 68, 68, 0.45)',
+                    borderRadius: '6px',
+                    color: '#fca5a5',
+                    cursor: 'pointer'
+                  }}
+                  title="Exit voice mode and return to website"
+                >
+                  <X size={14} />
+                  <span>Exit to Website</span>
+                </button>
+              </div>
+
               {/* Language Selector Chips */}
               <div className="zippy-voice-lang-bar">
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginRight: '4px' }}>Language:</span>
