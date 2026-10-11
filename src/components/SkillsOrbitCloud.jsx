@@ -27,12 +27,21 @@ const ALL_SKILLS = [...ORBIT_INNER, ...ORBIT_OUTER];
  */
 export default function SkillsOrbitCloud() {
   const { isFull, isReduced } = useQualityTier();
+  const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
   const [rotationOffset, setRotationOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
 
   const dragStartXRef = useRef(0);
   const rotationRef = useRef(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Desktop Mouse Tilt effect
   const handleMouseMove = (e) => {
@@ -80,7 +89,7 @@ export default function SkillsOrbitCloud() {
   };
 
   // 1. Accessibility & Mobile Fallback: Clean Responsive Badge Grid
-  if (!isFull || isReduced) {
+  if (isMobile || !isFull || isReduced) {
     return (
       <div
         className="skills-grid-fallback"
@@ -88,10 +97,11 @@ export default function SkillsOrbitCloud() {
           width: '100%',
           maxWidth: '820px',
           margin: '0 auto',
-          padding: '1rem',
+          padding: '0.5rem',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: '1rem'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
+          gap: '0.75rem',
+          overflow: 'hidden'
         }}
       >
         {ALL_SKILLS.map((skill, idx) => {

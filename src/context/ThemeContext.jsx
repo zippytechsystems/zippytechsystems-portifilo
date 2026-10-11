@@ -5,9 +5,12 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     try {
+      const isUserSet = localStorage.getItem('zippy_theme_user_set') === 'true';
       const saved = localStorage.getItem('zippy_theme');
-      if (saved) return saved;
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      if (isUserSet && (saved === 'dark' || saved === 'light')) {
+        return saved;
+      }
+      return 'dark'; // Always default to dark theme!
     } catch {
       return 'dark';
     }
@@ -15,13 +18,17 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    try {
-      localStorage.setItem('zippy_theme', theme);
-    } catch {}
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('zippy_theme', next);
+        localStorage.setItem('zippy_theme_user_set', 'true');
+      } catch {}
+      return next;
+    });
   };
 
   return (

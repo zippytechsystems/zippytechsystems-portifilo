@@ -14,7 +14,7 @@ import TiltCard from './TiltCard';
 export default function ProjectCoverflow({ projects = [], onSelectProject }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { isFull, isReduced } = useQualityTier();
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
   const containerRef = useRef(null);
 
   // Desktop Drag Scrubbing State

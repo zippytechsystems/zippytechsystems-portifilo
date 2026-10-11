@@ -124,47 +124,52 @@ export default function Navbar({ onOpenQuoteModal }) {
   return (
     <>
       <header
+        className="main-navbar-header"
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 1000,
-          height: isScrolled ? '68px' : '78px',
+          zIndex: 9999,
+          height: isScrolled ? '66px' : '76px',
           transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          backgroundColor: 'var(--nav-bg)',
+          backgroundColor: isScrolled ? 'rgba(7, 12, 30, 0.94)' : 'rgba(7, 12, 30, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid var(--nav-border)',
-          boxShadow: isScrolled ? '0 10px 30px rgba(0, 0, 0, 0.15)' : 'none'
+          borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: isScrolled ? '0 10px 30px rgba(0, 0, 0, 0.35)' : 'none'
         }}
       >
         <div
-          className="container"
+          className="container nav-container-inner"
           style={{
             height: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '1rem'
+            gap: '0.75rem'
           }}
         >
           {/* Brand Logo / Wordmark */}
           <Link
             to="/"
+            className="nav-brand-link"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.75rem',
-              textDecoration: 'none'
+              gap: '0.65rem',
+              textDecoration: 'none',
+              minWidth: 0,
+              flexShrink: 1
             }}
             aria-label="ZippyTechSystems Home"
           >
             {/* Real Logo or Glowing Brand Icon */}
             <div
+              className="nav-brand-logo-box"
               style={{
-                width: '40px',
-                height: '40px',
+                width: '38px',
+                height: '38px',
                 borderRadius: '50%',
                 overflow: 'hidden',
                 background: '#070e24',
@@ -179,8 +184,8 @@ export default function Navbar({ onOpenQuoteModal }) {
               <img
                 src="/images/company-logo-2026.png?v=20261011"
                 alt="ZippyTech Systems Logo"
-                width={40}
-                height={40}
+                width={38}
+                height={38}
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 onError={(e) => {
                   e.target.onerror = null;
@@ -189,26 +194,30 @@ export default function Navbar({ onOpenQuoteModal }) {
               />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
               <span
+                className="nav-brand-title"
                 style={{
                   fontFamily: 'var(--font-display)',
                   fontWeight: 800,
                   fontSize: '1.15rem',
                   letterSpacing: '-0.02em',
-                  color: 'var(--text-main)',
-                  lineHeight: 1.15
+                  color: '#ffffff',
+                  lineHeight: 1.15,
+                  whiteSpace: 'nowrap'
                 }}
               >
                 ZippyTech<span style={{ color: '#1d5cf0' }}>Systems</span>
               </span>
               <span
+                className="nav-brand-subtitle"
                 style={{
-                  fontSize: '0.66rem',
-                  color: 'var(--text-dim)',
+                  fontSize: '0.64rem',
+                  color: '#94a3b8',
                   letterSpacing: '0.04em',
                   fontWeight: 600,
-                  textTransform: 'uppercase'
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 Innovate • Develop • Deliver
@@ -295,10 +304,13 @@ export default function Navbar({ onOpenQuoteModal }) {
 
           {/* Right Action Cluster */}
           <div
+            className="nav-right-actions"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.65rem'
+              gap: '0.65rem',
+              flexShrink: 0,
+              marginLeft: 'auto'
             }}
           >
             {/* Quick Call Link (Desktop/Tablet) */}
@@ -321,22 +333,24 @@ export default function Navbar({ onOpenQuoteModal }) {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="btn btn-outline"
               style={{
-                padding: '0.5rem',
+                padding: '0.45rem',
                 borderRadius: '50%',
-                color: 'var(--text-main)',
+                color: '#ffffff',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.16)',
                 lineHeight: 1,
-                minWidth: '40px',
-                minHeight: '40px',
+                minWidth: '38px',
+                minHeight: '38px',
                 display: 'inline-flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                cursor: 'pointer'
               }}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              {theme === 'dark' ? <Sun size={17} color="#ffe500" /> : <Moon size={17} color="#1d5cf0" />}
+              {theme === 'dark' ? <Sun size={17} color="#ffe500" /> : <Moon size={17} color="#38bdf8" />}
             </button>
 
             {/* WhatsApp Direct CTA Button with Magnetic Pull */}
@@ -363,21 +377,26 @@ export default function Navbar({ onOpenQuoteModal }) {
             {/* Mobile Hamburger Button (44px target) */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="btn btn-outline"
+              className="nav-mobile-menu-trigger"
               style={{
                 display: 'inline-flex',
-                padding: '0.55rem',
+                padding: '0.5rem',
                 borderRadius: '10px',
-                minWidth: '44px',
-                minHeight: '44px',
+                minWidth: '42px',
+                minHeight: '42px',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                background: 'rgba(255, 229, 0, 0.15)',
+                border: '1.5px solid rgba(255, 229, 0, 0.65)',
+                color: '#ffe500',
+                cursor: 'pointer',
+                boxShadow: '0 2px 10px rgba(255, 229, 0, 0.25)'
               }}
               id="mobile-menu-trigger"
               aria-label="Open navigation menu"
               aria-expanded={mobileMenuOpen}
             >
-              <Menu size={22} />
+              <Menu size={22} color="#ffe500" strokeWidth={2.4} />
             </button>
           </div>
         </div>
@@ -391,7 +410,7 @@ export default function Navbar({ onOpenQuoteModal }) {
         style={{
           position: 'fixed',
           inset: 0,
-          zIndex: 9999,
+          zIndex: 10000,
           backgroundColor: 'rgba(5, 10, 24, 0.75)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
@@ -547,6 +566,38 @@ export default function Navbar({ onOpenQuoteModal }) {
           }
           #mobile-menu-trigger {
             display: none !important;
+          }
+        }
+        @media (max-width: 899px) {
+          .desktop-nav {
+            display: none !important;
+          }
+          #mobile-menu-trigger {
+            display: inline-flex !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .main-navbar-header {
+            height: 60px !important;
+          }
+          .nav-container-inner {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+            gap: 0.35rem !important;
+          }
+          .nav-brand-logo-box {
+            width: 32px !important;
+            height: 32px !important;
+            flex-shrink: 0 !important;
+          }
+          .nav-brand-title {
+            font-size: 0.98rem !important;
+          }
+          .nav-brand-subtitle {
+            display: none !important;
+          }
+          .nav-brand-link {
+            gap: 0.4rem !important;
           }
         }
       `}</style>

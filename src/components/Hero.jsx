@@ -21,11 +21,14 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
 
   return (
     <section
+      className="hero-main-section"
       style={{
         position: 'relative',
         paddingTop: 'calc(var(--navbar-height) + 2.5rem)',
         paddingBottom: '3.5rem',
         overflow: 'hidden',
+        width: '100%',
+        maxWidth: '100vw',
         background: 'radial-gradient(ellipse at 50% 15%, #0b173e 0%, #070e24 70%, #050a1a 100%)',
         color: '#ffffff'
       }}
@@ -41,7 +44,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
           position: 'absolute',
           top: '-15%',
           left: '50%',
-          width: '900px',
+          width: 'min(900px, 98vw)',
+          maxWidth: '100%',
           height: '600px',
           background: `radial-gradient(circle at 35% 35%, rgba(0, 229, 255, 0.12) 0%, transparent 60%),
                        radial-gradient(circle at 75% 45%, rgba(29, 92, 240, 0.14) 0%, transparent 55%),
@@ -78,18 +82,21 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
         </video>
       )}
 
-      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '100%', overflow: 'hidden' }}>
         
         {/* Top Pill Badge (Centered at top of Hero) */}
-        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+        <div className="hero-top-badge-wrapper" style={{ textAlign: 'center', marginBottom: '1.75rem', padding: '0 0.5rem' }}>
           <div
             className="animate-float-badge"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.6rem',
-              padding: '0.45rem 1.25rem',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.45rem 1rem',
               borderRadius: '9999px',
+              maxWidth: '100%',
+              flexWrap: 'wrap',
               background: 'rgba(255, 255, 255, 0.07)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.35)',
@@ -99,21 +106,24 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
           >
             <span
               style={{
-                width: '9px',
-                height: '9px',
+                width: '8px',
+                height: '8px',
                 borderRadius: '50%',
                 background: '#10b981',
                 boxShadow: '0 0 10px #10b981',
-                display: 'inline-block'
+                display: 'inline-block',
+                flexShrink: 0
               }}
             />
             <span
               style={{
-                fontSize: '0.88rem',
+                fontSize: '0.84rem',
                 fontWeight: 600,
                 color: '#ffffff',
                 letterSpacing: '0.01em',
-                textShadow: '0 1px 4px rgba(0,0,0,0.5)'
+                textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                whiteSpace: 'normal',
+                textAlign: 'center'
               }}
             >
               Direct line to founder Lingaswamy:{' '}
@@ -123,7 +133,8 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
                   color: '#22c55e',
                   fontWeight: 700,
                   textDecoration: 'none',
-                  marginLeft: '0.2rem'
+                  marginLeft: '0.2rem',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 {phone}
@@ -182,11 +193,10 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             {/* Main Headline - Ultra-crisp pure white in all modes */}
             <h1
               id="hero-heading"
+              className="hero-headline-h1"
               style={{
-                marginBottom: '1.25rem',
                 lineHeight: 1.15,
                 fontWeight: 800,
-                fontSize: 'clamp(2.3rem, 4.4vw, 3.6rem)',
                 letterSpacing: '-0.025em',
                 color: '#ffffff',
                 textShadow: '0 4px 24px rgba(0, 0, 0, 0.9), 0 1px 4px rgba(0, 0, 0, 0.9)'
@@ -208,11 +218,9 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
 
             {/* Subtitle / Positioning - High Contrast Pure White Text */}
             <p
+              className="hero-positioning-p"
               style={{
-                fontSize: 'clamp(1.05rem, 1.8vw, 1.25rem)',
                 color: '#ffffff',
-                lineHeight: 1.6,
-                marginBottom: '2rem',
                 maxWidth: '680px',
                 marginLeft: 'auto',
                 marginRight: 'auto',
@@ -225,16 +233,18 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               </strong>
             </p>
 
-            {/* MOBILE & TABLET: Dual 3D Rotating Circles Showcase (Founder on Left, Logo on Right) */}
+            {/* MOBILE & TABLET: 3D Rotating Circles Showcase (Founder on mobile, Founder + Logo on tablet) */}
             <div
               className="hero-wing-mobile-dual"
               style={{
                 display: 'none',
                 justifyContent: 'center',
                 alignItems: 'center',
-                gap: '1rem',
-                marginBottom: '2rem',
-                flexWrap: 'wrap'
+                gap: '0.75rem',
+                marginBottom: '1.5rem',
+                flexWrap: 'wrap',
+                maxWidth: '100%',
+                overflow: 'hidden'
               }}
             >
               <Hero3DCircle
@@ -246,22 +256,25 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
                 badgeText="Founder Proof"
                 phone={phone}
                 accentColor="gold"
-                size={145}
+                size={110}
               />
-              <Hero3DCircle
-                type="logo"
-                imageSrc="/images/company-logo-2026.png?v=20261011"
-                fallbackSrc="/images/company-logo-2026.webp?v=20261011"
-                title="ZippyTech Systems"
-                subtitle="Official Agency"
-                badgeText="Verified Agency"
-                accentColor="blue"
-                size={145}
-              />
+              <div className="hero-logo-circle-tablet-only">
+                <Hero3DCircle
+                  type="logo"
+                  imageSrc="/images/company-logo-2026.png?v=20261011"
+                  fallbackSrc="/images/company-logo-2026.webp?v=20261011"
+                  title="ZippyTech Systems"
+                  subtitle="Official Agency"
+                  badgeText="Verified Agency"
+                  accentColor="blue"
+                  size={110}
+                />
+              </div>
             </div>
 
             {/* Primary Action Buttons */}
             <div
+              className="hero-action-buttons-group"
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
@@ -333,6 +346,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
 
         {/* Trust Points Grid (4 Pillars) - High Contrast Glass Cards with Crisp White Titles */}
         <div
+          className="hero-trust-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
@@ -355,6 +369,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             return (
               <div
                 key={trust.id}
+                className="hero-trust-card"
                 style={{
                   padding: '1.15rem',
                   borderRadius: '16px',

@@ -45,8 +45,10 @@ export default function ProjectModal({
     }
   };
 
-  // Keyboard navigation
+  // Keyboard navigation & body scroll lock (ONLY while project is selected)
   useEffect(() => {
+    if (!project) return;
+
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         onClose();
@@ -61,9 +63,9 @@ export default function ProjectModal({
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = '';
     };
-  }, [currentIndex, projects, onClose]);
+  }, [project, currentIndex, projects, onClose]);
 
   // Touch swipe detection
   const handleTouchStart = (e) => {

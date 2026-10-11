@@ -455,12 +455,14 @@ export default function PortfolioSection({ initialSlug }) {
         )}
 
         {/* Project Lightbox Modal */}
-        <ProjectModal
-          project={selectedProject}
-          projects={filteredProjects}
-          onSelectProject={handleSelectProject}
-          onClose={handleCloseProject}
-        />
+        {selectedProject && (
+          <ProjectModal
+            project={selectedProject}
+            projects={filteredProjects}
+            onSelectProject={handleSelectProject}
+            onClose={handleCloseProject}
+          />
+        )}
 
       </div>
     </section>

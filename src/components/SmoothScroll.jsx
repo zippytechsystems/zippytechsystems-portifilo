@@ -35,9 +35,19 @@ export default function SmoothScroll({ children }) {
       return;
     }
 
-    // 2. Check touch screen: native touch scrolling feels better and uses less power
-    const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    if (isTouch) {
+    // 2. Check touch screen or screens under 1024px: native momentum scrolling is optimal and never locks
+    const isTouch =
+      (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0;
+    const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 1024;
+
+    if (isTouch || isSmallScreen) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+        window.__lenis = null;
+      }
       return;
     }
 
@@ -86,11 +96,9 @@ export default function SmoothScroll({ children }) {
       }
     }
 
-    // Scroll to top on navigation
+    // Scroll to top on navigation (Lenis desktop only; native scroller is handled by ScrollToTop)
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo(0, 0);
     }
   }, [location.pathname, location.hash, isAdminRoute]);
 
