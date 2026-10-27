@@ -7,6 +7,7 @@
     "prebuild": "node -e \"import fs from 'fs'; if (fs.existsSync('index.source.html')) fs.copyFileSync('index.source.html', 'index.html');\"",
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node -e \"import fs from 'fs'; if (fs.existsSync('dist/index.html')) fs.copyFileSync('dist/index.html', 'index.html'); if (fs.existsSync('dist/assets')) { if (!fs.existsSync('assets')) fs.mkdirSync('assets'); fs.cpSync('dist/assets', 'assets', { recursive: true }); }\"",
     "optimize-images": "node scripts/optimize-images.mjs",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "verify": "node scripts/smoke-test.mjs",
