@@ -156,11 +156,11 @@ export default function Navbar({ onOpenQuoteModal }) {
           zIndex: 9999,
           height: isScrolled ? '66px' : '76px',
           transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          backgroundColor: isScrolled ? 'rgba(7, 12, 30, 0.94)' : 'rgba(7, 12, 30, 0.85)',
+          backgroundColor: isScrolled ? 'var(--nav-bg)' : 'var(--bg-glass)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.08)',
-          boxShadow: isScrolled ? '0 10px 30px rgba(0, 0, 0, 0.35)' : 'none'
+          borderBottom: '1px solid var(--nav-border)',
+          boxShadow: isScrolled ? '0 4px 20px rgba(15, 23, 42, 0.06)' : 'none'
         }}
       >
         <div
@@ -231,7 +231,7 @@ export default function Navbar({ onOpenQuoteModal }) {
                   whiteSpace: 'nowrap'
                 }}
               >
-                Zippy<span style={{ color: '#1d5cf0' }}>Enterprises</span>
+                Zippy<span style={{ color: '#0062e0' }}>Enterprises</span>
               </span>
               <span
                 className="nav-brand-subtitle"
@@ -378,7 +378,7 @@ export default function Navbar({ onOpenQuoteModal }) {
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              {theme === 'dark' ? <Sun size={16} color="#ffe500" /> : <Moon size={16} color="#38bdf8" />}
+              {theme === 'dark' ? <Sun size={16} color="#f59e0b" /> : <Moon size={16} color="#0062e0" />}
             </button>
 
             {/* WhatsApp Direct CTA Button with Magnetic Pull */}
@@ -427,7 +427,7 @@ export default function Navbar({ onOpenQuoteModal }) {
               aria-label="Open navigation menu"
               aria-expanded={mobileMenuOpen}
             >
-              <Menu size={22} color="#ffe500" strokeWidth={2.4} />
+              <Menu size={22} color="#0062e0" strokeWidth={2.4} />
             </button>
           </div>
         </div>

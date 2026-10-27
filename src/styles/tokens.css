@@ -1,52 +1,50 @@
 /* ==========================================================================
    Zippy Enterprises Private Limited — Design Tokens & Theme Variables
-   Brand Colors:
-   - Navy:   #0b1b4a (Brand foundation)
-   - Blue:   #1d5cf0 (Web Development Domain)
-   - Green:  #12a150 (App Development Domain & WhatsApp)
-   - Purple: #7a2fd0 (AI Automation Domain)
-   - Yellow: #ffe500 (Primary Highlight / CTA)
-   - Light:  #f6f9ff (Light background canvas)
+   Enterprise White Theme (Microsoft & Amazon Corporate Portfolio Aesthetic)
    ========================================================================== */
 
 :root {
   /* Brand Core Static Tokens */
-  --brand-navy: #0b1b4a;
-  --brand-blue: #1d5cf0;
-  --brand-green: #12a150;
-  --brand-purple: #7a2fd0;
-  --brand-yellow: #ffe500;
-  --brand-light-bg: #f6f9ff;
+  --brand-navy: #0f172a;
+  --brand-blue: #0062e0;
+  --brand-green: #059669;
+  --brand-purple: #7c3aed;
+  --brand-yellow: #f59e0b;
+  --brand-light-bg: #ffffff;
 
-  /* Domain Color Mapping */
-  --domain-web: #1d5cf0;
-  --domain-web-glow: rgba(29, 92, 240, 0.28);
-  --domain-web-bg: rgba(29, 92, 240, 0.08);
+  /* Domain Color Mapping (Microsoft Azure & Amazon Cloud standards) */
+  --domain-web: #0062e0;
+  --domain-web-glow: rgba(0, 98, 224, 0.22);
+  --domain-web-bg: #eff6ff;
 
-  --domain-app: #12a150;
-  --domain-app-glow: rgba(18, 161, 80, 0.28);
-  --domain-app-bg: rgba(18, 161, 80, 0.08);
+  --domain-app: #059669;
+  --domain-app-glow: rgba(5, 150, 105, 0.22);
+  --domain-app-bg: #ecfdf5;
 
-  --domain-ai: #7a2fd0;
-  --domain-ai-glow: rgba(122, 47, 208, 0.28);
-  --domain-ai-bg: rgba(122, 47, 208, 0.08);
+  --domain-ai: #7c3aed;
+  --domain-ai-glow: rgba(124, 58, 237, 0.22);
+  --domain-ai-bg: #f5f3ff;
 
   /* Highlight / CTA */
-  --cta-yellow: #ffe500;
-  --cta-yellow-hover: #ffed33;
-  --cta-yellow-text: #0b1b4a;
+  --cta-yellow: #0062e0;
+  --cta-yellow-hover: #0052be;
+  --cta-yellow-text: #ffffff;
+
+  --cta-gold: #f59e0b;
+  --cta-gold-hover: #d97706;
+  --cta-gold-text: #ffffff;
 
   /* Typography */
   --font-display: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Radii */
+  /* Radii (Enterprise Clean Edges) */
   --radius-xs: 4px;
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
 
   /* Layout */
@@ -65,18 +63,96 @@
   --z-modal: 1000;
   --z-floating: 1050;
   --z-toast: 1100;
+
   /* Domain Gradients */
-  --gradient-web: linear-gradient(135deg, #1d5cf0 0%, #00c6ff 100%);
-  --gradient-app: linear-gradient(135deg, #12a150 0%, #10b981 100%);
-  --gradient-ai: linear-gradient(135deg, #7a2fd0 0%, #a855f7 100%);
-  --gradient-yellow: linear-gradient(135deg, #ffe500 0%, #ffc800 100%);
-  --glass-blur: 14px;
+  --gradient-web: linear-gradient(135deg, #0062e0 0%, #0284c7 100%);
+  --gradient-app: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --gradient-ai: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  --gradient-yellow: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  --glass-blur: 16px;
+
+  /* --------------------------------------------------------------------------
+     Default Theme: Pure White Enterprise Theme (:root & [data-theme='light'])
+     Inspired by Microsoft Surface / Azure & Amazon AWS / About Amazon Portfolios
+     -------------------------------------------------------------------------- */
+  color-scheme: light;
+
+  --bg-canvas: #ffffff;
+  --bg-surface: #f8fafc;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.94);
+  --bg-glass-subtle: rgba(15, 23, 42, 0.03);
+
+  /* Frosted Glass Tokens */
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: #e2e8f0;
+  --glass-border-hover: #cbd5e1;
+  --glass-fallback-bg: #ffffff;
+
+  --border-subtle: #e2e8f0;
+  --border-glass: #e2e8f0;
+  --border-glass-hover: #cbd5e1;
+
+  --text-main: #0f172a;
+  --text-body: #334155;
+  --text-dim: #64748b;
+  --text-contrast: #0f172a;
+
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --nav-border: #e2e8f0;
+
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(15, 23, 42, 0.05);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.05), 0 16px 36px rgba(15, 23, 42, 0.08);
+
+  --hero-bg: radial-gradient(ellipse at 50% 0%, rgba(0, 98, 224, 0.06) 0%, #f8fafc 55%, #ffffff 100%);
+  --hero-mesh-1: rgba(0, 98, 224, 0.07);
+  --hero-mesh-2: rgba(124, 58, 237, 0.05);
+  --hero-mesh-3: rgba(16, 185, 129, 0.04);
+}
+
+/* Explicit Light Theme Token Mirroring */
+[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-canvas: #ffffff;
+  --bg-surface: #f8fafc;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.94);
+  --bg-glass-subtle: rgba(15, 23, 42, 0.03);
+
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: #e2e8f0;
+  --glass-border-hover: #cbd5e1;
+  --glass-fallback-bg: #ffffff;
+
+  --border-subtle: #e2e8f0;
+  --border-glass: #e2e8f0;
+  --border-glass-hover: #cbd5e1;
+
+  --text-main: #0f172a;
+  --text-body: #334155;
+  --text-dim: #64748b;
+  --text-contrast: #0f172a;
+
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --nav-border: #e2e8f0;
+
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(15, 23, 42, 0.05);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.05), 0 16px 36px rgba(15, 23, 42, 0.08);
+
+  --hero-bg: radial-gradient(ellipse at 50% 0%, rgba(0, 98, 224, 0.06) 0%, #f8fafc 55%, #ffffff 100%);
+  --hero-mesh-1: rgba(0, 98, 224, 0.07);
+  --hero-mesh-2: rgba(124, 58, 237, 0.05);
+  --hero-mesh-3: rgba(16, 185, 129, 0.04);
 }
 
 /* --------------------------------------------------------------------------
-   Default / Dark Theme [data-theme="dark"]
+   Dark Theme [data-theme="dark"] (Supported on toggle)
    -------------------------------------------------------------------------- */
-:root,
 [data-theme='dark'] {
   color-scheme: dark;
 
@@ -88,7 +164,6 @@
   --bg-glass: rgba(11, 20, 45, 0.82);
   --bg-glass-subtle: rgba(255, 255, 255, 0.03);
 
-  /* Frosted Glass Tokens */
   --glass-bg: rgba(11, 20, 45, 0.72);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-border-hover: rgba(255, 255, 255, 0.22);
@@ -103,54 +178,14 @@
   --text-dim: #64748b;
   --text-contrast: #ffffff;
 
-  --nav-bg: rgba(7, 12, 30, 0.85);
+  --nav-bg: rgba(7, 12, 30, 0.94);
   --nav-border: rgba(255, 255, 255, 0.08);
 
   --card-shadow: 0 8px 32px rgba(2, 6, 20, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --card-shadow-hover: 0 16px 48px rgba(2, 6, 20, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.16);
 
+  --hero-bg: radial-gradient(ellipse at 50% 15%, #0b173e 0%, #070e24 70%, #050a1a 100%);
   --hero-mesh-1: rgba(29, 92, 240, 0.16);
   --hero-mesh-2: rgba(122, 47, 208, 0.14);
   --hero-mesh-3: rgba(18, 161, 80, 0.08);
 }
-
-/* --------------------------------------------------------------------------
-   Light Theme [data-theme="light"]
-   -------------------------------------------------------------------------- */
-[data-theme='light'] {
-  color-scheme: light;
-
-  --bg-canvas: #f6f9ff;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #edf3fc;
-  --bg-card: rgba(255, 255, 255, 0.92);
-  --bg-card-hover: #ffffff;
-  --bg-glass: rgba(246, 249, 255, 0.88);
-  --bg-glass-subtle: rgba(11, 27, 74, 0.03);
-
-  /* Frosted Glass Tokens */
-  --glass-bg: rgba(255, 255, 255, 0.78);
-  --glass-border: rgba(11, 27, 74, 0.12);
-  --glass-border-hover: rgba(11, 27, 74, 0.22);
-  --glass-fallback-bg: #ffffff;
-
-  --border-subtle: rgba(11, 27, 74, 0.08);
-  --border-glass: rgba(11, 27, 74, 0.12);
-  --border-glass-hover: rgba(11, 27, 74, 0.25);
-
-  --text-main: #0b1b4a;
-  --text-body: #334155;
-  --text-dim: #64748b;
-  --text-contrast: #0b1b4a;
-
-  --nav-bg: rgba(7, 12, 30, 0.94);
-  --nav-border: rgba(255, 255, 255, 0.08);
-
-  --card-shadow: 0 4px 20px rgba(11, 27, 74, 0.06), 0 1px 3px rgba(11, 27, 74, 0.04);
-  --card-shadow-hover: 0 12px 36px rgba(11, 27, 74, 0.12), 0 2px 6px rgba(11, 27, 74, 0.06);
-
-  --hero-mesh-1: rgba(29, 92, 240, 0.08);
-  --hero-mesh-2: rgba(122, 47, 208, 0.06);
-  --hero-mesh-3: rgba(18, 161, 80, 0.05);
-}
-

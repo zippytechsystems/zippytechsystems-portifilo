@@ -31,6 +31,8 @@ body {
   max-width: 100%;
   overflow-x: hidden;
   background-color: var(--bg-canvas);
+  background-image: radial-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
   color: var(--text-main);
   font-family: var(--font-sans);
   font-size: 1rem;
@@ -42,6 +44,10 @@ body {
   overscroll-behavior-y: auto;
   touch-action: pan-y;
   transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+[data-theme='dark'] body {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
 }
 
 #root, .app-layout {
@@ -146,66 +152,68 @@ a {
   transform: scale(0.98);
 }
 
-/* Primary Yellow CTA Button (High Contrast) */
+/* Primary Azure / Enterprise CTA Button */
 .btn-cta-yellow {
-  background-color: var(--cta-yellow);
-  color: var(--cta-yellow-text);
+  background: linear-gradient(135deg, #0062e0 0%, #004fb8 100%);
+  color: #ffffff;
   font-weight: 700;
-  border-color: rgba(11, 27, 74, 0.15);
-  box-shadow: 0 4px 14px rgba(255, 229, 0, 0.35);
+  border: 1px solid rgba(0, 98, 224, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 98, 224, 0.25);
 }
 .btn-cta-yellow:hover {
-  background-color: var(--cta-yellow-hover);
+  background: linear-gradient(135deg, #0052be 0%, #003f99 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 229, 0, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 98, 224, 0.35);
 }
 
 /* Green WhatsApp Button */
 .btn-whatsapp {
-  background-color: #12a150;
+  background-color: #059669;
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(18, 161, 80, 0.3);
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
 }
 .btn-whatsapp:hover {
-  background-color: #0e8541;
+  background-color: #047857;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(18, 161, 80, 0.45);
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
 }
 
 /* Blue Web Domain Button */
 .btn-web {
-  background-color: #1d5cf0;
+  background-color: #0062e0;
   color: #ffffff;
 }
 .btn-web:hover {
-  background-color: #164ac7;
+  background-color: #0052be;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--domain-web-glow);
 }
 
 /* Purple AI Domain Button */
 .btn-ai {
-  background-color: #7a2fd0;
+  background-color: #7c3aed;
   color: #ffffff;
 }
 .btn-ai:hover {
-  background-color: #6423ad;
+  background-color: #6d28d9;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--domain-ai-glow);
 }
 
-/* Secondary Ghost / Outline Button */
+/* Secondary Ghost / Outline Button (Microsoft Surface style) */
 .btn-outline {
-  background-color: transparent;
+  background-color: #ffffff;
   color: var(--text-main);
-  border: 1px solid var(--border-glass-hover);
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 .btn-outline:hover {
   background-color: var(--bg-surface-elevated);
   border-color: var(--brand-blue);
   color: var(--brand-blue);
   transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 98, 224, 0.12);
 }
 
 /* Badges */
@@ -222,27 +230,27 @@ a {
 }
 
 .badge-web {
-  background: var(--domain-web-bg);
-  color: var(--domain-web);
-  border: 1px solid rgba(29, 92, 240, 0.3);
+  background: #eff6ff;
+  color: #0062e0;
+  border: 1px solid rgba(0, 98, 224, 0.25);
 }
 
 .badge-app {
-  background: var(--domain-app-bg);
-  color: var(--domain-app);
-  border: 1px solid rgba(18, 161, 80, 0.3);
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid rgba(5, 150, 105, 0.25);
 }
 
 .badge-ai {
-  background: var(--domain-ai-bg);
-  color: var(--domain-ai);
-  border: 1px solid rgba(122, 47, 208, 0.3);
+  background: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.25);
 }
 
 .badge-yellow {
-  background: #ffe500;
-  color: #0b1b4a;
-  border: 1px solid rgba(11, 27, 74, 0.2);
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
   font-weight: 700;
 }
 

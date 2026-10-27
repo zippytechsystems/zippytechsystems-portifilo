@@ -84,11 +84,11 @@ export default function FAQSection() {
       <div className="container">
         {/* Section Heading */}
         <div style={{ textAlign: 'center', maxWidth: '760px', margin: '0 auto 3rem auto' }}>
-          <span className="badge badge-purple" style={{ marginBottom: '1rem' }}>
+          <span className="badge badge-ai" style={{ marginBottom: '1rem' }}>
             GOT QUESTIONS?
           </span>
           <h2 id="faq-heading" style={{ marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)' }}>
-            Frequently Asked <span style={{ color: '#7a2fd0' }}>Questions</span>
+            Frequently Asked <span style={{ color: '#7c3aed' }}>Questions</span>
           </h2>
           <p style={{ fontSize: '1.05rem', color: 'var(--text-body)', lineHeight: 1.6 }}>
             Clear, upfront answers about our starting prices, fast turnaround times, payment milestones, and post-delivery support.

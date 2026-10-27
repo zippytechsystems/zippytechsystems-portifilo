@@ -119,7 +119,7 @@ export default function QuoteModal({ isOpen, onClose, defaultService = 'Web Deve
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: 'rgba(7, 12, 30, 0.75)',
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
           backdropFilter: 'blur(8px)'
         }}
       />

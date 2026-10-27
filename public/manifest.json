@@ -4,8 +4,8 @@
   "description": "Low budget, high value digital solutions for small and mid-size businesses in India. Web Development from ₹6,500, App Development from ₹20,000, AI Automation from ₹7,500.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#070b1a",
-  "theme_color": "#0b1b4a",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "orientation": "portrait-primary",
   "icons": [
     {

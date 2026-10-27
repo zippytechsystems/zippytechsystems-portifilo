@@ -157,7 +157,7 @@ export default function ProjectModal({
         right: 0,
         bottom: 0,
         zIndex: 'var(--z-modal, 100)',
-        backgroundColor: 'rgba(5, 8, 15, 0.86)',
+        backgroundColor: 'rgba(15, 23, 42, 0.65)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
         display: 'flex',
@@ -258,7 +258,7 @@ export default function ProjectModal({
         <div
           style={{
             padding: '1.5rem 2rem 1.25rem 2rem',
-            background: `radial-gradient(circle at top right, ${accentColor}25 0%, rgba(12, 18, 31, 0.98) 70%)`,
+            background: `radial-gradient(circle at top right, ${accentColor}15 0%, var(--bg-card) 70%)`,
             borderBottom: '1px solid var(--border-glass)',
             position: 'relative'
           }}

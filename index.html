@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,7 +21,7 @@
     <meta name="geo.placename" content="Hyderabad" />
     <meta name="geo.position" content="17.4156;78.5376" />
     <meta name="ICBM" content="17.4156, 78.5376" />
-    <meta name="theme-color" content="#0b1b4a" />
+    <meta name="theme-color" content="#ffffff" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="business.business" />
@@ -64,18 +64,18 @@
       rel="stylesheet"
     />
 
-    <!-- Prevent Theme Flash & Guarantee Dark Theme by Default -->
+    <!-- Prevent Theme Flash & Guarantee Light Theme by Default (Microsoft / Amazon Enterprise) -->
     <script>
       (function() {
         document.documentElement.classList.add('js');
         try {
           var isUserSet = localStorage.getItem('zippy_theme_user_set') === 'true';
           var saved = localStorage.getItem('zippy_theme');
-          var theme = (isUserSet && (saved === 'light' || saved === 'dark')) ? saved : 'dark';
+          var theme = (isUserSet && (saved === 'light' || saved === 'dark')) ? saved : 'light';
           document.documentElement.setAttribute('data-theme', theme);
           document.documentElement.style.colorScheme = theme;
         } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'dark');
+          document.documentElement.setAttribute('data-theme', 'light');
         }
       })();
     </script>
@@ -193,11 +193,11 @@
         ]
       }
     </script>
-    <script type="module" crossorigin src="/assets/index-bycYV5Oi.js"></script>
+    <script type="module" crossorigin src="/assets/index-C79Xv0bu.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-hePW80VL.js">
     <link rel="modulepreload" crossorigin href="/assets/icons-BN6k7T9u.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-DlZaQ2-O.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-C_GF5VS0.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-CcMCZZJx.css">
   </head>
   <body>
     <div id="root"></div>

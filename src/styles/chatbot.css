@@ -372,7 +372,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   padding: 9px 12px;
-  color: var(--text-main, #ffffff);
+  color: var(--text-main, #0f172a);
   font-size: 0.88rem;
   font-family: inherit;
   outline: none;
@@ -401,7 +401,7 @@
 
 .zippy-chat-send-btn:hover:not(:disabled) {
   transform: scale(1.05);
-  background: #ffd000;
+  background: #0052be;
 }
 
 .zippy-chat-send-btn:disabled {

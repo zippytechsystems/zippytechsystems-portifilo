@@ -358,7 +358,7 @@ export default function HeroLiquidMask({
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(ellipse at center, rgba(11, 27, 74, 0.45) 0%, rgba(7, 14, 36, 0.85) 100%)',
+          background: 'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.88) 100%)',
           pointerEvents: 'none'
         }}
       />

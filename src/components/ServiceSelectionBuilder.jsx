@@ -206,7 +206,7 @@ export default function ServiceSelectionBuilder() {
                     width: '38px',
                     height: '38px',
                     borderRadius: '50%',
-                    background: currentStep >= st.num ? '#1d5cf0' : 'var(--bg-main)',
+                    background: currentStep >= st.num ? '#1d5cf0' : 'var(--bg-surface-elevated)',
                     border: currentStep >= st.num ? '2px solid #1d5cf0' : '2px solid var(--border-glass)',
                     color: currentStep >= st.num ? '#ffffff' : 'var(--text-dim)',
                     display: 'flex',
@@ -556,7 +556,7 @@ export default function ServiceSelectionBuilder() {
               <div className="form-group">
                 <label className="form-label">10-Digit Mobile / WhatsApp Number <span style={{ color: '#ef4444' }}>*</span></label>
                 <div style={{ display: 'flex' }}>
-                  <span style={{ padding: '0.75rem 1rem', background: 'var(--bg-main)', border: '1px solid var(--border-glass)', borderRight: 'none', borderRadius: '8px 0 0 8px', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>
+                  <span style={{ padding: '0.75rem 1rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-glass)', borderRight: 'none', borderRadius: '8px 0 0 8px', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>
                     +91
                   </span>
                   <input
@@ -630,7 +630,7 @@ export default function ServiceSelectionBuilder() {
             </p>
 
             {/* Selected Services Breakdown */}
-            <div style={{ background: 'var(--bg-main)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid var(--border-glass)' }}>
+            <div style={{ background: 'var(--bg-surface-elevated)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid var(--border-glass)' }}>
               <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
                 Selected Services ({selectedServices.length})
               </div>

@@ -129,7 +129,7 @@ export default function TestimonialsSection() {
             CLIENT SUCCESS STORIES
           </span>
           <h2 id="testimonials-heading" style={{ marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)' }}>
-            Trusted by <span style={{ color: '#1d5cf0' }}>Indian Business Owners</span>
+            Trusted by <span style={{ color: '#0062e0' }}>Indian Business Owners</span>
           </h2>
           <p style={{ fontSize: '1.05rem', color: 'var(--text-body)', lineHeight: 1.6, margin: 0 }}>
             Real experiences from clinic owners, wholesale traders, and local enterprises who saved time, cut operational costs, and grew with our custom digital solutions.

@@ -227,7 +227,7 @@ export default function SkillsOrbitCloud() {
             e.target.src = '/images/company-logo-2026.webp?v=20261011';
           }}
         />
-        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#ffffff', letterSpacing: '0.04em', marginTop: '4px' }}>
+        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '0.04em', marginTop: '4px' }}>
           ZIPPY ENTERPRISES
         </span>
       </div>

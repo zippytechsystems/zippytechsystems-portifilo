@@ -25,7 +25,7 @@ export default function TechEcosystemSection() {
             ENGINEERING EXCELLENCE
           </span>
           <h2 id="tech-ecosystem-heading" style={{ marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)' }}>
-            Battle-Tested <span style={{ color: '#1d5cf0' }}>Tech Ecosystem</span>
+            Battle-Tested <span style={{ color: '#0062e0' }}>Tech Ecosystem</span>
           </h2>
           <p style={{ fontSize: '1.05rem', color: 'var(--text-body)', lineHeight: 1.6 }}>
             We engineer high-performance software with zero bloat. From instant mobile billing to cloud automation,

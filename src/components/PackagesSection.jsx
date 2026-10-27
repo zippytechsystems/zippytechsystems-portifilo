@@ -172,271 +172,271 @@ export default function PackagesSection() {
               })}
             </div>
 
-        {/* Loading Skeleton */}
-        {loading && (!packages || packages.length === 0) && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '2rem'
-            }}
-          >
-            {[1, 2, 3].map((n) => (
+            {/* Loading Skeleton */}
+            {loading && (!packages || packages.length === 0) && (
               <div
-                key={n}
-                className="card skeleton"
-                style={{ height: '420px', borderRadius: '16px', opacity: 0.6 }}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Friendly Empty State */}
-        {!loading && filteredPackages.length === 0 && (
-          <div className="card" style={{ padding: '3rem', textAlign: 'center', maxWidth: '550px', margin: '0 auto' }}>
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem' }}>No Packages Found</h3>
-            <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem', fontSize: '0.92rem' }}>
-              We customize bespoke packages for unique enterprise requirements. Reach out directly on WhatsApp.
-            </p>
-            <a
-              href={buildWhatsAppUrl("Hi Lingaswamy, I'd like to get a custom solution package quote.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-cta-yellow"
-            >
-              <MessageCircle size={16} />
-              <span>Request Custom Package Quote</span>
-            </a>
-          </div>
-        )}
-
-        {/* Packages Grid */}
-        {filteredPackages.length > 0 && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '2rem'
-            }}
-          >
-            {filteredPackages.map((pkg) => {
-              const isWeb = pkg.domain === 'web';
-              const isApp = pkg.domain === 'app';
-              const domainColor = isWeb ? '#1d5cf0' : isApp ? '#12a150' : '#7a2fd0';
-              const domainLabel = isWeb
-                ? 'Web Development Services'
-                : isApp
-                ? 'App Development Services'
-                : 'AI Agent Development Services';
-
-              const quoteMsg = `Hi Lingaswamy, I am interested in the ${pkg.name} (${pkg.price}) for my business. Please share next steps!`;
-
-              return (
-                <div
-                  key={pkg.id}
-                  className="card"
-                  style={{
-                    padding: '2.25rem 2rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    position: 'relative',
-                    border: pkg.popular ? `2px solid ${domainColor}` : '1px solid var(--border-glass)',
-                    borderRadius: '18px',
-                    boxShadow: pkg.popular ? `0 12px 35px ${domainColor}20` : '0 8px 30px rgba(0,0,0,0.06)'
-                  }}
-                >
-                  {/* Popular Badge */}
-                  {pkg.popular && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '-13px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        background: domainColor,
-                        color: '#ffffff',
-                        fontSize: '0.74rem',
-                        fontWeight: 800,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                        padding: '4px 14px',
-                        borderRadius: 'var(--radius-full)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        boxShadow: `0 4px 12px ${domainColor}40`
-                      }}
-                    >
-                      <Sparkles size={13} />
-                      <span>Most Popular</span>
-                    </div>
-                  )}
-
-                  <div>
-                    {/* Header */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                      <span
-                        style={{
-                          fontSize: '0.72rem',
-                          fontWeight: 700,
-                          textTransform: 'uppercase',
-                          color: domainColor,
-                          background: `${domainColor}15`,
-                          padding: '3px 8px',
-                          borderRadius: 'var(--radius-full)'
-                        }}
-                      >
-                        {domainLabel}
-                      </span>
-                    </div>
-
-                    <h3
-                      style={{
-                        fontSize: '1.35rem',
-                        fontWeight: 800,
-                        fontFamily: 'var(--font-display)',
-                        color: 'var(--text-main)',
-                        marginBottom: '0.5rem'
-                      }}
-                    >
-                      {pkg.name}
-                    </h3>
-
-                    {pkg.tagline && (
-                      <p style={{ fontSize: '0.88rem', color: 'var(--text-dim)', marginBottom: '1.25rem', lineHeight: 1.4 }}>
-                        {pkg.tagline}
-                      </p>
-                    )}
-
-                    {/* Price */}
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem', marginBottom: '1.75rem' }}>
-                      <span
-                        style={{
-                          fontSize: '2.2rem',
-                          fontWeight: 800,
-                          fontFamily: 'var(--font-display)',
-                          color: domainColor
-                        }}
-                      >
-                        {pkg.price}
-                      </span>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>all-inclusive start</span>
-                    </div>
-
-                    {/* Deliverables List */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
-                      {pkg.deliverables?.map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                          <div
-                            style={{
-                              width: '18px',
-                              height: '18px',
-                              borderRadius: '50%',
-                              background: `${domainColor}20`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              flexShrink: 0,
-                              marginTop: '2px'
-                            }}
-                          >
-                            <Check size={11} color={domainColor} strokeWidth={3} />
-                          </div>
-                          <span style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.4 }}>
-                            {item}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* CTA Button */}
-                  <a
-                    href={buildWhatsAppUrl(quoteMsg)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={pkg.popular ? 'btn btn-cta-yellow' : 'btn btn-outline'}
-                    style={{ width: '100%', padding: '0.8rem', justifyContent: 'center' }}
-                  >
-                    <MessageCircle size={16} />
-                    <span>Choose This Package</span>
-                  </a>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Custom Quote Banner below Packages */}
-          <div
-            className="card"
-            style={{
-              marginTop: '3.5rem',
-              padding: 'clamp(1.5rem, 3vw, 2.25rem)',
-              background: 'linear-gradient(135deg, rgba(11, 27, 74, 0.7) 0%, rgba(29, 92, 240, 0.15) 100%)',
-              border: '1px solid rgba(29, 92, 240, 0.3)',
-              borderRadius: '20px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '1.5rem'
-            }}
-          >
-            <div style={{ maxWidth: '600px' }}>
-              <span
                 style={{
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  color: '#ffe500',
-                  letterSpacing: '1px',
-                  display: 'block',
-                  marginBottom: '0.35rem'
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                  gap: '2rem'
                 }}
               >
-                LOOKING FOR A HYBRID OR CUSTOM STACK?
-              </span>
-              <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>
-                Build Your Own Custom Feature Package
-              </h4>
-              <p style={{ color: 'var(--text-dim)', fontSize: '0.92rem', margin: 0, lineHeight: 1.5 }}>
-                Select exact modules (E-commerce, UPI payments, barcode scanner, GST invoices, AI voice) and receive a calculated instant INR estimate.
-              </p>
-            </div>
+                {[1, 2, 3].map((n) => (
+                  <div
+                    key={n}
+                    className="card skeleton"
+                    style={{ height: '420px', borderRadius: '16px', opacity: 0.6 }}
+                  />
+                ))}
+              </div>
+            )}
 
-            <button
-              onClick={() => {
-                setViewMode('estimator');
-                const el = document.getElementById('packages');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="btn btn-primary"
+            {/* Friendly Empty State */}
+            {!loading && filteredPackages.length === 0 && (
+              <div className="card" style={{ padding: '3rem', textAlign: 'center', maxWidth: '550px', margin: '0 auto' }}>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem' }}>No Packages Found</h3>
+                <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem', fontSize: '0.92rem' }}>
+                  We customize bespoke packages for unique enterprise requirements. Reach out directly on WhatsApp.
+                </p>
+                <a
+                  href={buildWhatsAppUrl("Hi Lingaswamy, I'd like to get a custom solution package quote.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-cta-yellow"
+                >
+                  <MessageCircle size={16} />
+                  <span>Request Custom Package Quote</span>
+                </a>
+              </div>
+            )}
+
+            {/* Packages Grid */}
+            {filteredPackages.length > 0 && (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                  gap: '2rem'
+                }}
+              >
+                {filteredPackages.map((pkg) => {
+                  const isWeb = pkg.domain === 'web';
+                  const isApp = pkg.domain === 'app';
+                  const domainColor = isWeb ? '#1d5cf0' : isApp ? '#12a150' : '#7a2fd0';
+                  const domainLabel = isWeb
+                    ? 'Web Development Services'
+                    : isApp
+                      ? 'App Development Services'
+                      : 'AI Agent Development Services';
+
+                  const quoteMsg = `Hi Lingaswamy, I am interested in the ${pkg.name} (${pkg.price}) for my business. Please share next steps!`;
+
+                  return (
+                    <div
+                      key={pkg.id}
+                      className="card"
+                      style={{
+                        padding: '2.25rem 2rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        position: 'relative',
+                        border: pkg.popular ? `2px solid ${domainColor}` : '1px solid var(--border-glass)',
+                        borderRadius: '18px',
+                        boxShadow: pkg.popular ? `0 12px 35px ${domainColor}20` : '0 8px 30px rgba(0,0,0,0.06)'
+                      }}
+                    >
+                      {/* Popular Badge */}
+                      {pkg.popular && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '-13px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            background: domainColor,
+                            color: '#ffffff',
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.04em',
+                            padding: '4px 14px',
+                            borderRadius: 'var(--radius-full)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            boxShadow: `0 4px 12px ${domainColor}40`
+                          }}
+                        >
+                          <Sparkles size={13} />
+                          <span>Most Popular</span>
+                        </div>
+                      )}
+
+                      <div>
+                        {/* Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                          <span
+                            style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              color: domainColor,
+                              background: `${domainColor}15`,
+                              padding: '3px 8px',
+                              borderRadius: 'var(--radius-full)'
+                            }}
+                          >
+                            {domainLabel}
+                          </span>
+                        </div>
+
+                        <h3
+                          style={{
+                            fontSize: '1.35rem',
+                            fontWeight: 800,
+                            fontFamily: 'var(--font-display)',
+                            color: 'var(--text-main)',
+                            marginBottom: '0.5rem'
+                          }}
+                        >
+                          {pkg.name}
+                        </h3>
+
+                        {pkg.tagline && (
+                          <p style={{ fontSize: '0.88rem', color: 'var(--text-dim)', marginBottom: '1.25rem', lineHeight: 1.4 }}>
+                            {pkg.tagline}
+                          </p>
+                        )}
+
+                        {/* Price */}
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem', marginBottom: '1.75rem' }}>
+                          <span
+                            style={{
+                              fontSize: '2.2rem',
+                              fontWeight: 800,
+                              fontFamily: 'var(--font-display)',
+                              color: domainColor
+                            }}
+                          >
+                            {pkg.price}
+                          </span>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>all-inclusive start</span>
+                        </div>
+
+                        {/* Deliverables List */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
+                          {pkg.deliverables?.map((item, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  background: `${domainColor}20`,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  marginTop: '2px'
+                                }}
+                              >
+                                <Check size={11} color={domainColor} strokeWidth={3} />
+                              </div>
+                              <span style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.4 }}>
+                                {item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* CTA Button */}
+                      <a
+                        href={buildWhatsAppUrl(quoteMsg)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={pkg.popular ? 'btn btn-cta-yellow' : 'btn btn-outline'}
+                        style={{ width: '100%', padding: '0.8rem', justifyContent: 'center' }}
+                      >
+                        <MessageCircle size={16} />
+                        <span>Choose This Package</span>
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Custom Quote Banner below Packages */}
+            <div
+              className="card"
               style={{
-                padding: '0.85rem 1.6rem',
-                fontWeight: 700,
-                fontSize: '0.95rem',
-                display: 'inline-flex',
+                marginTop: '3.5rem',
+                padding: 'clamp(1.5rem, 3vw, 2.25rem)',
+                background: 'linear-gradient(135deg, rgba(11, 27, 74, 0.7) 0%, rgba(29, 92, 240, 0.15) 100%)',
+                border: '1px solid rgba(29, 92, 240, 0.3)',
+                borderRadius: '20px',
+                display: 'flex',
+                flexWrap: 'wrap',
                 alignItems: 'center',
-                gap: '0.6rem'
+                justifyContent: 'space-between',
+                gap: '1.5rem'
               }}
             >
-              <Calculator size={18} />
-              <span>Open Cost Estimator</span>
-              <ArrowRight size={16} />
-            </button>
-          </div>
-        </>
-      )}
+              <div style={{ maxWidth: '600px' }}>
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: '#ffe500',
+                    letterSpacing: '1px',
+                    display: 'block',
+                    marginBottom: '0.35rem'
+                  }}
+                >
+                  LOOKING FOR A HYBRID OR CUSTOM STACK?
+                </span>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>
+                  Build Your Own Custom Feature Package
+                </h4>
+                <p style={{ color: 'var(--text-dim)', fontSize: '0.92rem', margin: 0, lineHeight: 1.5 }}>
+                  Select exact modules (E-commerce, UPI payments, barcode scanner, GST invoices, AI voice) and receive a calculated instant INR estimate.
+                </p>
+              </div>
 
-      {/* View 2: Interactive Cost Estimator */}
-      {viewMode === 'estimator' && (
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <CostEstimator />
-        </div>
-      )}
-    </div>
-  </section>
+              <button
+                onClick={() => {
+                  setViewMode('estimator');
+                  const el = document.getElementById('packages');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="btn btn-primary"
+                style={{
+                  padding: '0.85rem 1.6rem',
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem'
+                }}
+              >
+                <Calculator size={18} />
+                <span>Open Cost Estimator</span>
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* View 2: Interactive Cost Estimator */}
+        {viewMode === 'estimator' && (
+          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            <CostEstimator />
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

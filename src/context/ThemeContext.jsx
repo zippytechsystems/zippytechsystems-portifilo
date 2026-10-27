@@ -10,9 +10,9 @@ export function ThemeProvider({ children }) {
       if (isUserSet && (saved === 'dark' || saved === 'light')) {
         return saved;
       }
-      return 'dark'; // Always default to dark theme!
+      return 'light'; // Clean enterprise white theme by default (Microsoft/Amazon aesthetic)
     } catch {
-      return 'dark';
+      return 'light';
     }
   });
 

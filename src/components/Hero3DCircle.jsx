@@ -313,7 +313,7 @@ export default function Hero3DCircle({
               height: '12px',
               borderRadius: '50%',
               background: '#10b981',
-              border: '2px solid #070c1e',
+              border: '2px solid var(--bg-surface)',
               boxShadow: '0 0 8px #10b981'
             }}
             title="Verified Authenticity"
@@ -354,9 +354,9 @@ export default function Hero3DCircle({
           }}
         >
           {isGold ? (
-            <Award size={size <= 110 ? 9 : 11} color="#ffe500" />
+            <Award size={size <= 110 ? 9 : 11} color="#f59e0b" />
           ) : (
-            <ShieldCheck size={size <= 110 ? 9 : 11} color="#00e5ff" />
+            <ShieldCheck size={size <= 110 ? 9 : 11} color="#0062e0" />
           )}
           <span
             style={{
@@ -364,7 +364,7 @@ export default function Hero3DCircle({
               fontWeight: 700,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
-              color: isGold ? '#ffe500' : '#00e5ff'
+              color: isGold ? '#b45309' : '#0062e0'
             }}
           >
             {badgeText}
@@ -390,7 +390,7 @@ export default function Hero3DCircle({
         <span
           style={{
             fontSize: size <= 110 ? '0.62rem' : '0.72rem',
-            color: '#cbd5e1',
+            color: 'var(--text-dim)',
             lineHeight: 1.25,
             marginTop: '0.1rem',
             fontWeight: 500

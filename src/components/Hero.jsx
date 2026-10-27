@@ -228,7 +228,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               }}
             >
               {content.company.positioning}{' '}
-              <strong style={{ color: '#ffffff', fontWeight: 700 }}>
+              <strong style={{ color: 'var(--text-main)', fontWeight: 700 }}>
                 {secondaryTagline}.
               </strong>
             </p>
@@ -302,7 +302,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
                     boxShadow: '0 8px 30px rgba(255, 229, 0, 0.35)'
                   }}
                 >
-                  <MessageCircle size={20} color="#0b1b4a" />
+                  <MessageCircle size={20} color="#ffffff" />
                   <span>Get a Quote on WhatsApp</span>
                 </a>
               </MagneticButton>

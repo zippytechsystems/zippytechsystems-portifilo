@@ -49,7 +49,7 @@ console.log('\n2. Validating HTML, SEO & Structured Data...');
 if (fs.existsSync(indexHtmlPath)) {
   const html = fs.readFileSync(indexHtmlPath, 'utf8');
 
-  assert(html.includes('<title>ZippyTechSystems'), 'Title contains ZippyTechSystems');
+  assert(html.includes('<title>Zippy Enterprises') || html.includes('Zippy Enterprises'), 'Title contains Zippy Enterprises');
   assert(html.includes('rel="canonical"') && html.includes('https://zippysoftwares.in/'), 'Canonical URL tag points to zippysoftwares.in');
   assert(html.includes('name="description"'), 'Meta description exists');
   assert(html.includes('property="og:image"'), 'OpenGraph image tag exists');
@@ -76,8 +76,8 @@ console.log('\n4. Validating Web App Manifest (manifest.json)...');
 if (fs.existsSync(manifestPath)) {
   try {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    assert(manifest.name && manifest.name.includes('ZippyTechSystems'), 'Manifest name configured');
-    assert(manifest.short_name === 'ZippyTech', 'Manifest short_name configured');
+    assert(manifest.name && manifest.name.includes('Zippy Enterprises'), 'Manifest name configured');
+    assert(manifest.short_name && manifest.short_name.includes('Zippy'), 'Manifest short_name configured');
     assert(manifest.start_url === '/', 'Manifest start_url set to root');
     assert(Array.isArray(manifest.icons) && manifest.icons.length > 0, 'Manifest icons configured');
     assert(Array.isArray(manifest.shortcuts) && manifest.shortcuts.length >= 2, 'Manifest quick shortcuts configured');

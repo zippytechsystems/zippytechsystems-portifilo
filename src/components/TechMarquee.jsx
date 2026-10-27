@@ -128,7 +128,7 @@ export default function TechMarquee({ speed = 32, direction = 'left', type = 'te
                 borderRadius: 'var(--radius-full)',
                 border: '1px solid var(--border-glass)',
                 background: 'var(--bg-glass)',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+                boxShadow: '0 2px 10px rgba(15, 23, 42, 0.05)',
                 whiteSpace: 'nowrap',
                 userSelect: 'none',
                 transition: 'transform 200ms ease, border-color 200ms ease'
