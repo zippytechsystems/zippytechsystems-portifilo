@@ -1,6 +1,6 @@
 /**
  * =========================================================================
- * ZippyTechSystems Pvt. Ltd. — Central Content Configuration
+ * Zippy Enterprises Private Limited — Central Content Configuration
  * =========================================================================
  * All website text, services, prices, copy, and projects live in this single file.
  * Structured with i18n readiness so a Telugu version (e.g. content.te) can be
@@ -14,9 +14,9 @@ export const content = {
 
   // Company Information
   company: {
-    name: 'ZippyTechSystems Pvt. Ltd.',
-    shortName: 'ZippyTechSystems',
-    legalName: 'ZippyTechSystems Pvt. Ltd.',
+    name: 'Zippy Enterprises Private Limited',
+    shortName: 'Zippy Enterprises',
+    legalName: 'Zippy Enterprises Private Limited',
     tagline: 'Build • Automate • Grow',
     secondaryTagline: 'Smart Technology for a Stronger Tomorrow',
     headline: 'Websites, apps and AI for your business',
@@ -45,8 +45,8 @@ export const content = {
 
   // Social Media Links (Muted, optional-looking)
   social: {
-    instagram: 'https://www.instagram.com/zippytechsystems',
-    youtube: 'https://www.youtube.com/@zippytechsystems'
+    instagram: 'https://www.instagram.com/zippysoftwares.in',
+    youtube: 'https://www.youtube.com/@zippysoftwares'
   },
 
   // Trust Points (Used for Bento Grid and Hero pillars with zero fabricated stats)
@@ -370,7 +370,7 @@ export const content = {
     missionStatement:
       'We believe every shop owner, clinic, and growing enterprise in India deserves modern software that works smoothly, saves time, and does not cost a fortune.',
     story: [
-      'ZippyTechSystems was founded by Lingaswamy to provide affordable, transparent, and high-quality software solutions specifically for Indian SMBs.',
+      'Zippy Enterprises was founded by Lingaswamy to provide affordable, transparent, and high-quality software solutions specifically for Indian SMBs.',
       'Big agencies charge lakhs for basic setups, while generic templates fail when your business expands. We provide custom websites, business accountant apps, and WhatsApp AI automations that bring tangible value from day one.',
       'With direct founder communication on WhatsApp, honest starting prices (Web from ₹6.5k, App from ₹20k, AI from ₹7.5k), and rapid delivery, we partner with you for long-term growth.'
     ],
@@ -423,7 +423,7 @@ export const content = {
     {
       id: 'faq-1',
       category: 'General',
-      question: 'What makes ZippyTechSystems different from other agencies in India?',
+      question: 'What makes Zippy Enterprises different from other agencies in India?',
       answer: 'We eliminate bloated agency overhead and middleman layers. You communicate directly with founder Lingaswamy on WhatsApp or call. We provide transparent starting prices (Web from ₹6.5k, App from ₹20k, AI from ₹7.5k) and deliver production-ready software in 48 hours to 7 days.'
     },
     {
@@ -594,7 +594,7 @@ export const content = {
  */
 export function buildWhatsAppUrl(message) {
   const base = `https://wa.me/${content.founder.whatsappNumber}`;
-  const text = encodeURIComponent(message || "Hi Lingaswamy, I'd like to discuss a project with ZippyTechSystems.");
+  const text = encodeURIComponent(message || "Hi Lingaswamy, I'd like to discuss a project with Zippy Enterprises.");
   return `${base}?text=${text}`;
 }
 
@@ -602,7 +602,7 @@ export function buildWhatsAppUrl(message) {
  * Helper to build enquiry form WhatsApp URL
  */
 export function buildEnquiryWhatsAppUrl({ name, phone, service, message }) {
-  const text = `*New Project Enquiry — ZippyTechSystems*
+  const text = `*New Project Enquiry — Zippy Enterprises*
 -----------------------------
 👤 *Name:* ${name || 'N/A'}
 📱 *Phone:* ${phone || 'N/A'}

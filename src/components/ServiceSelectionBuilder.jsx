@@ -136,7 +136,7 @@ export default function ServiceSelectionBuilder() {
         const rawWaNumber = settingsData?.whatsappNumber || '6302690251';
         const cleanWa = String(rawWaNumber).replace(/\D/g, '');
         const lines = [
-          'Hello Lingaswamy, I selected services on ZippyTechSystems website:',
+          'Hello Lingaswamy, I selected services on Zippy Enterprises website:',
           '',
           `*Name:* ${name.trim()}`,
           `*Phone:* ${cleanPhone}`,

@@ -58,7 +58,7 @@ export default function TestimonialsTab({ showToast, openConfirm }) {
             Client Reviews &amp; Testimonials ({(testimonialsData || []).length})
           </h1>
           <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
-            Verified feedback and ratings from business owners who built with ZippyTechSystems.
+            Verified feedback and ratings from business owners who built with Zippy Enterprises.
           </p>
         </div>
 

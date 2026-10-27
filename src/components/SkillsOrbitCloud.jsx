@@ -198,7 +198,7 @@ export default function SkillsOrbitCloud() {
         }}
       />
 
-      {/* Central Core: ZippyTech Softwares Official Badge */}
+      {/* Central Core: Zippy Enterprises Official Badge */}
       <div
         className="frosted-glass"
         style={{
@@ -220,7 +220,7 @@ export default function SkillsOrbitCloud() {
       >
         <img
           src="/images/company-logo-2026.png?v=20261011"
-          alt="ZippyTech Softwares Logo"
+          alt="Zippy Enterprises Logo"
           style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'contain' }}
           onError={(e) => {
             e.target.onerror = null;
@@ -228,7 +228,7 @@ export default function SkillsOrbitCloud() {
           }}
         />
         <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#ffffff', letterSpacing: '0.04em', marginTop: '4px' }}>
-          ZIPPYTECH
+          ZIPPY ENTERPRISES
         </span>
       </div>
 

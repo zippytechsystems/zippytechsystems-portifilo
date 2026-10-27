@@ -33,7 +33,7 @@ export default function ChatbotTab({ showToast }) {
   });
   const [quickReplyInput, setQuickReplyInput] = useState('');
   const [testChatMessages, setTestChatMessages] = useState([
-    { role: 'assistant', content: 'Hi! I am the ZippyTechSystems AI assistant. Test me right here in Admin!' }
+    { role: 'assistant', content: 'Hi! I am the Zippy Enterprises AI assistant. Test me right here in Admin!' }
   ]);
   const [testChatInput, setTestChatInput] = useState('');
   const [isTestBotSending, setIsTestBotSending] = useState(false);
@@ -125,7 +125,7 @@ export default function ChatbotTab({ showToast }) {
                 className="form-input"
                 value={chatbotForm.welcomeMessage || ''}
                 onChange={(e) => setChatbotForm({ ...chatbotForm, welcomeMessage: e.target.value })}
-                placeholder="Hi! I am the ZippyTechSystems AI assistant..."
+                placeholder="Hi! I am the Zippy Enterprises AI assistant..."
               />
             </div>
 
@@ -370,7 +370,7 @@ export default function ChatbotTab({ showToast }) {
               style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
               onClick={() => {
                 setTestChatMessages([
-                  { role: 'assistant', content: chatbotForm.welcomeMessage || 'Hi! I am the ZippyTechSystems AI assistant. Test me right here in Admin!' }
+                  { role: 'assistant', content: chatbotForm.welcomeMessage || 'Hi! I am the Zippy Enterprises AI assistant. Test me right here in Admin!' }
                 ]);
               }}
             >

@@ -92,7 +92,10 @@ export function AdminAuthProvider({ children }) {
     const matchesUser =
       cleanId === ADMIN_CREDENTIALS.username ||
       cleanId === ADMIN_CREDENTIALS.email ||
-      cleanId === 'lingaswamy';
+      cleanId === 'lingaswamy' ||
+      cleanId === 'admin' ||
+      cleanId === 'zippy' ||
+      cleanId === 'zippyenterprises';
 
     const matchesPass = cleanPass === ADMIN_CREDENTIALS.password;
 

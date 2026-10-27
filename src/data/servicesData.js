@@ -19,7 +19,7 @@ export const servicesData = [
       'Custom Web Solutions',
       'Responsive Design'
     ],
-    overview: 'At ZippyTechSystems, our web development services bridge visual finesse with clean, battle-tested software engineering. Whether you need an agile landing page that converts, an end-to-end e-commerce platform, or a complex software-as-a-service (SaaS) web application, we construct accessible, SEO-optimized, and lightning-fast web products tailored to your operational objectives.',
+    overview: 'At Zippy Enterprises, our web development services bridge visual finesse with clean, battle-tested software engineering. Whether you need an agile landing page that converts, an end-to-end e-commerce platform, or a complex software-as-a-service (SaaS) web application, we construct accessible, SEO-optimized, and lightning-fast web products tailored to your operational objectives.',
     features: [
       {
         title: 'Modern Front-End Engineering',
@@ -107,7 +107,7 @@ export const servicesData = [
       'Custom Mobile Applications',
       'API Integration'
     ],
-    overview: 'Mobile experiences demand immediacy, fluid 60fps animations, and dependable offline capabilities. ZippyTechSystems designs and builds custom mobile applications that solve real-world problems. Utilizing modern cross-platform frameworks alongside native device integrations, we deliver unified iOS and Android apps that reduce development overhead while preserving authentic native feel.',
+    overview: 'Mobile experiences demand immediacy, fluid 60fps animations, and dependable offline capabilities. Zippy Enterprises designs and builds custom mobile applications that solve real-world problems. Utilizing modern cross-platform frameworks alongside native device integrations, we deliver unified iOS and Android apps that reduce development overhead while preserving authentic native feel.',
     features: [
       {
         title: 'Unified Cross-Platform Codebase',
@@ -195,7 +195,7 @@ export const servicesData = [
       'AI-powered Applications',
       'Business Process Automation'
     ],
-    overview: 'Modern organizations spend hundreds of hours every month on repetitive data entry, manual customer triage, and siloed administrative tasks. ZippyTechSystems designs and deploys custom AI automation pipelines that connect your existing software ecosystem. From intelligent conversational chatbots to multi-stage automated webhooks, we empower businesses to scale their throughput without scaling operational friction.',
+    overview: 'Modern organizations spend hundreds of hours every month on repetitive data entry, manual customer triage, and siloed administrative tasks. Zippy Enterprises designs and deploys custom AI automation pipelines that connect your existing software ecosystem. From intelligent conversational chatbots to multi-stage automated webhooks, we empower businesses to scale their throughput without scaling operational friction.',
     features: [
       {
         title: 'Custom AI Conversational Agents',

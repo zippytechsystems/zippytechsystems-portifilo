@@ -181,7 +181,7 @@ export default function CostEstimator() {
       })
       .filter(Boolean);
 
-    let message = `Hi Lingaswamy, I calculated a project estimate on ZippyTechSystems website:\n\n`;
+    let message = `Hi Lingaswamy, I calculated a project estimate on Zippy Enterprises website:\n\n`;
     message += `• Core Service: ${selectedDomain.title} (${formatINR(selectedDomain.basePrice)})\n`;
     if (chosenAddonTitles.length > 0) {
       message += `• Selected Modules:\n  ${chosenAddonTitles.join('\n  ')}\n`;

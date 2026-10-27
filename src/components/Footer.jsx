@@ -21,7 +21,7 @@ export default function Footer() {
   const cleanWa = String(rawWa).replace(/[^0-9]/g, '');
   const whatsappNumber = cleanWa.startsWith('91') ? cleanWa : `91${cleanWa}`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-    settingsData?.defaultWhatsAppMessage || 'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote for my business.'
+    settingsData?.defaultWhatsAppMessage || 'Hi Lingaswamy, I visited Zippy Enterprises and would like to get a quote for my business.'
   )}`;
 
   return (
@@ -67,7 +67,7 @@ export default function Footer() {
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
               <img
                 src="/images/company-logo-2026.png?v=20261011"
-                alt="ZippyTech Softwares"
+                alt="Zippy Enterprises"
                 width={40}
                 height={40}
                 style={{
@@ -85,7 +85,7 @@ export default function Footer() {
               />
               <div>
                 <div style={{ fontWeight: 800, fontSize: '1.2rem', fontFamily: 'var(--font-display)', color: '#ffffff' }}>
-                  ZippyTech<span style={{ color: '#1d5cf0' }}>Systems</span>
+                  Zippy<span style={{ color: '#1d5cf0' }}>Enterprises</span>
                 </div>
                 <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
                   Pvt. Ltd.

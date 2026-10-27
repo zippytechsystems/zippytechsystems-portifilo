@@ -115,7 +115,7 @@ export default function ChatWidget() {
 
   const defaultWelcome =
     chatbotSettings?.welcomeMessage ||
-    'Hi! I am the ZippyTechSystems AI assistant. How can I help you grow your business with Web Development, App Development, or AI Automation today?';
+    'Hi! I am the Zippy Enterprises AI assistant. How can I help you grow your business with Web Development, App Development, or AI Automation today?';
 
   // Check SpeechRecognition browser support
   useEffect(() => {
@@ -191,7 +191,7 @@ export default function ChatWidget() {
       sessionStorage.setItem(`zippy_voice_greeted_${sessionId}`, 'true');
 
       let greetingText =
-        'Hello! I am the ZippyTechSystems AI assistant. Which language do you prefer? English, Telugu, or Hindi?';
+        'Hello! I am the Zippy Enterprises AI assistant. Which language do you prefer? English, Telugu, or Hindi?';
       if (voiceLang.startsWith('te')) {
         greetingText =
           'నమస్కారం! నేను జిప్పీటెక్ సిస్టమ్స్ AI అసిస్టెంట్‌ని. మీరు ఏ భాషలో మాట్లాడాలనుకుంటున్నారు? తెలుగు, ఇంగ్లీష్, లేదా హిందీ?';
@@ -507,7 +507,7 @@ export default function ChatWidget() {
   const fallbackHandoffUrl =
     activeWhatsAppUrl ||
     `https://wa.me/${activeWa}?text=${encodeURIComponent(
-      'Hi Lingaswamy, I visited ZippyTechSystems and would like to talk with you.'
+      'Hi Lingaswamy, I visited Zippy Enterprises and would like to talk with you.'
     )}`;
 
   return (
@@ -566,7 +566,7 @@ export default function ChatWidget() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <Sparkles size={22} color="#1d5cf0" />
               <h3 id="zippy-consent-title" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
-                ZippyTechSystems Voice Assistant
+                Zippy Enterprises Voice Assistant
               </h3>
             </div>
             <p style={{ fontSize: '0.86rem', color: 'var(--text-body)', lineHeight: 1.5, marginBottom: '16px' }}>
@@ -657,7 +657,7 @@ export default function ChatWidget() {
                 </div>
                 <div style={{ overflow: 'hidden' }}>
                   <h2 id="zippy-chat-title" className="zippy-chat-title" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                    {isVoiceMode ? 'AI Voice Assistant' : 'ZippyTechSystems AI'}
+                    {isVoiceMode ? 'AI Voice Assistant' : 'Zippy Enterprises AI'}
                   </h2>
                   <div className="zippy-chat-status">
                     <span className="zippy-status-dot" aria-hidden="true" />

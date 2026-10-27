@@ -105,7 +105,7 @@ if (fs.existsSync(path.join(distDir, 'projects'))) {
 
 // 7. Write DEPLOY_GUIDE.md inside package
 console.log('5. Generating step-by-step Hostinger Deployment Guide...');
-const deployGuideContent = `# Hostinger Deployment Guide for ZippyTechSystems
+const deployGuideContent = `# Hostinger Deployment Guide for Zippy Enterprises
 **Domain**: https://zippysoftwares.in
 **Target Directory**: /public_html
 **Founder**: Lingaswamy Maddeboina (+91 63026 90251)
@@ -150,7 +150,7 @@ const deployGuideContent = `# Hostinger Deployment Guide for ZippyTechSystems
    ];
    \`\`\`
 5. In Hostinger hPanel > Databases > phpMyAdmin, import \`database/schema.sql\`.
-6. Log in to the Admin Panel at \`https://zippysoftwares.in/admin\` using:
+6. Log in to the Admin Dashboard at \`https://zippysoftwares.in/dashboard\` or \`https://zippysoftwares.in/admin\` using:
    - **Username**: \`lingaswamymaddeboina\`
    - **Password**: \`linga@123\`
 
@@ -160,14 +160,15 @@ const deployGuideContent = `# Hostinger Deployment Guide for ZippyTechSystems
 
 - [ ] **Homepage**: https://zippysoftwares.in loads with HTTPS and glass animations.
 - [ ] **Interactive Cost Estimator**: Test calculating customized packages in #packages section.
-- [ ] **FAQ Live Search**: Test searching questions with instant matching highlights in #faq.
+- [ ] **Dashboard Access**: Visit https://zippysoftwares.in/dashboard directly.
+- [ ] **Favicon & Logo**: Visit https://zippysoftwares.in/favicon.ico and https://zippysoftwares.in/images/company-logo-2026.png.
 - [ ] **Deep-Link Routing**: Visit https://zippysoftwares.in/projects/saree-business-management-app directly (must not show 404).
 - [ ] **Dynamic Sitemap**: Visit https://zippysoftwares.in/sitemap.xml (should output XML).
-- [ ] **PWA Manifest**: Check DevTools Application tab -> Manifest -> Short Name: "ZippyTech".
+- [ ] **PWA Manifest**: Check DevTools Application tab -> Manifest -> Short Name: "Zippy Enterprises".
 - [ ] **Direct Contact**: WhatsApp CTAs point to +91 63026 90251.
 
 ---
-Generated automatically by ZippyTechSystems Packager on ${new Date().toISOString()}.
+Generated automatically by Zippy Enterprises Packager on ${new Date().toISOString()}.
 `;
 
 fs.writeFileSync(path.join(packageDir, 'DEPLOY_GUIDE.md'), deployGuideContent, 'utf8');

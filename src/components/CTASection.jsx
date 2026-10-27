@@ -65,7 +65,7 @@ export default function CTASection({ onOpenQuoteModal }) {
               }}
             >
               From custom web platforms and mobile apps to smart workflow automations,
-              partner with ZippyTechSystems to bring your technology goals to life.
+              partner with Zippy Enterprises to bring your technology goals to life.
             </p>
 
             <div

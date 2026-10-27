@@ -111,7 +111,7 @@ export default function SettingsTab({ showToast }) {
               <input
                 type="url"
                 className="form-input"
-                placeholder="https://www.instagram.com/zippytechsystems"
+                placeholder="https://www.instagram.com/zippysoftwares.in"
                 value={settingsForm.instagramUrl || ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, instagramUrl: e.target.value })}
               />
@@ -122,7 +122,7 @@ export default function SettingsTab({ showToast }) {
               <input
                 type="url"
                 className="form-input"
-                placeholder="https://www.youtube.com/@zippytechsystems"
+                placeholder="https://www.youtube.com/@zippysoftwares.in"
                 value={settingsForm.youtubeUrl || ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, youtubeUrl: e.target.value })}
               />
@@ -135,7 +135,7 @@ export default function SettingsTab({ showToast }) {
               <input
                 type="url"
                 className="form-input"
-                placeholder="https://www.facebook.com/zippytechsystems"
+                placeholder="https://www.facebook.com/zippysoftwares.in"
                 value={settingsForm.facebookUrl || ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, facebookUrl: e.target.value })}
               />
@@ -146,7 +146,7 @@ export default function SettingsTab({ showToast }) {
               <input
                 type="url"
                 className="form-input"
-                placeholder="https://www.linkedin.com/company/zippytechsystems"
+                placeholder="https://www.linkedin.com/company/zippysoftwares.in"
                 value={settingsForm.linkedinUrl || ''}
                 onChange={(e) => setSettingsForm({ ...settingsForm, linkedinUrl: e.target.value })}
               />
@@ -212,7 +212,7 @@ export default function SettingsTab({ showToast }) {
             </div>
 
             <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-              <label className="form-label">About ZippyTechSystems / Founder Note</label>
+              <label className="form-label">About Zippy Enterprises / Founder Note</label>
               <textarea
                 rows={2}
                 className="form-input"
@@ -389,7 +389,7 @@ export default function SettingsTab({ showToast }) {
                 <textarea
                   rows={2}
                   className="form-input"
-                  value={settingsForm.waTemplateEn || 'Thank you for contacting ZippyTechSystems. We received your enquiry and will contact you within 24 hours.'}
+                  value={settingsForm.waTemplateEn || 'Thank you for contacting Zippy Enterprises. We received your enquiry and will contact you within 24 hours.'}
                   onChange={(e) => setSettingsForm({ ...settingsForm, waTemplateEn: e.target.value })}
                 />
               </div>
@@ -399,7 +399,7 @@ export default function SettingsTab({ showToast }) {
                 <textarea
                   rows={2}
                   className="form-input"
-                  value={settingsForm.waTemplateTe || 'ZippyTechSystems ను సంప్రదించినందుకు ధన్యవాదాలు. మీ విచారణ మాకు అందింది, మేము 24 గంటల్లో మిమ్మల్ని సంప్రదిస్తాము.'}
+                  value={settingsForm.waTemplateTe || 'Zippy Enterprises ను సంప్రదించినందుకు ధన్యవాదాలు. మీ విచారణ మాకు అందింది, మేము 24 గంటల్లో మిమ్మల్ని సంప్రదిస్తాము.'}
                   onChange={(e) => setSettingsForm({ ...settingsForm, waTemplateTe: e.target.value })}
                 />
               </div>
@@ -409,7 +409,7 @@ export default function SettingsTab({ showToast }) {
                 <textarea
                   rows={2}
                   className="form-input"
-                  value={settingsForm.waTemplateHi || 'ZippyTechSystems से संपर्क करने के लिए धन्यवाद। हमें आपकी पूछताछ मिल गई है और हम 24 घंटे के भीतर आपसे संपर्क करेंगे।'}
+                  value={settingsForm.waTemplateHi || 'Zippy Enterprises से संपर्क करने के लिए धन्यवाद। हमें आपकी पूछताछ मिल गई है और हम 24 घंटे के भीतर आपसे संपर्क करेंगे।'}
                   onChange={(e) => setSettingsForm({ ...settingsForm, waTemplateHi: e.target.value })}
                 />
               </div>

@@ -17,7 +17,7 @@ export default function AboutSection() {
   const cleanWa = String(rawWa).replace(/[^0-9]/g, '');
   const whatsappNumber = cleanWa.startsWith('91') ? cleanWa : `91${cleanWa}`;
   const founderWhatsApp = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-    `Hi ${founderName.split(' ')[0]}, I read about ZippyTechSystems and would like to consult on my business project.`
+    `Hi ${founderName.split(' ')[0]}, I read about Zippy Enterprises and would like to consult on my business project.`
   )}`;
 
   return (
@@ -27,7 +27,7 @@ export default function AboutSection() {
         {/* Top Header */}
         <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 3.5rem auto' }}>
           <span className="badge badge-ai" style={{ marginBottom: '1rem' }}>
-            ABOUT ZIPPYTECHSYSTEMS
+            ABOUT ZIPPY ENTERPRISES
           </span>
           <h2 id="about-heading" style={{ marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)' }}>
             Smart Technology for a <span style={{ color: '#1d5cf0' }}>Stronger Tomorrow</span>
@@ -113,7 +113,7 @@ export default function AboutSection() {
                 >
                   <img
                     src="/images/company-logo-2026.png?v=20261011"
-                    alt="ZippyTech Systems"
+                    alt="Zippy Enterprises"
                     width={72}
                     height={72}
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}

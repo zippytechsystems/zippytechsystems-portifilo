@@ -167,7 +167,7 @@ export default function TestimonialsSection() {
               We are currently compiling fresh client reviews. Reach out to founder Lingaswamy on WhatsApp to discuss your project!
             </p>
             <a
-              href={buildWhatsAppUrl("Hi Lingaswamy, I'd like to discuss a project and become a ZippyTechSystems client.")}
+              href={buildWhatsAppUrl("Hi Lingaswamy, I'd like to discuss a project and become a Zippy Enterprises client.")}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-cta-yellow"

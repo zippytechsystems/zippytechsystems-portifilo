@@ -231,7 +231,7 @@ export default function FAQSection() {
                 href={buildWhatsAppUrl(
                   searchQuery.trim()
                     ? `Hi Lingaswamy, I searched for "${searchQuery}" on your FAQ but had a question about...`
-                    : 'Hi Lingaswamy, I have a question about ZippyTechSystems services.'
+                    : 'Hi Lingaswamy, I have a question about Zippy Enterprises services.'
                 )}
                 target="_blank"
                 rel="noopener noreferrer"

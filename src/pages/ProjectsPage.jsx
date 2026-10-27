@@ -14,9 +14,9 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     if (currentProject) {
-      document.title = `${currentProject.title} | Case Study - ZippyTechSystems`;
+      document.title = `${currentProject.title} | Case Study - Zippy Enterprises`;
     } else {
-      document.title = 'Projects & Portfolio Showcase | ZippyTechSystems';
+      document.title = 'Projects & Portfolio Showcase | Zippy Enterprises';
     }
   }, [currentProject]);
 

@@ -1,5 +1,5 @@
 /**
- * ZippyTechSystems Pvt. Ltd. — Chatbot Client API
+ * Zippy Enterprises Private Limited — Chatbot Client API
  * Domain: https://zippysoftwares.in
  */
 
@@ -75,7 +75,7 @@ export async function sendChatMessage({
         reply:
           'I would be happy to connect you directly with our founder Lingaswamy on WhatsApp for personalized assistance!',
         whatsapp_url: `https://wa.me/${fallbackWhatsApp}?text=${encodeURIComponent(
-          'Hi Lingaswamy, I visited ZippyTechSystems and would like to get a quote.'
+          'Hi Lingaswamy, I visited Zippy Enterprises and would like to get a quote.'
         )}`,
         fallback: true
       };

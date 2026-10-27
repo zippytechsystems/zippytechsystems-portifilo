@@ -162,7 +162,7 @@ export default function AdminPage() {
             Admin Portal
           </h1>
           <p style={{ fontSize: '0.88rem', color: 'var(--text-body)', marginBottom: '1.5rem' }}>
-            ZippyTechSystems Pvt. Ltd. Management Console
+            Zippy Enterprises Private Limited Management Console
           </p>
 
           {loginError && (
@@ -224,8 +224,29 @@ export default function AdminPage() {
               className="btn btn-cta-yellow"
               style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 700 }}
             >
-              {authLoading ? 'Verifying...' : 'Sign In to Admin'}
+              {authLoading ? 'Verifying...' : 'Sign In to Dashboard'}
             </button>
+            <div style={{ marginTop: '0.85rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginEmail('lingaswamy');
+                  setLoginPassword('linga@123');
+                }}
+                style={{
+                  background: 'rgba(255, 229, 0, 0.1)',
+                  border: '1px solid rgba(255, 229, 0, 0.3)',
+                  color: '#ffe500',
+                  fontSize: '0.8rem',
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                🔑 Auto-fill Lingaswamy Credentials
+              </button>
+            </div>
           </form>
 
           <div style={{ marginTop: '1rem', textAlign: 'center' }}>

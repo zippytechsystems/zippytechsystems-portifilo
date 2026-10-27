@@ -1,5 +1,5 @@
 /**
- * ZippyTechSystems Motion Engine
+ * Zippy Enterprises Motion Engine
  * Lightweight, zero-dependency scroll observer & motion utilities.
  * Adheres to strict performance budgets: zero layout shift, single-trigger observer,
  * full respect for prefers-reduced-motion, and foolproof safety fallback.

@@ -15,7 +15,7 @@ export default function Hero3DCircle({
   type = 'logo', // 'logo' | 'founder'
   imageSrc = '/images/logo.png',
   fallbackSrc = '/images/logo.png',
-  title = 'ZippyTech Systems',
+  title = 'Zippy Enterprises',
   subtitle = 'Official Agency Brand',
   badgeText = 'Verified Agency',
   phone = '',

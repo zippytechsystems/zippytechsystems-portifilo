@@ -51,7 +51,7 @@ export default function TechMarquee({ speed = 32, direction = 'left', type = 'te
         maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
         WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)'
       }}
-      aria-label={type === 'clients' ? 'Businesses and clients served by ZippyTechSoftwares' : 'Technologies and frameworks used by ZippyTech Softwares'}
+      aria-label={type === 'clients' ? 'Businesses and clients served by Zippy Enterprises' : 'Technologies and frameworks used by Zippy Enterprises'}
     >
       <div
         className="tech-marquee-track"

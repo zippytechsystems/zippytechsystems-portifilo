@@ -183,7 +183,7 @@ export default function EnquiriesTab({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {filteredEnquiries.map((enq) => {
-            const whatsappUrl = `https://wa.me/91${enq.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(enq.name)}%2C%20Lingaswamy%20from%20ZippyTechSystems%20here.%20I%20received%20your%20quote%20request%20for%20${encodeURIComponent(enq.service || 'our services')}.`;
+            const whatsappUrl = `https://wa.me/91${enq.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(enq.name)}%2C%20Lingaswamy%20from%20Zippy Enterprises%20here.%20I%20received%20your%20quote%20request%20for%20${encodeURIComponent(enq.service || 'our services')}.`;
 
             const isOverdue =
               enq.status === 'New' &&

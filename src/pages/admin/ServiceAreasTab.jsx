@@ -28,7 +28,7 @@ export default function ServiceAreasTab({ showToast, openConfirm }) {
             Service Areas &amp; Locations ({serviceAreas.length})
           </h1>
           <p style={{ color: 'var(--text-body)', fontSize: '0.95rem' }}>
-            Locations where ZippyTechSystems provides services. The AI Chatbot uses these real locations to answer customer enquiries.
+            Locations where Zippy Enterprises provides services. The AI Chatbot uses these real locations to answer customer enquiries.
           </p>
         </div>
 

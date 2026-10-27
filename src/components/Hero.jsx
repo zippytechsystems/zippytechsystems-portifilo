@@ -262,13 +262,13 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
                 />
               </div>
 
-              {/* Right Circle: Official ZippyTech Systems Logo */}
+              {/* Right Circle: Official Zippy Enterprises Logo */}
               <div className="hero-mobile-circle-wrapper">
                 <Hero3DCircle
                   type="logo"
                   imageSrc="/images/company-logo-2026.png?v=20261011"
                   fallbackSrc="/images/company-logo-2026.webp?v=20261011"
-                  title="ZippyTech"
+                  title="Zippy Enterprises"
                   subtitle="Official Agency"
                   badgeText="Verified Agency"
                   accentColor="blue"
@@ -327,7 +327,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
             </div>
           </div>
 
-          {/* RIGHT WING: 3D Rotating Circle with ZippyTech Company Logo (Desktop View) */}
+          {/* RIGHT WING: 3D Rotating Circle with Zippy Enterprises Company Logo (Desktop View) */}
           <div
             className="hero-wing-desktop hero-wing-right"
             style={{
@@ -340,7 +340,7 @@ export default function Hero({ onOpenQuoteModal, onExploreServices }) {
               type="logo"
               imageSrc="/images/company-logo-2026.png?v=20261011"
               fallbackSrc="/images/company-logo-2026.webp?v=20261011"
-              title="ZippyTech Systems"
+              title="Zippy Enterprises"
               subtitle="Official Software Agency"
               badgeText="Verified Agency"
               accentColor="blue"

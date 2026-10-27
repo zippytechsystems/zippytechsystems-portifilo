@@ -141,7 +141,7 @@ export default function Navbar({ onOpenQuoteModal }) {
   };
 
   const whatsappNavUrl = buildWhatsAppUrl(
-    'Hi Lingaswamy, I visited ZippyTechSystems website and would like to get a quote for my business.'
+    'Hi Lingaswamy, I visited Zippy Enterprises website and would like to get a quote for my business.'
   );
 
   return (
@@ -186,7 +186,7 @@ export default function Navbar({ onOpenQuoteModal }) {
               minWidth: 'max-content',
               zIndex: 10
             }}
-            aria-label="ZippyTechSystems Home"
+            aria-label="Zippy Enterprises Home"
           >
             {/* Real Logo Box */}
             <div
@@ -207,7 +207,7 @@ export default function Navbar({ onOpenQuoteModal }) {
             >
               <img
                 src="/images/company-logo-2026.png?v=20261011"
-                alt="ZippyTech Systems Logo"
+                alt="Zippy Enterprises Logo"
                 width={42}
                 height={42}
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
@@ -231,7 +231,7 @@ export default function Navbar({ onOpenQuoteModal }) {
                   whiteSpace: 'nowrap'
                 }}
               >
-                ZippyTech<span style={{ color: '#1d5cf0' }}>Systems</span>
+                Zippy<span style={{ color: '#1d5cf0' }}>Enterprises</span>
               </span>
               <span
                 className="nav-brand-subtitle"
@@ -483,7 +483,7 @@ export default function Navbar({ onOpenQuoteModal }) {
                 <div style={{ width: '34px', height: '34px', borderRadius: '50%', overflow: 'hidden', border: '1px solid #ffe500' }}>
                   <img
                     src="/images/company-logo-2026.png?v=20261011"
-                    alt="ZippyTech Logo"
+                    alt="Zippy Enterprises Logo"
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     onError={(e) => {
                       e.target.onerror = null;
@@ -492,7 +492,7 @@ export default function Navbar({ onOpenQuoteModal }) {
                   />
                 </div>
                 <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-main)' }}>
-                  ZippyTech<span style={{ color: '#1d5cf0' }}>Systems</span>
+                  Zippy<span style={{ color: '#1d5cf0' }}>Enterprises</span>
                 </span>
               </div>
 

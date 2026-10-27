@@ -68,7 +68,7 @@ export default function ContactSection() {
 
     // 2. Open WhatsApp with prefilled message
     const waNumber = activeWhatsApp.startsWith('91') ? activeWhatsApp : `91${activeWhatsApp}`;
-    const prefillText = encodeURIComponent(`*New Project Enquiry — ZippyTechSystems*
+    const prefillText = encodeURIComponent(`*New Project Enquiry — Zippy Enterprises*
 -----------------------------
 👤 *Name:* ${formData.name.trim()}
 📱 *Phone:* ${cleanDigits}
@@ -87,7 +87,7 @@ ${formData.email.trim() ? `✉️ *Email:* ${formData.email.trim()}\n` : ''}🛠
   const founderFirstName = founderName.split(' ')[0];
 
   const directWhatsAppUrl = `https://wa.me/${activeWhatsApp.startsWith('91') ? activeWhatsApp : `91${activeWhatsApp}`}?text=${encodeURIComponent(
-    `Hi ${founderFirstName}, I would like to get a quote and discuss a project with ZippyTechSystems.`
+    `Hi ${founderFirstName}, I would like to get a quote and discuss a project with Zippy Enterprises.`
   )}`;
 
   return (
@@ -139,7 +139,7 @@ ${formData.email.trim() ? `✉️ *Email:* ${formData.email.trim()}\n` : ''}🛠
                 >
                   <img
                     src="/images/company-logo-2026.png?v=20261011"
-                    alt="ZippyTech Systems Logo"
+                    alt="Zippy Enterprises Logo"
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     onError={(e) => {
                       e.target.onerror = null;
@@ -152,7 +152,7 @@ ${formData.email.trim() ? `✉️ *Email:* ${formData.email.trim()}\n` : ''}🛠
                     Direct Founder Contact
                   </h3>
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
-                    ZippyTech Systems Official Line
+                    Zippy Enterprises Official Line
                   </span>
                 </div>
               </div>
@@ -185,7 +185,7 @@ ${formData.email.trim() ? `✉️ *Email:* ${formData.email.trim()}\n` : ''}🛠
 
                 {settingsData?.email && settingsData.email.trim() && (
                   <a
-                    href={`mailto:${settingsData.email.trim()}?subject=Project%20Enquiry%20-%20ZippyTechSystems`}
+                    href={`mailto:${settingsData.email.trim()}?subject=Project%20Enquiry%20-%20Zippy Enterprises`}
                     className="btn btn-outline"
                     style={{ padding: '0.9rem', fontSize: '1rem' }}
                   >

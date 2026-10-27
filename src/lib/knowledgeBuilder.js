@@ -1,5 +1,5 @@
 /**
- * Dynamic Knowledge Builder for ZippyTechSystems AI Assistant
+ * Dynamic Knowledge Builder for Zippy Enterprises AI Assistant
  * Converts live database entities into structured text for system prompt and admin preview.
  * Zero hardcoded prices, services, or contact details.
  */
@@ -216,7 +216,7 @@ export function buildKnowledge(data) {
   const wa = settings.whatsapp_number || settings.whatsappNumber || '6302690251';
 
   const contactLines = [
-    'Company Name: ZippyTechSystems Pvt. Ltd.',
+    'Company Name: Zippy Enterprises Private Limited',
     `Founder & Architect: ${founderName}`,
     `Phone / Calling: +91 ${phone}`,
     `WhatsApp: +91 ${wa}`

@@ -285,7 +285,7 @@ export default function ContactForm({ preselectedService = 'Web Development' }) 
               <span style={{ color: 'var(--text-dim)' }}>•</span>
 
               <a
-                href={`mailto:${companyData.contact.email}?subject=Project%20Enquiry%20-%20ZippyTechSystems`}
+                href={`mailto:${companyData.contact.email}?subject=Project%20Enquiry%20-%20Zippy Enterprises`}
                 style={{
                   display: 'flex',
                   alignItems: 'center',

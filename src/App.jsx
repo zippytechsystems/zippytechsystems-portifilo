@@ -61,7 +61,7 @@ export default function App() {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [quoteDefaultService, setQuoteDefaultService] = useState('Web Development');
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/dashboard');
 
   // Enforce noindex, nofollow meta tag on admin routes
   React.useEffect(() => {
@@ -141,6 +141,48 @@ export default function App() {
                 <Route
                   path="/terms"
                   element={<TermsPage />}
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <React.Suspense
+                      fallback={
+                        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: '0.95rem' }}>
+                          Loading Admin Dashboard...
+                        </div>
+                      }
+                    >
+                      <AdminPage />
+                    </React.Suspense>
+                  }
+                />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <React.Suspense
+                      fallback={
+                        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: '0.95rem' }}>
+                          Loading Admin Dashboard...
+                        </div>
+                      }
+                    >
+                      <AdminPage />
+                    </React.Suspense>
+                  }
+                />
+                <Route
+                  path="/portfolio/dashboard"
+                  element={
+                    <React.Suspense
+                      fallback={
+                        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dim)', fontSize: '0.95rem' }}>
+                          Loading Admin Dashboard...
+                        </div>
+                      }
+                    >
+                      <AdminPage />
+                    </React.Suspense>
+                  }
                 />
                 <Route
                   path="/admin"

@@ -356,7 +356,7 @@ export default function DashboardTab({ setActiveTab, setStatusFilter }) {
                     <span>Call</span>
                   </a>
                   <a
-                    href={`https://wa.me/91${enq.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(enq.name)}%2C%20Lingaswamy%20from%20ZippyTechSystems%20here.`}
+                    href={`https://wa.me/91${enq.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(enq.name)}%2C%20Lingaswamy%20from%20Zippy Enterprises%20here.`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn"

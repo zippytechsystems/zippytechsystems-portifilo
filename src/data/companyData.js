@@ -1,9 +1,9 @@
 export const companyData = {
-  brandName: 'ZippyTechSystems',
-  legalName: 'ZippyTechSystems Digital Solutions',
+  brandName: 'Zippy Enterprises',
+  legalName: 'Zippy Enterprises Private Limited',
   tagline: 'Build. Automate. Grow.',
   subheadline: 'Modern Web, App & AI Automation Solutions for Businesses.',
-  description: 'ZippyTechSystems helps businesses turn ideas into modern digital products, applications and intelligent automated solutions.',
+  description: 'Zippy Enterprises helps businesses turn ideas into modern digital products, applications and intelligent automated solutions.',
   pillars: [
     'Web Development',
     'App Development',
@@ -11,7 +11,7 @@ export const companyData = {
   ],
   contact: {
     email: 'contact@zippysoftwares.in',
-    whatsapp: 'https://wa.me/916302690251?text=Hello%20Lingaswamy%2C%20I%20am%20interested%20in%20discussing%20a%20new%20project%20with%20ZippyTechSystems.',
+    whatsapp: 'https://wa.me/916302690251?text=Hello%20Lingaswamy%2C%20I%20am%20interested%20in%20discussing%20a%20new%20project%20with%20Zippy%20Enterprises.',
     responseTime: 'Replies typically within 24 business hours',
     availability: 'Monday – Friday, 9:00 AM – 6:00 PM IST'
   },
