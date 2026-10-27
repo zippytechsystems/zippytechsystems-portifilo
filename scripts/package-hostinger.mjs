@@ -93,6 +93,12 @@ console.log('   Syncing production assets to repository root for Git deployment.
 copyRecursiveSync(path.join(distDir, 'assets'), path.join(rootDir, 'assets'));
 fs.copyFileSync(path.join(distDir, 'index.html'), path.join(rootDir, 'index.html'));
 fs.copyFileSync(path.join(rootDir, 'public', '.htaccess'), path.join(rootDir, '.htaccess'));
+if (fs.existsSync(path.join(distDir, 'sitemap.xml'))) {
+  fs.copyFileSync(path.join(distDir, 'sitemap.xml'), path.join(rootDir, 'sitemap.xml'));
+}
+if (fs.existsSync(path.join(distDir, 'robots.txt'))) {
+  fs.copyFileSync(path.join(distDir, 'robots.txt'), path.join(rootDir, 'robots.txt'));
+}
 if (fs.existsSync(path.join(distDir, 'projects'))) {
   copyRecursiveSync(path.join(distDir, 'projects'), path.join(rootDir, 'projects'));
 }

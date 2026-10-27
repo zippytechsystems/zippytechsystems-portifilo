@@ -213,8 +213,8 @@ ${formData.email.trim() ? `✉️ *Email:* ${formData.email.trim()}\n` : ''}🛠
                   <MapPin size={18} color="#12a150" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>Location</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)' }}>{content.company.location}</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>Nearby IT Service Office</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)' }}>Habsiguda / Nacharam, Hyderabad, Telangana</div>
                 </div>
               </div>
 
